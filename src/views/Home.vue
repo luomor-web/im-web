@@ -14,7 +14,9 @@
           :messages="messages"
           :messagesLoaded="messageLoaded"
           :rooms-loaded="roomsLoaded"
+          :text-messages="textMessages"
           @send-message="sendMessage"
+          @add-room="addRoom"
       />
     </div>
   </div>
@@ -27,7 +29,7 @@ import {ref} from "@vue/composition-api";
 import TopBar from "../components/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
-import {clearUnReadMessage, getHistoryMessage, getUserInfo, sendChatMessage} from "@/net/messageSend";
+import {buildLastMessage, clearUnReadMessage, getHistoryMessage, getUserInfo, sendChatMessage} from "@/net/message";
 
 
 export default {
@@ -49,6 +51,19 @@ export default {
     const messageLoaded = ref(false)
     const loadingRooms = ref(true)
     const roomsLoaded = ref(true)
+    const textMessages = ref({
+      ROOMS_EMPTY: '去创建一些聊天吧',
+      ROOM_EMPTY: '暂无会话被选择',
+      NEW_MESSAGES: 'New Messages',
+      MESSAGE_DELETED: '消息已删除',
+      MESSAGES_EMPTY: '暂无消息',
+      CONVERSATION_STARTED: '会话开始于',
+      TYPE_MESSAGE: '输入消息',
+      SEARCH: '搜索',
+      IS_ONLINE: '当前在线',
+      LAST_SEEN: '最后上线时间 ',
+      IS_TYPING: 'is writing...'
+    })
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
@@ -82,6 +97,16 @@ export default {
       msg.$on("COMMAND_CHAT_RESP", (data) => {
         const message = data.data
 
+        if(!message.isSystem){
+          const lastMessage = buildLastMessage(message)
+          loadedRooms.value.forEach(room => {
+            if(room.roomId === message.roomId){
+              room.lastMessage = lastMessage
+            }
+          })
+        }
+
+
         if(message.roomId === roomId.value) {
           clearUnReadMessage(roomId.value)
           messages.value.push(message)
@@ -91,6 +116,19 @@ export default {
         loadedRooms.value.forEach(room => {
           if(room.roomId === message.roomId){
             room.unreadCount = message.unreadCount
+          }
+        })
+
+      })
+
+      /**
+       * 用户状态变化消息
+       */
+      msg.$on("COMMAND_USER_STATUS_RESP", (data) => {
+        const { group } = data.data
+        loadedRooms.value.forEach(room => {
+          if(room.roomId === group.roomId){
+            room.users = [...group.users]
           }
         })
 
@@ -109,13 +147,21 @@ export default {
       sendChatMessage(message)
     }
 
+    const addRoom = () => {
+      console.log('addroom')
+      const ipcRenderer = window.require('electron').ipcRenderer
+
+      ipcRenderer.send('create-window','https://github.com')
+
+    }
+
     const styles = ref({
       container: {
         boxShadow: ''
       }
     })
 
-    const pageHeight = isElectron ? 'calc(100vh - 48px)' : '100vh'
+    const pageHeight = isElectron ? 'calc(100vh - 32px)' : '100vh'
 
     return {
       currentUserId,
@@ -128,13 +174,13 @@ export default {
       messageLoaded,
       roomsLoaded,
       styles,
-      sendMessage
+      textMessages,
+      sendMessage,
+      addRoom
     }
   },
 }
 </script>
 <style scoped>
-.chat-window {
-  height: calc(100vh - 64px);
-}
+
 </style>

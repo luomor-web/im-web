@@ -13,7 +13,6 @@ const webSocket = (username, password) => {
         // websocketHeartbeatJs.send('{"code":REDAY}')
     }
     socket.onmessage = (event) => {
-        console.log(event)
         const data = JSON.parse(event.data)
         switch (data.command) {
             // 登录返回信息

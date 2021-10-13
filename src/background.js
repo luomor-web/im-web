@@ -1,10 +1,11 @@
 'use strict'
 
 import {app, ipcMain, protocol, BrowserWindow, Menu, Tray, dialog} from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 // import { autoUpdater } from 'electron-updater'
 // import config from '../public/config'
 import path from 'path'
+
 const versionInfo = require("../package.json")
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -12,11 +13,12 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let win
 let appIcon
 
-protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
-function createWindow () {
+protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: {secure: true, standard: true}}])
+
+function createWindow() {
     win = new BrowserWindow({
-        width: 1000,
-        height: 563,
+        width: 1300,
+        height: 765,
         useContentSize: true,
         frame: false,
         webPreferences: {
@@ -67,7 +69,7 @@ app.on('ready', async () => {
     // updateHandle()
 })
 
-ipcMain.on('min', () =>  win.minimize())
+ipcMain.on('min', () => win.minimize())
 
 ipcMain.on('max', () => win.isMaximized() ? win.unmaximize() : win.maximize())
 
@@ -124,24 +126,24 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
 
 // 绑定托盘
 const bindTray = () => {
-    const iconPath = path.join(__dirname,isDevelopment ? '../public/icons/tray.png' : './icons/tray.png')
+    const iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.png' : './icons/tray.png')
     appIcon = new Tray(iconPath)
     appIcon.setContextMenu(Menu.buildFromTemplate([
         {
             label: '显示',
-            click: function() {
+            click: function () {
                 showWindow()
             }
         },
         {
             label: '退出',
-            click: function() {
+            click: function () {
                 app.quit();
             }
         }
     ]))
     appIcon.setToolTip('ins-im')
-    appIcon.on('click',() => {
+    appIcon.on('click', () => {
         showWindow()
     })
 }

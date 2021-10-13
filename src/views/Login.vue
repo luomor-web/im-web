@@ -139,13 +139,7 @@ export default {
     TopBar
   },
   setup(){
-    console.log('123')
-    let isElectron;
-    try {
-      isElectron = window.require('electron').ipcRenderer;
-    } catch (e) {
-      isElectron = false
-    }
+    let isElectron = ref(process.env.IS_ELECTRON);
 
     const isPasswordVisible = ref(false)
     const username = ref('')

@@ -19,6 +19,11 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: () => import('../views/Login.vue')
+    },
+    {
+        path: '/create',
+        name: 'Create',
+        component: () => import('../views/CreateRoom.vue')
     }
 ]
 
@@ -28,15 +33,10 @@ const router = new VueRouter({
 
 
 router.beforeEach((to, from, next) => {
-    console.log('to', to.path)
-    console.log(to.path === '/login')
     if(to.path === '/login'){
-        console.log('next执行')
         next()
-        console.log('next完成')
     }else {
         const token = getValue('token')
-        console.log(token,'token')
         if(token === undefined || token === null || token === ''){
             next('/login')
         }

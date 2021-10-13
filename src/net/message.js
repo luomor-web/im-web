@@ -27,6 +27,7 @@ const clearUnReadMessage = (data) => {
     sendMsg(param)
 }
 
+// 发送聊天消息
 const sendChatMessage = (data) => {
     let param = {
         cmd: 11,
@@ -35,9 +36,21 @@ const sendChatMessage = (data) => {
     sendMsg(param)
 }
 
+const buildLastMessage = (data) => {
+    return {
+        content :data.content,
+        senderId : data.senderId,
+        username: data.username,
+        timestamp: data.timestamp,
+        // saved: true,
+        // distributed: true,
+    }
+}
+
 export {
     getUserInfo,
     getHistoryMessage,
     clearUnReadMessage,
-    sendChatMessage
+    sendChatMessage,
+    buildLastMessage
 }

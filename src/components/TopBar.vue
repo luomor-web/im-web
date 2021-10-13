@@ -1,15 +1,15 @@
 <template>
   <div class="top">
-    <v-toolbar flat dense>
+    <v-toolbar height="32px" flat style="padding: 0">
       <v-spacer></v-spacer>
       <div class="no-drag">
-        <v-btn icon @click="handler('min')" dense>
-          <v-icon dense>
+        <v-btn icon @click="handler('min')" dense v-if="!isChild">
+          <v-icon>
             {{ icons.mdiWindowMinimize }}
           </v-icon>
         </v-btn>
 
-        <v-btn icon @click="handler('max')" dense>
+        <v-btn icon @click="handler('max')" dense v-if="!isChild">
           <v-icon dense>
             {{ icons.mdiWindowMaximize }}
           </v-icon>
@@ -30,6 +30,7 @@ import {mdiWindowClose, mdiWindowMaximize, mdiWindowMinimize} from "@mdi/js"
 
 export default {
   name: "TopBar",
+
   setup() {
 
     const handler = item => {
@@ -56,5 +57,9 @@ export default {
 
 .no-drag {
   -webkit-app-region: no-drag;
+}
+
+.v-toolbar__content {
+  padding: 0 !important;
 }
 </style>
