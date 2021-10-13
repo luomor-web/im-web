@@ -6,6 +6,7 @@
     <div>
       <chat-window
           :height="pageHeight"
+          :styles="styles"
           :current-user-id="currentUserId"
           :room-id="roomId"
           :rooms="loadedRooms"
@@ -13,6 +14,7 @@
           :messages="messages"
           :messagesLoaded="messageLoaded"
           :rooms-loaded="roomsLoaded"
+          @send-message="sendMessage"
       />
     </div>
   </div>
@@ -25,7 +27,7 @@ import {ref} from "@vue/composition-api";
 import TopBar from "../components/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
-import { sendMsg } from "@/net/socket";
+import {clearUnReadMessage, getHistoryMessage, getUserInfo, sendChatMessage} from "@/net/messageSend";
 
 
 export default {
@@ -35,41 +37,85 @@ export default {
     ChatWindow
   },
   setup() {
-    const currentUserId = ref(1234)
+    // 当前用户ID
+    const currentUserId = ref('')
+    // 已加载的房间列表
     const loadedRooms = ref([])
+    // 当前房间ID
     const roomId = ref('')
+    // 当前消息列表
     const messages = ref([])
-    const username = ref("")
+    // 消息是否加载完成
     const messageLoaded = ref(false)
     const loadingRooms = ref(true)
     const roomsLoaded = ref(true)
 
-    console.log(process.env)
-
     let isElectron = ref(process.env.IS_ELECTRON);
-    console.log(isElectron.value)
 
     const init = () => {
-      username.value = localStoreUtil.getValue('username')
-      console.log(username.value)
-      // 发送获取用户信息
-      let param = {
-        cmd: 17,
-        userId: username.value,
-      }
-      sendMsg(param)
+      currentUserId.value = localStoreUtil.getValue('username')
+      getUserInfo(currentUserId.value)
 
-      msg.$on("COMMAND_GET_USER_RESP",(data) => {
-        console.log(data, 'data')
+      // 获取用户信息响应
+      msg.$on("COMMAND_GET_USER_RESP", (data) => {
         loadedRooms.value = data.data.groups
         loadingRooms.value = false
+
+        // 获取历史消息
+        if (loadedRooms.value.length > 0) {
+          roomId.value = loadedRooms.value[0].roomId
+
+          getHistoryMessage(roomId.value)
+
+          messageLoaded.value = false
+        }
+
       })
 
+      // 获取历史消息响应
+      msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
+        messages.value = data.data
+        messageLoaded.value = true
+      })
+
+      // 聊天请求
+      msg.$on("COMMAND_CHAT_RESP", (data) => {
+        const message = data.data
+
+        if(message.roomId === roomId.value) {
+          clearUnReadMessage(roomId.value)
+          messages.value.push(message)
+          return
+        }
+
+        loadedRooms.value.forEach(room => {
+          if(room.roomId === message.roomId){
+            room.unreadCount = message.unreadCount
+          }
+        })
+
+      })
     }
 
     init()
 
-    const pageHeight = isElectron ?  'calc(100vh - 48px)' : '100vh'
+    const sendMessage = ({ content, roomId, files, replyMessage }) => {
+      console.log(files,replyMessage)
+      const message = {
+        senderId: currentUserId.value,
+        content,
+        roomId,
+      }
+      sendChatMessage(message)
+    }
+
+    const styles = ref({
+      container: {
+        boxShadow: ''
+      }
+    })
+
+    const pageHeight = isElectron ? 'calc(100vh - 48px)' : '100vh'
 
     return {
       currentUserId,
@@ -80,7 +126,9 @@ export default {
       isElectron,
       pageHeight,
       messageLoaded,
-      roomsLoaded
+      roomsLoaded,
+      styles,
+      sendMessage
     }
   },
 }
