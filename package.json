@@ -20,7 +20,8 @@
     "vue": "^2.6.11",
     "vue-advanced-chat": "^1.2.1",
     "vue-router": "^3.2.0",
-    "vuetify": "^2.5.9"
+    "vuetify": "^2.5.9",
+    "websocket-heartbeat-js": "^1.0.13"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

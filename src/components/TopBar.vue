@@ -1,22 +1,22 @@
 <template>
   <div class="top">
-    <v-toolbar color="deep-purple accent-4" tile>
+    <v-toolbar flat dense>
       <v-spacer></v-spacer>
       <div class="no-drag">
-        <v-btn icon @click="handler('min')">
-          <v-icon>
+        <v-btn icon @click="handler('min')" dense>
+          <v-icon dense>
             {{ icons.mdiWindowMinimize }}
           </v-icon>
         </v-btn>
 
-        <v-btn icon @click="handler('max')">
-          <v-icon>
+        <v-btn icon @click="handler('max')" dense>
+          <v-icon dense>
             {{ icons.mdiWindowMaximize }}
           </v-icon>
         </v-btn>
 
-        <v-btn icon @click="handler('close')">
-          <v-icon>
+        <v-btn icon @click="handler('close')" dense>
+          <v-icon dense>
             {{ icons.mdiWindowClose }}
           </v-icon>
         </v-btn>
