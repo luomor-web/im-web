@@ -25,21 +25,22 @@
     <div class="users-container">
       <v-list rounded>
         <v-list-item-group
-            v-model="users"
+            v-model="items"
             color="primary"
         >
           <v-list-item
               v-for="(item, i) in users"
               :key="i"
+              @click="showUserInfo"
           >
             <v-list-item-avatar>
               <v-img :src="item.avatar"></v-img>
             </v-list-item-avatar>
-            <v-list-item-content>
+            <v-list-item-content >
               <v-list-item-title v-text="item.username"></v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-btn icon><v-icon>{{icons.mdiChatOutline}}</v-icon></v-btn>
+              <v-btn icon @click="startChat"><v-icon>{{icons.mdiChatOutline}}</v-icon></v-btn>
             </v-list-item-action>
           </v-list-item>
         </v-list-item-group>
@@ -50,6 +51,7 @@
 
 <script>
 import {mdiMagnify, mdiWindowClose, mdiChatOutline} from "@mdi/js";
+import {ref} from "@vue/composition-api";
 
 export default {
   name: "AddChat",
@@ -63,17 +65,35 @@ export default {
   },
   setup(props, context) {
 
+    const items = ref([])
+    const clock = ref(false)
+
     const closeAddChat = () => {
       context.emit('close')
     }
 
+    const showUserInfo = () => {
+      if(!clock.value){
+        console.log('showUserInfo')
+      }
+      clock.value = false
+    }
+
+    const startChat = () => {
+      console.log('startChat')
+      clock.value = true
+    }
+
     return {
       closeAddChat,
+      showUserInfo,
       icons:{
         mdiWindowClose,
         mdiMagnify,
-        mdiChatOutline
-      }
+        mdiChatOutline,
+      },
+      items,
+      startChat
     }
   }
 }
