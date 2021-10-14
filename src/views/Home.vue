@@ -8,6 +8,7 @@
           :height="pageHeight"
           :styles="styles"
           :current-user-id="currentUserId"
+          :show-add-room="false"
           :room-id="roomId"
           :rooms="loadedRooms"
           :loading-rooms="loadingRooms"
@@ -17,7 +18,41 @@
           :text-messages="textMessages"
           @send-message="sendMessage"
           @add-room="addRoom"
-      />
+      >
+        <template #rooms-header="{}">
+          <div class="room-header-container">
+            <v-avatar>
+              <img
+                  src="https://cdn.vuetifyjs.com/images/john.jpg"
+                  alt="John"
+              >
+            </v-avatar>
+            <h3 class="ml-3">
+              <!--              {{currentUserId}}-->
+              {{ '诸葛亮' }}
+            </h3>
+            <v-spacer></v-spacer>
+            <v-menu offset-x>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn icon
+                       v-bind="attrs"
+                       v-on="on"
+                >
+                  <v-icon>
+                    {{ icons.mdiChevronDown }}
+                  </v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item>
+                  <v-list-item-title>{{ "创建群组" }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+
+          </div>
+        </template>
+      </chat-window>
     </div>
   </div>
 </template>
@@ -30,6 +65,7 @@ import TopBar from "../components/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
 import {buildLastMessage, clearUnReadMessage, getHistoryMessage, getUserInfo, sendChatMessage} from "@/net/message";
+import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
 
 
 export default {
@@ -97,24 +133,24 @@ export default {
       msg.$on("COMMAND_CHAT_RESP", (data) => {
         const message = data.data
 
-        if(!message.isSystem){
+        if (!message.isSystem) {
           const lastMessage = buildLastMessage(message)
           loadedRooms.value.forEach(room => {
-            if(room.roomId === message.roomId){
+            if (room.roomId === message.roomId) {
               room.lastMessage = lastMessage
             }
           })
         }
 
 
-        if(message.roomId === roomId.value) {
+        if (message.roomId === roomId.value) {
           clearUnReadMessage(roomId.value)
           messages.value.push(message)
           return
         }
 
         loadedRooms.value.forEach(room => {
-          if(room.roomId === message.roomId){
+          if (room.roomId === message.roomId) {
             room.unreadCount = message.unreadCount
           }
         })
@@ -125,9 +161,9 @@ export default {
        * 用户状态变化消息
        */
       msg.$on("COMMAND_USER_STATUS_RESP", (data) => {
-        const { group } = data.data
+        const {group} = data.data
         loadedRooms.value.forEach(room => {
-          if(room.roomId === group.roomId){
+          if (room.roomId === group.roomId) {
             room.users = [...group.users]
           }
         })
@@ -137,8 +173,8 @@ export default {
 
     init()
 
-    const sendMessage = ({ content, roomId, files, replyMessage }) => {
-      console.log(files,replyMessage)
+    const sendMessage = ({content, roomId, files, replyMessage}) => {
+      console.log(files, replyMessage)
       const message = {
         senderId: currentUserId.value,
         content,
@@ -151,7 +187,7 @@ export default {
       console.log('addroom')
       const ipcRenderer = window.require('electron').ipcRenderer
 
-      ipcRenderer.send('create-window','https://github.com')
+      ipcRenderer.send('create-window', 'https://github.com')
 
     }
 
@@ -176,11 +212,22 @@ export default {
       styles,
       textMessages,
       sendMessage,
-      addRoom
+      addRoom,
+
+      icons: {
+        mdiWindowClose,
+        mdiChevronDown
+      }
     }
   },
 }
 </script>
 <style scoped>
-
+.room-header-container {
+  position: sticky;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 15px;
+}
 </style>

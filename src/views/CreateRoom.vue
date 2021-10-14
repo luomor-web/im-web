@@ -1,7 +1,7 @@
 <template>
 <div>
   <div v-if="isElectron">
-    <top-bar :isChild="true"></top-bar>
+    <top-bar></top-bar>
   </div>
   <div class="create-room-content">
     123

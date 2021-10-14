@@ -3,13 +3,13 @@
     <v-toolbar height="32px" flat style="padding: 0">
       <v-spacer></v-spacer>
       <div class="no-drag">
-        <v-btn icon @click="handler('min')" dense v-if="!isChild">
+        <v-btn icon @click="handler('min')" dense>
           <v-icon>
             {{ icons.mdiWindowMinimize }}
           </v-icon>
         </v-btn>
 
-        <v-btn icon @click="handler('max')" dense v-if="!isChild">
+        <v-btn icon @click="handler('max')" dense>
           <v-icon dense>
             {{ icons.mdiWindowMaximize }}
           </v-icon>
