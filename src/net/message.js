@@ -36,6 +36,15 @@ const sendChatMessage = (data) => {
     sendMsg(param)
 }
 
+// 获取所有用户
+const getUserList = () => {
+    let param = {
+        cmd: 26,
+    }
+    sendMsg(param)
+}
+
+// 构建最后一条消息
 const buildLastMessage = (data) => {
     return {
         content :data.content,
@@ -52,5 +61,6 @@ export {
     getHistoryMessage,
     clearUnReadMessage,
     sendChatMessage,
+    getUserList,
     buildLastMessage
 }

@@ -6,7 +6,7 @@ let socket
 
 const webSocket = (username, password) => {
     socket = new WebsocketHeartbeatJs({
-        url: 'ws://127.0.0.1:9326?username=' + username + '&password=' + password,
+        url: 'ws://127.0.0.1:9326?account=' + username + '&password=' + password,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
     })
     socket.onopen = () => {
@@ -50,6 +50,10 @@ const webSocket = (username, password) => {
             // 消息已读响应
             case 25:
                 msg.$emit("COMMAND_MESSAGE_READ_RESP", data)
+                break;
+            // 当前用户列表
+            case 27:
+                msg.$emit("COMMAND_USER_LIST_RESP",data)
                 break;
             default:
                 break

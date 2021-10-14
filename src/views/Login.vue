@@ -176,6 +176,7 @@ export default {
         if(data.success) {
           localStoreUtil.setValue('token','123456')
           localStoreUtil.setValue('username',username.value)
+          localStoreUtil.setValue('userId',data.data._id)
           router.push('/')
         }
       })

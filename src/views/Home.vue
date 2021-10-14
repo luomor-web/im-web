@@ -29,10 +29,10 @@
             </v-avatar>
             <h3 class="ml-3">
               <!--              {{currentUserId}}-->
-              {{ '诸葛亮' }}
+              {{ curUser.username }}
             </h3>
             <v-spacer></v-spacer>
-            <v-menu offset-x>
+            <v-menu bottom left offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon
                        v-bind="attrs"
@@ -43,16 +43,50 @@
                   </v-icon>
                 </v-btn>
               </template>
-              <v-list>
-                <v-list-item>
-                  <v-list-item-title>{{ "创建群组" }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
+              <v-card>
+                <v-list-item-content class="justify-center">
+                  <div class="mx-auto text-center pl-3 pr-3">
+                    <v-btn
+                        depressed
+                        rounded
+                        text
+                        @click="addRoom"
+                    >
+                      创建群组
+                    </v-btn>
+                    <v-divider class="my-3"></v-divider>
+                    <v-btn
+                        depressed
+                        rounded
+                        text
+                        @click="addChat"
+                    >
+                      添加会话
+                    </v-btn>
+                    <v-divider class="my-3"></v-divider>
+                    <v-btn
+                        depressed
+                        rounded
+                        text
+                    >
+                      退出
+                    </v-btn>
+                  </div>
+                </v-list-item-content>
+              </v-card>
             </v-menu>
-
           </div>
         </template>
       </chat-window>
+      <v-navigation-drawer
+          v-model="chatAddVisible"
+          absolute
+          temporary
+          hide-overlay
+          width="300"
+      >
+        <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers"></add-chat>
+      </v-navigation-drawer>
     </div>
   </div>
 </template>
@@ -64,19 +98,30 @@ import {ref} from "@vue/composition-api";
 import TopBar from "../components/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
-import {buildLastMessage, clearUnReadMessage, getHistoryMessage, getUserInfo, sendChatMessage} from "@/net/message";
+import {
+  buildLastMessage,
+  clearUnReadMessage,
+  getHistoryMessage,
+  getUserInfo,
+  getUserList,
+  sendChatMessage
+} from "@/net/message";
 import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
+import AddChat from "@/components/AddChat";
 
 
 export default {
   name: 'HelloWorld',
   components: {
+    AddChat,
     TopBar,
     ChatWindow
   },
   setup() {
     // 当前用户ID
     const currentUserId = ref('')
+    // 当前用户信息
+    const curUser = ref({})
     // 已加载的房间列表
     const loadedRooms = ref([])
     // 当前房间ID
@@ -100,15 +145,18 @@ export default {
       LAST_SEEN: '最后上线时间 ',
       IS_TYPING: 'is writing...'
     })
+    const  systemUsers = ref([])
 
     let isElectron = ref(process.env.IS_ELECTRON);
+    const chatAddVisible = ref(false)
 
     const init = () => {
-      currentUserId.value = localStoreUtil.getValue('username')
+      currentUserId.value = localStoreUtil.getValue('userId')
       getUserInfo(currentUserId.value)
 
       // 获取用户信息响应
       msg.$on("COMMAND_GET_USER_RESP", (data) => {
+        curUser.value = data.data
         loadedRooms.value = data.data.groups
         loadingRooms.value = false
 
@@ -157,9 +205,7 @@ export default {
 
       })
 
-      /**
-       * 用户状态变化消息
-       */
+      // 用户状态变化消息
       msg.$on("COMMAND_USER_STATUS_RESP", (data) => {
         const {group} = data.data
         loadedRooms.value.forEach(room => {
@@ -168,6 +214,11 @@ export default {
           }
         })
 
+      })
+
+      // 用户列表
+      msg.$on("COMMAND_USER_LIST_RESP",(data) => {
+         systemUsers.value = data.data
       })
     }
 
@@ -185,11 +236,14 @@ export default {
 
     const addRoom = () => {
       console.log('addroom')
-      const ipcRenderer = window.require('electron').ipcRenderer
-
-      ipcRenderer.send('create-window', 'https://github.com')
 
     }
+
+    const addChat = () => {
+      chatAddVisible.value = !chatAddVisible.value
+      getUserList()
+    }
+
 
     const styles = ref({
       container: {
@@ -211,8 +265,12 @@ export default {
       roomsLoaded,
       styles,
       textMessages,
+      chatAddVisible,
+      curUser,
+      systemUsers,
       sendMessage,
       addRoom,
+      addChat,
 
       icons: {
         mdiWindowClose,
