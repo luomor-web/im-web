@@ -40,7 +40,7 @@
               <v-list-item-title v-text="item.username"></v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-btn icon @click="startChat"><v-icon>{{icons.mdiChatOutline}}</v-icon></v-btn>
+              <v-btn icon @click="startChat(item)"><v-icon>{{icons.mdiChatOutline}}</v-icon></v-btn>
             </v-list-item-action>
           </v-list-item>
         </v-list-item-group>
@@ -79,8 +79,9 @@ export default {
       clock.value = false
     }
 
-    const startChat = () => {
+    const startChat = item => {
       console.log('startChat')
+      context.emit('chat',item)
       clock.value = true
     }
 

@@ -1,4 +1,4 @@
-import {sendMsg} from "@/net/socket";
+import {close, sendMsg} from "@/net/socket";
 
 const getUserInfo = (data) => {
     // 发送获取用户信息
@@ -44,6 +44,21 @@ const getUserList = () => {
     sendMsg(param)
 }
 
+// 创建一个好友会话群
+const createGroup = (data) => {
+    let param = {
+        cmd: 22,
+        isFriend: data.isFriend,
+        users: data.users,
+        roomName: data.roomName
+    }
+    sendMsg(param)
+}
+
+const quitSystem = () => {
+  close()
+}
+
 // 构建最后一条消息
 const buildLastMessage = (data) => {
     return {
@@ -62,5 +77,7 @@ export {
     clearUnReadMessage,
     sendChatMessage,
     getUserList,
-    buildLastMessage
+    buildLastMessage,
+    createGroup,
+    quitSystem
 }

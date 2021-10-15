@@ -10,7 +10,7 @@
           :current-user-id="currentUserId"
           :show-add-room="false"
           :room-id="roomId"
-          :rooms="loadedRooms"
+          :rooms="chatRooms"
           :loading-rooms="loadingRooms"
           :messages="messages"
           :messagesLoaded="messageLoaded"
@@ -28,7 +28,6 @@
               >
             </v-avatar>
             <h3 class="ml-3">
-              <!--              {{currentUserId}}-->
               {{ curUser.username }}
             </h3>
             <v-spacer></v-spacer>
@@ -68,6 +67,7 @@
                         depressed
                         rounded
                         text
+                        @click="quit"
                     >
                       退出
                     </v-btn>
@@ -85,7 +85,7 @@
           hide-overlay
           width="300"
       >
-        <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers"></add-chat>
+        <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers" @chat="createChat"></add-chat>
       </v-navigation-drawer>
     </div>
   </div>
@@ -100,10 +100,10 @@ import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
 import {
   buildLastMessage,
-  clearUnReadMessage,
+  clearUnReadMessage, createGroup,
   getHistoryMessage,
   getUserInfo,
-  getUserList,
+  getUserList, quitSystem,
   sendChatMessage
 } from "@/net/message";
 import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
@@ -122,6 +122,8 @@ export default {
     const currentUserId = ref('')
     // 当前用户信息
     const curUser = ref({})
+    // 会话列表
+    const chatRooms = ref([])
     // 已加载的房间列表
     const loadedRooms = ref([])
     // 当前房间ID
@@ -145,7 +147,7 @@ export default {
       LAST_SEEN: '最后上线时间 ',
       IS_TYPING: 'is writing...'
     })
-    const  systemUsers = ref([])
+    const systemUsers = ref([])
 
     let isElectron = ref(process.env.IS_ELECTRON);
     const chatAddVisible = ref(false)
@@ -158,6 +160,7 @@ export default {
       msg.$on("COMMAND_GET_USER_RESP", (data) => {
         curUser.value = data.data
         loadedRooms.value = data.data.groups
+        chatRooms.value = data.data.chats
         loadingRooms.value = false
 
         // 获取历史消息
@@ -190,7 +193,6 @@ export default {
           })
         }
 
-
         if (message.roomId === roomId.value) {
           clearUnReadMessage(roomId.value)
           messages.value.push(message)
@@ -217,8 +219,26 @@ export default {
       })
 
       // 用户列表
-      msg.$on("COMMAND_USER_LIST_RESP",(data) => {
-         systemUsers.value = data.data
+      msg.$on("COMMAND_USER_LIST_RESP", (data) => {
+        systemUsers.value = data.data
+      })
+
+      // 群组创建成功
+      msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
+        console.log("群组创建成功", data)
+        let room = data.data
+        chatRooms.value.push(room)
+        loadedRooms.value.push(room)
+        loadingRooms.value = false
+      })
+
+      // 加入群组返回
+      msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
+        let room = data.data.group
+        console.log("加入群组返回", room)
+        chatRooms.value.push(room)
+        loadedRooms.value.push(room)
+        loadingRooms.value = false
       })
     }
 
@@ -236,7 +256,6 @@ export default {
 
     const addRoom = () => {
       console.log('addroom')
-
     }
 
     const addChat = () => {
@@ -244,6 +263,20 @@ export default {
       getUserList()
     }
 
+    const createChat = item => {
+      console.log(item, '创建会话')
+      loadedRooms.value.forEach(x => {
+        if (x.friendId === item._id) {
+          // 查找到了已存在的会话
+          return
+        }
+      })
+      createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
+    }
+
+    const quit = () => {
+      quitSystem()
+    }
 
     const styles = ref({
       container: {
@@ -268,9 +301,12 @@ export default {
       chatAddVisible,
       curUser,
       systemUsers,
+      chatRooms,
+      createChat,
       sendMessage,
       addRoom,
       addChat,
+      quit,
 
       icons: {
         mdiWindowClose,
