@@ -1,6 +1,6 @@
 import WebsocketHeartbeatJs from 'websocket-heartbeat-js'
 import msg from '../plugins/msg'
-import {getValue} from "@/utils/localStoreUtil";
+import localStoreUtil, {getValue} from "@/utils/localStoreUtil";
 import router from "@/router";
 
 let socket
@@ -61,7 +61,7 @@ const webSocket = (username, password) => {
         }
     }
     socket.onclose = () => {
-        localStorage.clear()
+        localStoreUtil.clear()
         router.push('/Login')
     }
     socket.onreconnect = () => {

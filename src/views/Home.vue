@@ -10,7 +10,7 @@
           :current-user-id="currentUserId"
           :show-add-room="false"
           :room-id="roomId"
-          :rooms="chatRooms"
+          :rooms="loadedRooms"
           :loading-rooms="loadingRooms"
           :messages="messages"
           :messagesLoaded="messageLoaded"
@@ -94,7 +94,7 @@
 <script>
 import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
-import {ref} from "@vue/composition-api";
+import {nextTick, ref} from "@vue/composition-api";
 import TopBar from "../components/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
@@ -122,8 +122,6 @@ export default {
     const currentUserId = ref('')
     // 当前用户信息
     const curUser = ref({})
-    // 会话列表
-    const chatRooms = ref([])
     // 已加载的房间列表
     const loadedRooms = ref([])
     // 当前房间ID
@@ -132,6 +130,7 @@ export default {
     const messages = ref([])
     // 消息是否加载完成
     const messageLoaded = ref(false)
+    // 加载动画
     const loadingRooms = ref(true)
     const roomsLoaded = ref(true)
     const textMessages = ref({
@@ -160,16 +159,12 @@ export default {
       msg.$on("COMMAND_GET_USER_RESP", (data) => {
         curUser.value = data.data
         loadedRooms.value = data.data.groups
-        chatRooms.value = data.data.chats
-        loadingRooms.value = false
-
+        nextTick(() => {
+          loadingRooms.value = false
+        })
         // 获取历史消息
-        if (loadedRooms.value.length > 0) {
-          roomId.value = loadedRooms.value[0].roomId
-
-          getHistoryMessage(roomId.value)
-
-          messageLoaded.value = false
+        if (loadedRooms.value.length > 0 ) {
+          changeRoom(loadedRooms.value[0].roomId)
         }
 
       })
@@ -177,7 +172,9 @@ export default {
       // 获取历史消息响应
       msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
         messages.value = data.data
-        messageLoaded.value = true
+        nextTick(() => {
+          messageLoaded.value = true
+        })
       })
 
       // 聊天请求
@@ -226,21 +223,21 @@ export default {
       // 群组创建成功
       msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
         console.log("群组创建成功", data)
-        loadingRooms.value = true
-        let room = data.data
-        chatRooms.value.push(room)
-        loadedRooms.value.push(room)
         loadingRooms.value = false
+        let room = data.data
+        loadedRooms.value.push(room)
+        changeRoom(room.roomId)
+
       })
 
       // 加入群组返回
       msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
         let room = data.data.group
         console.log("加入群组返回", room)
-        loadingRooms.value = true
-        chatRooms.value.push(room)
         loadedRooms.value.push(room)
-        loadingRooms.value = false
+        if(loadedRooms.value.length === 1){
+          changeRoom(room.roomId)
+        }
       })
     }
 
@@ -258,6 +255,11 @@ export default {
 
     const addRoom = () => {
       console.log('addroom')
+    }
+
+    const changeRoom = item => {
+      roomId.value = item
+      getHistoryMessage(roomId.value)
     }
 
     const addChat = () => {
@@ -303,7 +305,6 @@ export default {
       chatAddVisible,
       curUser,
       systemUsers,
-      chatRooms,
       createChat,
       sendMessage,
       addRoom,

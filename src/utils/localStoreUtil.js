@@ -1,13 +1,20 @@
 export const setJsonValue = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value))
+    sessionStorage.setItem(key,JSON.stringify(value))
+    // localStorage.setItem(key, JSON.stringify(value))
 }
 
 export const setValue = (key, value) => {
-    localStorage.setItem(key, value)
+    sessionStorage.setItem(key,value)
+    // localStorage.setItem(key, value)
 }
 
 export const getValue = (key) => {
-    return localStorage.getItem(key)
+    return sessionStorage.getItem(key)
+    // return localStorage.getItem(key)
 }
 
-export default {setValue, setJsonValue, getValue}
+export const clear = () => {
+    sessionStorage.clear()
+}
+
+export default {setValue, setJsonValue, getValue, clear}
