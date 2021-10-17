@@ -131,7 +131,7 @@ export default {
     // 消息是否加载完成
     const messageLoaded = ref(false)
     // 加载动画
-    const loadingRooms = ref(true)
+    const loadingRooms = ref(false)
     const roomsLoaded = ref(true)
     const textMessages = ref({
       ROOMS_EMPTY: '去创建一些聊天吧',
@@ -161,9 +161,10 @@ export default {
         loadedRooms.value = data.data.groups
         nextTick(() => {
           loadingRooms.value = false
+          roomsLoaded.value = true
         })
         // 获取历史消息
-        if (loadedRooms.value.length > 0 ) {
+        if (loadedRooms.value.length > 0) {
           changeRoom(loadedRooms.value[0].roomId)
         }
 
@@ -181,13 +182,27 @@ export default {
       msg.$on("COMMAND_CHAT_RESP", (data) => {
         const message = data.data
 
+        const roomIndex = loadedRooms.value.findIndex(
+            r => message.roomId === r.roomId
+        )
+
         if (!message.isSystem) {
           const lastMessage = buildLastMessage(message)
-          loadedRooms.value.forEach(room => {
-            if (room.roomId === message.roomId) {
-              room.lastMessage = lastMessage
+          console.log('find LastMessage ',lastMessage)
+
+          if(!loadedRooms.value[roomIndex].lastMessage){
+
+            const room = {
+              ...loadedRooms.value[roomIndex],
+              lastMessage
             }
-          })
+
+            loadedRooms.value[roomIndex] = room
+          }else {
+            loadedRooms.value[roomIndex].lastMessage = lastMessage
+          }
+
+          loadedRooms.value = [...loadedRooms.value]
         }
 
         if (message.roomId === roomId.value) {
@@ -196,11 +211,8 @@ export default {
           return
         }
 
-        loadedRooms.value.forEach(room => {
-          if (room.roomId === message.roomId) {
-            room.unreadCount = message.unreadCount
-          }
-        })
+        loadedRooms.value[roomIndex].unreadCount = message.unreadCount
+        loadedRooms.value = [...loadedRooms.value]
 
       })
 
@@ -223,19 +235,30 @@ export default {
       // 群组创建成功
       msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
         console.log("群组创建成功", data)
-        loadingRooms.value = false
         let room = data.data
-        loadedRooms.value.push(room)
-        changeRoom(room.roomId)
+        loadedRooms.value[loadedRooms.value.length] = room
+        loadedRooms.value = [...loadedRooms.value]
 
+        nextTick(() => {
+          loadingRooms.value = false
+          roomsLoaded.value = true
+        })
+        changeRoom(room.roomId)
       })
 
       // 加入群组返回
       msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
         let room = data.data.group
         console.log("加入群组返回", room)
-        loadedRooms.value.push(room)
-        if(loadedRooms.value.length === 1){
+
+        loadedRooms.value[loadedRooms.value.length] = room
+        loadedRooms.value = [...loadedRooms.value]
+
+        nextTick(() => {
+          loadingRooms.value = false
+          roomsLoaded.value = true
+        })
+        if (loadedRooms.value.length === 1) {
           changeRoom(room.roomId)
         }
       })
@@ -259,6 +282,7 @@ export default {
 
     const changeRoom = item => {
       roomId.value = item
+      console.log(loadedRooms.value)
       getHistoryMessage(roomId.value)
     }
 
