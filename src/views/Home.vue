@@ -226,6 +226,7 @@ export default {
       // 群组创建成功
       msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
         console.log("群组创建成功", data)
+        loadingRooms.value = true
         let room = data.data
         chatRooms.value.push(room)
         loadedRooms.value.push(room)
@@ -236,6 +237,7 @@ export default {
       msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
         let room = data.data.group
         console.log("加入群组返回", room)
+        loadingRooms.value = true
         chatRooms.value.push(room)
         loadedRooms.value.push(room)
         loadingRooms.value = false

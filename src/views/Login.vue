@@ -172,6 +172,10 @@ export default {
     }
 
     const init = () => {
+      const value = localStoreUtil.getValue('username');
+      if(value){
+        username.value = value
+      }
       msg.$on("COMMAND_LOGIN_RESP",(data) => {
         if(data.success) {
           localStoreUtil.setValue('token','123456')
