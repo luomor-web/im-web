@@ -18,6 +18,7 @@
           :text-messages="textMessages"
           @send-message="sendMessage"
           @add-room="addRoom"
+          @fetch-messages="fetchMessage"
       >
         <template #rooms-header="{}">
           <div class="room-header-container">
@@ -188,9 +189,9 @@ export default {
 
         if (!message.isSystem) {
           const lastMessage = buildLastMessage(message)
-          console.log('find LastMessage ',lastMessage)
+          console.log('find LastMessage ', lastMessage)
 
-          if(!loadedRooms.value[roomIndex].lastMessage){
+          if (!loadedRooms.value[roomIndex].lastMessage) {
 
             const room = {
               ...loadedRooms.value[roomIndex],
@@ -198,7 +199,7 @@ export default {
             }
 
             loadedRooms.value[roomIndex] = room
-          }else {
+          } else {
             loadedRooms.value[roomIndex].lastMessage = lastMessage
           }
 
@@ -210,7 +211,8 @@ export default {
           messages.value.push(message)
           return
         }
-
+        // 将目标消息置顶
+        upRoom(message.roomId)
         loadedRooms.value[roomIndex].unreadCount = message.unreadCount
         loadedRooms.value = [...loadedRooms.value]
 
@@ -274,6 +276,7 @@ export default {
         roomId,
       }
       sendChatMessage(message)
+      upRoom(roomId)
     }
 
     const addRoom = () => {
@@ -283,7 +286,15 @@ export default {
     const changeRoom = item => {
       roomId.value = item
       console.log(loadedRooms.value)
+      console.log(item, 'roomId')
+
+      const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
+      console.log(roomIndex, 'roomIndex')
+      loadedRooms.value[roomIndex].unreadCount = 0;
+      loadedRooms.value = [...loadedRooms.value]
+
       getHistoryMessage(roomId.value)
+      clearUnReadMessage(roomId.value)
     }
 
     const addChat = () => {
@@ -292,14 +303,38 @@ export default {
     }
 
     const createChat = item => {
+      chatAddVisible.value = !chatAddVisible.value
       console.log(item, '创建会话')
-      loadedRooms.value.forEach(x => {
-        if (x.friendId === item._id) {
-          // 查找到了已存在的会话
-          return
-        }
-      })
-      createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
+      const roomIndex = loadedRooms.value.findIndex(r => item._id === r.friendId)
+      if (roomIndex === -1) {
+        createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
+        return
+      }
+
+      upRoom(loadedRooms.value[roomIndex].roomId)
+      changeRoom(loadedRooms.value[roomIndex].roomId)
+    }
+
+    const fetchMessage = (item) => {
+      console.log(item, 'fetchMessage')
+      changeRoom(item.room.roomId)
+    }
+
+    /**
+     * 会话置顶
+     * @param roomId 会话Id
+     */
+    const upRoom = (roomId) => {
+      const roomIndex = loadedRooms.value.findIndex(r => roomId === r.roomId)
+      if (roomIndex === -1) {
+        return
+      }
+      loadedRooms.value[roomIndex].index = new Date().getTime()
+      loadedRooms.value = [...loadedRooms.value]
+    }
+
+    const fetchRoom = (item) => {
+      console.log(item, 'fetchRoom')
     }
 
     const quit = () => {
@@ -333,6 +368,8 @@ export default {
       sendMessage,
       addRoom,
       addChat,
+      fetchMessage,
+      fetchRoom,
       quit,
 
       icons: {
