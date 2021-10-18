@@ -55,6 +55,18 @@ const createGroup = (data) => {
     sendMsg(param)
 }
 
+// 发送表情回复
+const messageReaction = ({ reaction, remove, messageId, roomId }) => {
+    const param = {
+        cmd: 28,
+        reaction,
+        remove,
+        messageId,
+        roomId
+    }
+    sendMsg(param)
+}
+
 const quitSystem = () => {
   close()
 }
@@ -79,5 +91,6 @@ export {
     getUserList,
     buildLastMessage,
     createGroup,
-    quitSystem
+    quitSystem,
+    messageReaction
 }

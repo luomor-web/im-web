@@ -7,7 +7,7 @@ let socket
 
 const webSocket = (username, password) => {
     socket = new WebsocketHeartbeatJs({
-        url: 'ws://192.168.1.91:9326?account=' + username + '&password=' + password,
+        url: 'ws://127.0.0.1:9326?account=' + username + '&password=' + password,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
     })
     socket.onopen = () => {

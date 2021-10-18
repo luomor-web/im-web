@@ -16,9 +16,11 @@
           :messagesLoaded="messageLoaded"
           :rooms-loaded="roomsLoaded"
           :text-messages="textMessages"
+          :message-actions="messageActions"
           @send-message="sendMessage"
           @add-room="addRoom"
           @fetch-messages="fetchMessage"
+          @send-message-reaction="sendMessageReaction"
       >
         <template #rooms-header="{}">
           <div class="room-header-container">
@@ -104,7 +106,7 @@ import {
   clearUnReadMessage, createGroup,
   getHistoryMessage,
   getUserInfo,
-  getUserList, quitSystem,
+  getUserList, messageReaction, quitSystem,
   sendChatMessage
 } from "@/net/message";
 import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
@@ -147,6 +149,22 @@ export default {
       LAST_SEEN: '最后上线时间 ',
       IS_TYPING: 'is writing...'
     })
+    const messageActions = ref([
+      {
+        name: 'replyMessage',
+        title: '引用'
+      },
+      {
+        name: 'editMessage',
+        title: '编辑',
+        onlyMe: true
+      },
+      {
+        name: 'deleteMessage',
+        title: '撤回',
+        onlyMe: true
+      }
+    ])
     const systemUsers = ref([])
 
     let isElectron = ref(process.env.IS_ELECTRON);
@@ -173,8 +191,9 @@ export default {
 
       // 获取历史消息响应
       msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
-        messages.value = data.data
-        nextTick(() => {
+        messages.value = [...data.data]
+
+        setTimeout(() => {
           messageLoaded.value = true
         })
       })
@@ -241,7 +260,7 @@ export default {
         loadedRooms.value[loadedRooms.value.length] = room
         loadedRooms.value = [...loadedRooms.value]
 
-        nextTick(() => {
+        setTimeout(() => {
           loadingRooms.value = false
           roomsLoaded.value = true
         })
@@ -256,7 +275,7 @@ export default {
         loadedRooms.value[loadedRooms.value.length] = room
         loadedRooms.value = [...loadedRooms.value]
 
-        nextTick(() => {
+        setTimeout(() => {
           loadingRooms.value = false
           roomsLoaded.value = true
         })
@@ -270,10 +289,19 @@ export default {
 
     const sendMessage = ({content, roomId, files, replyMessage}) => {
       console.log(files, replyMessage)
+      let reply;
+      if (replyMessage) {
+        reply = {
+          content: replyMessage.content,
+          senderId: replyMessage.senderId,
+        }
+      }
+
       const message = {
         senderId: currentUserId.value,
         content,
         roomId,
+        replyMessage: reply
       }
       sendChatMessage(message)
       upRoom(roomId)
@@ -293,6 +321,8 @@ export default {
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
 
+      messages.value = []
+      messageLoaded.value = false
       getHistoryMessage(roomId.value)
       clearUnReadMessage(roomId.value)
     }
@@ -316,6 +346,9 @@ export default {
     }
 
     const fetchMessage = (item) => {
+      if (item.room.roomId === roomId.value) {
+        return
+      }
       console.log(item, 'fetchMessage')
       changeRoom(item.room.roomId)
     }
@@ -335,6 +368,11 @@ export default {
 
     const fetchRoom = (item) => {
       console.log(item, 'fetchRoom')
+    }
+
+    const sendMessageReaction = ({ reaction, remove, messageId, roomId }) => {
+      console.log( reaction, remove, messageId, roomId)
+      messageReaction({ reaction, remove, messageId, roomId })
     }
 
     const quit = () => {
@@ -364,10 +402,12 @@ export default {
       chatAddVisible,
       curUser,
       systemUsers,
+      messageActions,
       createChat,
       sendMessage,
       addRoom,
       addChat,
+      sendMessageReaction,
       fetchMessage,
       fetchRoom,
       quit,
