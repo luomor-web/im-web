@@ -56,6 +56,10 @@ const webSocket = (username, password) => {
             case 27:
                 msg.$emit("COMMAND_USER_LIST_RESP",data)
                 break;
+            // 表情回复消息
+            case 29:
+                msg.$emit("COMMAND_SEND_MESSAGE_REACTION_RESP",data)
+                break;
             default:
                 break
         }

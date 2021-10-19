@@ -283,6 +283,27 @@ export default {
           changeRoom(room.roomId)
         }
       })
+
+      // 表情回复
+      msg.$on("COMMAND_SEND_MESSAGE_REACTION_RESP", (data) => {
+        console.log(data.data, 'COMMAND_SEND_MESSAGE_REACTION_RESP')
+        const reaction = data.data
+        if (roomId.value !== reaction.roomId) {
+          return
+        }
+        const messageIndex = messages.value.findIndex(r => reaction.messageId === r._id)
+        if(messageIndex === -1){
+          return;
+        }
+
+        if (messages.value[messageIndex].reactions) {
+          messages.value[messageIndex].reactions = reaction.reactions
+        } else {
+          const message = {...messages.value[messageIndex], reactions: reaction.reactions}
+          messages.value[messageIndex] = message
+        }
+        messages.value = [...messages.value]
+      })
     }
 
     init()
@@ -349,7 +370,6 @@ export default {
       if (item.room.roomId === roomId.value) {
         return
       }
-      console.log(item, 'fetchMessage')
       changeRoom(item.room.roomId)
     }
 
@@ -366,13 +386,10 @@ export default {
       loadedRooms.value = [...loadedRooms.value]
     }
 
-    const fetchRoom = (item) => {
-      console.log(item, 'fetchRoom')
-    }
-
-    const sendMessageReaction = ({ reaction, remove, messageId, roomId }) => {
-      console.log( reaction, remove, messageId, roomId)
-      messageReaction({ reaction, remove, messageId, roomId })
+    const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
+      console.log(messages.value)
+      console.log(reaction.unicode, remove, messageId, roomId)
+      messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
     }
 
     const quit = () => {
@@ -409,7 +426,6 @@ export default {
       addChat,
       sendMessageReaction,
       fetchMessage,
-      fetchRoom,
       quit,
 
       icons: {
