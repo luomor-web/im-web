@@ -152,7 +152,7 @@ export default {
     const messageActions = ref([
       {
         name: 'replyMessage',
-        title: '引用'
+        title: '回复'
       },
       {
         name: 'editMessage',
@@ -161,7 +161,7 @@ export default {
       },
       {
         name: 'deleteMessage',
-        title: '撤回',
+        title: '删除',
         onlyMe: true
       }
     ])
