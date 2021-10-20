@@ -111,6 +111,7 @@ import {
 } from "@/net/message";
 import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
 import AddChat from "@/components/AddChat";
+import {addFiles} from "@/utils/upload";
 
 
 export default {
@@ -171,7 +172,9 @@ export default {
     const chatAddVisible = ref(false)
 
     const init = () => {
+
       currentUserId.value = localStoreUtil.getValue('userId')
+      // console.log(this.$refs)
       getUserInfo(currentUserId.value)
 
       // 获取用户信息响应
@@ -310,6 +313,7 @@ export default {
 
     const sendMessage = ({content, roomId, files, replyMessage}) => {
       console.log(files, replyMessage)
+      addFiles(files)
       let reply;
       if (replyMessage) {
         reply = {

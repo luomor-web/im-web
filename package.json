@@ -18,6 +18,7 @@
     "@vuetify/cli-plugin-utils": "^0.0.10",
     "core-js": "^3.6.5",
     "lamejs": "^1.2.0",
+    "simple-uploader.js": "^0.5.6",
     "vue": "^2.6.11",
     "vue-advanced-chat": "^1.2.1",
     "vue-router": "^3.2.0",
