@@ -4,6 +4,7 @@
       <top-bar></top-bar>
     </div>
     <div>
+
       <chat-window
           :height="pageHeight"
           :styles="styles"
@@ -174,7 +175,6 @@ export default {
     const init = () => {
 
       currentUserId.value = localStoreUtil.getValue('userId')
-      // console.log(this.$refs)
       getUserInfo(currentUserId.value)
 
       // 获取用户信息响应
@@ -338,11 +338,8 @@ export default {
 
     const changeRoom = item => {
       roomId.value = item
-      console.log(loadedRooms.value)
-      console.log(item, 'roomId')
 
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
-      console.log(roomIndex, 'roomIndex')
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
 

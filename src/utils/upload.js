@@ -4,15 +4,27 @@ let uploader = null;
 const created = () => {
 
     uploader = new Uploader({
-        target: '/upload/chunk',
-        testMethod: (file, chunk) => {
-            console.log("test Chunk", file, chunk)
-        }
+        target: 'http://localhost/upload/chunk',
+        testChunks: true,
+        readFileFn: (fileObj, fileType, startByte, endByte, chunk) => {
+            console.log(fileObj, 'testChunks:e')
+            console.log(fileObj, fileType, startByte, endByte, chunk)
+            chunk.readFinished(fileObj.file.blob.slice(startByte, endByte, fileType))
+        },
+
     })
     // 文件添加 单个文件
     uploader.on('fileAdded', function (file, event) {
         console.log(file, event)
-        file.upload()
+    })
+
+    uploader.on('filesAdded', function (files, fileList, event) {
+        console.log(files, fileList, event)
+    })
+
+    uploader.on('filesSubmitted', function (files, fileList, event) {
+        console.log('filesSubmitted', files, fileList, event)
+        uploader.upload()
     })
     // 单个文件上传成功
     uploader.on('fileSuccess', function (rootFile, file, message) {
@@ -44,7 +56,6 @@ const addFiles = (files) => {
         created();
     }
     uploader.addFiles(files);
-    uploader.stop
 }
 
 
