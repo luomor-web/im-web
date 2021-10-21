@@ -16,6 +16,7 @@
     "@mdi/js": "^6.2.95",
     "@vue/composition-api": "^1.2.4",
     "@vuetify/cli-plugin-utils": "^0.0.10",
+    "axios": "^0.23.0",
     "core-js": "^3.6.5",
     "lamejs": "^1.2.0",
     "simple-uploader.js": "^0.5.6",

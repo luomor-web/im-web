@@ -1,5 +1,16 @@
 const { mergeSassVariables } = require('@vuetify/cli-plugin-utils')
 module.exports = {
+  devServer: {
+    proxy: {
+      '/api': {
+        target: "http://localhost:8245",
+        changeOrigin: false,
+        pathRewrite: {
+          '^/api': ""
+        }
+      }
+    }
+  },
   transpileDependencies: [
     'vuetify'
   ],

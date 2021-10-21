@@ -4,7 +4,6 @@
       <top-bar></top-bar>
     </div>
     <div>
-
       <chat-window
           :height="pageHeight"
           :styles="styles"
@@ -175,6 +174,7 @@ export default {
     const init = () => {
 
       currentUserId.value = localStoreUtil.getValue('userId')
+      // console.log(this.$refs)
       getUserInfo(currentUserId.value)
 
       // 获取用户信息响应
@@ -295,7 +295,7 @@ export default {
           return
         }
         const messageIndex = messages.value.findIndex(r => reaction.messageId === r._id)
-        if(messageIndex === -1){
+        if (messageIndex === -1) {
           return;
         }
 
@@ -312,8 +312,15 @@ export default {
     init()
 
     const sendMessage = ({content, roomId, files, replyMessage}) => {
-      console.log(files, replyMessage)
-      addFiles(files)
+      // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
+      if (files) {
+        addFiles(files, currentUserId.value,roomId)
+      }
+
+      if(!content){
+        return
+      }
+
       let reply;
       if (replyMessage) {
         reply = {
@@ -321,13 +328,13 @@ export default {
           senderId: replyMessage.senderId,
         }
       }
-
       const message = {
         senderId: currentUserId.value,
         content,
         roomId,
         replyMessage: reply
       }
+
       sendChatMessage(message)
       upRoom(roomId)
     }
@@ -338,8 +345,11 @@ export default {
 
     const changeRoom = item => {
       roomId.value = item
+      console.log(loadedRooms.value)
+      console.log(item, 'roomId')
 
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
+      console.log(roomIndex, 'roomIndex')
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
 
