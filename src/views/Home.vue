@@ -111,7 +111,7 @@ import {
 } from "@/net/message";
 import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
 import AddChat from "@/components/AddChat";
-import {addFiles} from "@/utils/upload";
+import {addFiles} from "@/utils/file";
 
 
 export default {

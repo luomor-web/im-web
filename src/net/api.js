@@ -1,10 +1,28 @@
 import request from "@/utils/request";
 
-export const mergeFile = (data) => {
-  console.log(data,'data')
+export function init(data) {
   return request({
-    url: '/api/file/upload/merge/file',
+    url: '/api/multipart/init',
     method: 'post',
-    params: data
+    data: data
+  })
+}
+
+export function upload(url, data) {
+  return request({
+    url: url,
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/octet-stream'
+    },
+    data: data
+  })
+}
+
+export function mergeMultipartUpload(data) {
+  return request({
+    url: '/api/multipart/complete',
+    method: 'put',
+    data: data
   })
 }
