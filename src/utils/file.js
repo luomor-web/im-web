@@ -1,11 +1,11 @@
 import {init, mergeMultipartUpload, upload} from "@/net/api";
+import SparkMD5 from 'spark-md5'
 
 const CHUNK_SIZE = 5 * 1024 * 1024
-import SparkMD5 from 'spark-md5'
 
 export const files = []
 
-const addFiles = async (f) => {
+const addFiles = async (f, roomId, cb) => {
     for (let file of f) {
         const data = {
             // 文件名
@@ -18,68 +18,103 @@ const addFiles = async (f) => {
             chunks: [],
             // 上传进度
             percentage: 0,
+            // 已上传大小
+            uploaded: '',
+            // 开始上传时间
+            uploadTime: 0,
             // 上传速度
             speed: 0,
             // 切片完成度
             chunkedProgress: 0,
+            // 总数量大小
+            fileSizeByte: file.size,
             // 总大小
             fileSize: formatSize(file.size),
+            // 原始文件
             file: file,
+            // url
+            url: '',
         }
-        // this.files.add(data)
+
         await inputChange(data, (list, len) => {
             const listLen = list.length
-            console.log('当前切片进度:', listLen, len)
+            data.chunkedProgress = listLen <= 0 ? 0 : Math.round((listLen / len) * 10000) / 100.0
         })
-        console.log(data)
+        console.log('切片完成:', data.md5)
 
         const response = await init({
             filename: file.name + '.' + file.extension,
             partCount: data.chunks.length,
             md5: data.md5
         })
-        console.log('初始化文件上传列表:', response)
         const uploadUrls = response.uploadUrls
+        const promises = [];
+        data.uploadTime = new Date().getTime()
+        console.log('开始上传:', data.uploadTime)
         for (let i = 0; i < uploadUrls.length; i++) {
-            console.log('文件上传:', uploadUrls[i], data.chunks[i])
-            await upload(uploadUrls[i], data.chunks[i].file)
+            promises.push(new Promise((resolve) => {
+                upload(uploadUrls[i], data.chunks[i].file, (loaded, total) => {
+                    data.chunks[i].uploadProgress = loaded
+                    data.chunks[i].total = total
+                }).then(() => {
+                    resolve()
+                })
+            }))
         }
-        if (response.uploadId) {
-            await mergeMultipartUpload({
-                uploadId: response.uploadId,
-                objectName: response.objectName
-            })
-        }
-
+        const t = setInterval(() => {
+            countSpeed(data)
+        }, 300)
+        Promise.all(promises).then(async () => {
+            files.push(data)
+            clearInterval(t)
+            if (response.uploadId) {
+                await mergeMultipartUpload({
+                    uploadId: response.uploadId,
+                    objectName: response.objectName
+                })
+                console.log('文件合并完成!')
+            }
+            data.url = response.objectName
+            cb({...data.file, url: data.url}, files.length === f.length)
+        })
     }
 
 }
 
+const countSpeed = (data) => {
+    let uploaded = 0;
+    data.chunks.forEach(x => {
+        uploaded += x.uploadProgress
+    })
+    const useTime = new Date().getTime() - data.uploadTime
+    const speed = uploaded / (useTime / 1000)
+    data.percentage = uploaded <= 0 ? 0 : Math.round((uploaded / data.fileSizeByte) * 10000) / 100.0
+    data.uploaded = formatSize(uploaded)
+    data.speed = formatSize(speed)
+    console.log('总大小:', data.fileSize, ' 上传速度:', data.speed, ' 上传百分比:', data.percentage, ' 已上传:{}', data.uploaded)
+}
+
 const inputChange = async (file, cb) => {
-    console.log('开始切片')
     if (file) {
         const fileChunkList = await createFileChunk(file.file, (data, size) => {
             cb(data, size)
         })
-        const md5 = await getFileChunkMd5(fileChunkList)
-        console.log(md5, '当前文件Md5')
-        file.md5 = md5
+        file.md5 = await getFileChunkMd5(fileChunkList)
         file.chunks = fileChunkList
-        console.log('切片数据', fileChunkList)
     }
 }
 
 const createFileChunk = async (file, cb) => {
     const list = []
     const type = file.type
-    console.log('当前文件大小', file.size, 'Byte')
     let size = 0
     const len = Math.ceil(file.size / CHUNK_SIZE)
-    console.log(len)
     while (size < file.size) {
         const data = {
             file: file.blob.slice(size, size + CHUNK_SIZE),
-            type: type
+            type: type,
+            uploadProgress: 0,
+            total: 0
         }
         list.push(data)
         size += CHUNK_SIZE
@@ -109,11 +144,10 @@ const getFileChunkMd5 = (fileChunkList) => {
             if (currentChunk < chunkSize) {
                 loadNext()
             } else {
-                console.info('获取Md5完成')
                 resolve(spark.end())
             }
         }
-        fileReader.onerror = function() {
+        fileReader.onerror = function () {
             console.warn('Md5：文件读取错误')
         }
 

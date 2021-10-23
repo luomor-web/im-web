@@ -174,7 +174,6 @@ export default {
     const init = () => {
 
       currentUserId.value = localStoreUtil.getValue('userId')
-      // console.log(this.$refs)
       getUserInfo(currentUserId.value)
 
       // 获取用户信息响应
@@ -211,7 +210,6 @@ export default {
 
         if (!message.isSystem) {
           const lastMessage = buildLastMessage(message)
-          console.log('find LastMessage ', lastMessage)
 
           if (!loadedRooms.value[roomIndex].lastMessage) {
 
@@ -258,7 +256,6 @@ export default {
 
       // 群组创建成功
       msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
-        console.log("群组创建成功", data)
         let room = data.data
         loadedRooms.value[loadedRooms.value.length] = room
         loadedRooms.value = [...loadedRooms.value]
@@ -273,7 +270,6 @@ export default {
       // 加入群组返回
       msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
         let room = data.data.group
-        console.log("加入群组返回", room)
 
         loadedRooms.value[loadedRooms.value.length] = room
         loadedRooms.value = [...loadedRooms.value]
@@ -289,7 +285,6 @@ export default {
 
       // 表情回复
       msg.$on("COMMAND_SEND_MESSAGE_REACTION_RESP", (data) => {
-        console.log(data.data, 'COMMAND_SEND_MESSAGE_REACTION_RESP')
         const reaction = data.data
         if (roomId.value !== reaction.roomId) {
           return
@@ -310,17 +305,23 @@ export default {
     }
 
     init()
+    const waitSendMessage = ref([])
 
-    const sendMessage = ({content, roomId, files, replyMessage}) => {
-      // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
-      if (files) {
-        addFiles(files, currentUserId.value,roomId)
-      }
-
-      if(!content){
+    const sendFileMessage = (file, roomId, isLast) => {
+      const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
+      if (index === -1) {
+        console.log('未找到')
         return
       }
+      waitSendMessage.value[index].files.push(file)
+      if (isLast) {
+        console.log('最后一个 发送消息', waitSendMessage.value[index])
+        sendChatMessage(waitSendMessage.value[index])
+        waitSendMessage.value.splice(index, 1)
+      }
+    }
 
+    const sendMessage = async ({content, roomId, files, replyMessage}) => {
       let reply;
       if (replyMessage) {
         reply = {
@@ -332,10 +333,24 @@ export default {
         senderId: currentUserId.value,
         content,
         roomId,
-        replyMessage: reply
+        replyMessage: reply,
+        files: []
       }
 
-      sendChatMessage(message)
+      // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
+      if (files) {
+        waitSendMessage.value.push(message)
+        await addFiles(files, roomId, (file, isOver) => {
+          sendFileMessage({
+            name: file.name + '.' + file.extension,
+            size: file.size,
+            type: file.type,
+            url: "http://localhost/download/" + file.url,
+          }, roomId, isOver)
+        })
+      } else {
+        sendChatMessage(message)
+      }
       upRoom(roomId)
     }
 
@@ -345,11 +360,8 @@ export default {
 
     const changeRoom = item => {
       roomId.value = item
-      console.log(loadedRooms.value)
-      console.log(item, 'roomId')
 
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
-      console.log(roomIndex, 'roomIndex')
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
 
@@ -366,7 +378,6 @@ export default {
 
     const createChat = item => {
       chatAddVisible.value = !chatAddVisible.value
-      console.log(item, '创建会话')
       const roomIndex = loadedRooms.value.findIndex(r => item._id === r.friendId)
       if (roomIndex === -1) {
         createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
@@ -398,8 +409,6 @@ export default {
     }
 
     const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
-      console.log(messages.value)
-      console.log(reaction.unicode, remove, messageId, roomId)
       messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
     }
 

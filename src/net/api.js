@@ -8,10 +8,14 @@ export function init(data) {
   })
 }
 
-export function upload(url, data) {
+export function upload(url, data,cb) {
   return request({
     url: url,
     method: 'put',
+    onUploadProgress: (event) => {
+      // console.log(event,'upload')
+      cb(event.loaded, event.total)
+    },
     headers: {
       'Content-Type': 'application/octet-stream'
     },
