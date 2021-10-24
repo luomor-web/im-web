@@ -2,7 +2,7 @@ import request from "@/utils/request";
 
 export function init(data) {
   return request({
-    url: '/api/multipart/init',
+    url: '/multipart/init',
     method: 'post',
     data: data
   })
@@ -25,7 +25,7 @@ export function upload(url, data,cb) {
 
 export function mergeMultipartUpload(data) {
   return request({
-    url: '/api/multipart/complete',
+    url: '/multipart/complete',
     method: 'put',
     data: data
   })

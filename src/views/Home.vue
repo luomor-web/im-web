@@ -345,7 +345,7 @@ export default {
             name: file.name + '.' + file.extension,
             size: file.size,
             type: file.type,
-            url: "http://localhost/download/" + file.url,
+            url: file.url,
           }, roomId, isOver)
         })
       } else {

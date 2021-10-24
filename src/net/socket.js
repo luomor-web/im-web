@@ -6,8 +6,10 @@ import router from "@/router";
 let socket
 
 const webSocket = (username, password) => {
+    console.log(process.env.VUE_APP_SOCKET_URL)
+    const socketUrl = process.env.VUE_APP_SOCKET_URL
     socket = new WebsocketHeartbeatJs({
-        url: 'ws://127.0.0.1:9326?account=' + username + '&password=' + password,
+        url: socketUrl + '?account=' + username + '&password=' + password,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
     })
     socket.onopen = () => {
@@ -54,11 +56,11 @@ const webSocket = (username, password) => {
                 break;
             // 当前用户列表
             case 27:
-                msg.$emit("COMMAND_USER_LIST_RESP",data)
+                msg.$emit("COMMAND_USER_LIST_RESP", data)
                 break;
             // 表情回复消息
             case 29:
-                msg.$emit("COMMAND_SEND_MESSAGE_REACTION_RESP",data)
+                msg.$emit("COMMAND_SEND_MESSAGE_REACTION_RESP", data)
                 break;
             default:
                 break

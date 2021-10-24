@@ -139,6 +139,7 @@ export default {
     TopBar
   },
   setup(){
+
     let isElectron = ref(process.env.IS_ELECTRON);
 
     const isPasswordVisible = ref(false)
@@ -172,6 +173,7 @@ export default {
     }
 
     const init = () => {
+      console.log(process.env)
       const value = localStoreUtil.getValue('username');
       if(value){
         username.value = value

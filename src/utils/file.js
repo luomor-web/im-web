@@ -3,7 +3,7 @@ import SparkMD5 from 'spark-md5'
 
 const CHUNK_SIZE = 5 * 1024 * 1024
 
-export const files = []
+export let files = []
 
 const addFiles = async (f, roomId, cb) => {
     for (let file of f) {
@@ -75,7 +75,12 @@ const addFiles = async (f, roomId, cb) => {
                 console.log('文件合并完成!')
             }
             data.url = response.objectName
-            cb({...data.file, url: data.url}, files.length === f.length)
+            if (files.length === f.length) {
+                files = []
+                cb({...data.file, url: data.url}, true)
+            } else {
+                cb({...data.file, url: data.url}, false)
+            }
         })
     }
 
@@ -91,7 +96,7 @@ const countSpeed = (data) => {
     data.percentage = uploaded <= 0 ? 0 : Math.round((uploaded / data.fileSizeByte) * 10000) / 100.0
     data.uploaded = formatSize(uploaded)
     data.speed = formatSize(speed)
-    console.log('总大小:', data.fileSize, ' 上传速度:', data.speed, ' 上传百分比:', data.percentage, ' 已上传:{}', data.uploaded)
+    console.log('总大小:', data.fileSize, ' 上传速度:', data.speed, ' 上传百分比:', data.percentage, ' 已上传:', data.uploaded)
 }
 
 const inputChange = async (file, cb) => {
