@@ -1,60 +1,52 @@
 <template>
   <div>
-    <v-toolbar class="pl-4 pr-4" flat>
-      <v-toolbar-title class="font-weight-bold">
-        添加会话
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn class="no-drag" icon @click="closeAddChat">
-        <v-icon>
-          {{icons.mdiWindowClose}}
-        </v-icon>
-      </v-btn>
-    </v-toolbar>
-    <div class="pl-2 pr-2 search">
-        <v-text-field
-            dense
-            required
-            rounded
-            outlined
-            :prepend-inner-icon="icons.mdiMagnify"
-            placeholder="搜索"
-            :hide-details="true"
-        ></v-text-field>
-    </div>
-    <div class="users-container">
-      <v-list rounded>
-        <v-list-item-group
-            v-model="items"
-            color="primary"
-        >
-          <v-list-item
-              v-for="(item, i) in users"
-              :key="i"
-              @click="showUserInfo"
-          >
-            <v-list-item-avatar>
-              <v-img :src="item.avatar"></v-img>
-            </v-list-item-avatar>
-            <v-list-item-content >
-              <v-list-item-title v-text="item.username"></v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-btn icon @click="startChat(item)"><v-icon>{{icons.mdiChatOutline}}</v-icon></v-btn>
-            </v-list-item-action>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </div>
+    <im-drawer title="添加会话" @close="closeAddChat">
+      <template #content="{}">
+        <div class="d-flex align-center ">
+          <v-text-field
+              dense
+              required
+              rounded
+              outlined
+              :prepend-inner-icon="icons.mdiMagnify"
+              placeholder="搜索"
+              :hide-details="true"
+          ></v-text-field>
+        </div>
+        <div class="overflow-y-auto pt-3">
+          <v-list>
+            <v-list-item
+                v-for="(item, i) in users"
+                :key="i"
+                @click="showUserInfo"
+            >
+              <v-list-item-avatar>
+                <v-img :src="item.avatar"></v-img>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title v-text="item.username"></v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn icon @click="startChat(item)">
+                  <v-icon>{{ icons.mdiChatOutline }}</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </div>
+      </template>
+    </im-drawer>
   </div>
 </template>
 
 <script>
-import {mdiMagnify, mdiWindowClose, mdiChatOutline} from "@mdi/js";
+import {mdiMagnify, mdiChatOutline} from "@mdi/js";
 import {ref} from "@vue/composition-api";
+import ImDrawer from "@/components/ImDrawer";
 
 export default {
   name: "AddChat",
+  components: {ImDrawer},
   props: {
     users: {
       default: () => {
@@ -73,7 +65,7 @@ export default {
     }
 
     const showUserInfo = () => {
-      if(!clock.value){
+      if (!clock.value) {
         console.log('showUserInfo')
       }
       clock.value = false
@@ -81,15 +73,14 @@ export default {
 
     const startChat = item => {
       console.log('startChat')
-      context.emit('chat',item)
+      context.emit('chat', item)
       clock.value = true
     }
 
     return {
       closeAddChat,
       showUserInfo,
-      icons:{
-        mdiWindowClose,
+      icons: {
         mdiMagnify,
         mdiChatOutline,
       },
@@ -103,15 +94,5 @@ export default {
 <style lang="scss" scoped>
 .no-drag {
   -webkit-app-region: no-drag;
-}
-.search{
-  height: 64px;
-  display: flex;
-  align-items: center
-}
-.users-container {
-  overflow-y: auto;
-  max-width: 100%;
-  padding: 0 8px;
 }
 </style>

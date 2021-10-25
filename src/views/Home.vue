@@ -86,10 +86,20 @@
           absolute
           temporary
           hide-overlay
-          width="300"
+          width="400"
       >
         <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers" @chat="createChat"></add-chat>
       </v-navigation-drawer>
+      <v-navigation-drawer
+          v-model="roomAddVisible"
+          absolute
+          temporary
+          hide-overlay
+          width="400"
+      >
+        <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" @chat="createChat"></add-room>
+      </v-navigation-drawer>
+
     </div>
   </div>
 </template>
@@ -111,6 +121,7 @@ import {
 } from "@/net/message";
 import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
 import AddChat from "@/components/AddChat";
+import AddRoom from "@/components/AddRoom";
 import {addFiles} from "@/utils/file";
 
 
@@ -118,6 +129,7 @@ export default {
   name: 'HelloWorld',
   components: {
     AddChat,
+    AddRoom,
     TopBar,
     ChatWindow
   },
@@ -134,6 +146,8 @@ export default {
     const messages = ref([])
     // 消息是否加载完成
     const messageLoaded = ref(false)
+    // 新建房间是否展示
+    const roomAddVisible = ref(false)
     // 加载动画
     const loadingRooms = ref(false)
     const roomsLoaded = ref(true)
@@ -356,6 +370,8 @@ export default {
 
     const addRoom = () => {
       console.log('addroom')
+      roomAddVisible.value = !roomAddVisible.value
+      getUserList()
     }
 
     const changeRoom = item => {
@@ -440,6 +456,7 @@ export default {
       curUser,
       systemUsers,
       messageActions,
+      roomAddVisible,
       createChat,
       sendMessage,
       addRoom,
