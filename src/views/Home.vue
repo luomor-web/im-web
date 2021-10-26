@@ -97,7 +97,7 @@
           hide-overlay
           width="400"
       >
-        <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" @chat="createChat"></add-room>
+        <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" @chat="createChat" :visible="roomAddVisible"></add-room>
       </v-navigation-drawer>
 
     </div>

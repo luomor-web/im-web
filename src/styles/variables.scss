@@ -1,4 +1,11 @@
+@import "./theme";
 
 // Write your variable overrides
 $toolbar-content-padding-x: 0px;
 
+.v-input__slot:before{
+  border-color: $v-grey-lighten1 !important;
+}
+.v-input__icon--append .v-icon, .v-input__icon--prepend .v-icon {
+  color: $v-grey-lighten1 !important;
+}
