@@ -24,10 +24,10 @@
       >
         <template #rooms-header="{}">
           <div class="room-header-container">
-            <v-avatar>
+            <v-avatar color="#b7c1ca">
               <img
-                  src="https://cdn.vuetifyjs.com/images/john.jpg"
-                  alt="John"
+                   :src="curUser.avatar"
+                   :alt="curUser.username"
               >
             </v-avatar>
             <h3 class="ml-3">
@@ -97,7 +97,8 @@
           hide-overlay
           width="400"
       >
-        <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" @chat="createChat" :visible="roomAddVisible"></add-room>
+        <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" @chat="createChat"
+                  :visible="roomAddVisible"></add-room>
       </v-navigation-drawer>
 
     </div>
@@ -119,7 +120,7 @@ import {
   getUserList, messageReaction, quitSystem,
   sendChatMessage
 } from "@/net/message";
-import {mdiChevronDown, mdiWindowClose} from "@mdi/js";
+import {mdiAccount, mdiChevronDown, mdiWindowClose} from "@mdi/js";
 import AddChat from "@/components/AddChat";
 import AddRoom from "@/components/AddRoom";
 import {addFiles} from "@/utils/file";
@@ -467,18 +468,27 @@ export default {
 
       icons: {
         mdiWindowClose,
-        mdiChevronDown
+        mdiChevronDown,
+        mdiAccount,
       }
     }
   },
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
+
+@import "../styles/theme.scss";
+
 .room-header-container {
   position: sticky;
   display: flex;
   align-items: center;
   height: 64px;
   padding: 0 15px;
+}
+
+.account-img {
+  border-radius: 32px;
+  background-color: $v-grey-lighten1;
 }
 </style>

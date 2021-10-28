@@ -47,43 +47,54 @@ const addFiles = async (f, roomId, cb) => {
             partCount: data.chunks.length,
             md5: data.md5
         })
-        const uploadUrls = response.uploadUrls
-        const promises = [];
-        data.uploadTime = new Date().getTime()
-        console.log('开始上传:', data.uploadTime)
-        for (let i = 0; i < uploadUrls.length; i++) {
-            promises.push(new Promise((resolve) => {
-                upload(uploadUrls[i], data.chunks[i].file, (loaded, total) => {
-                    data.chunks[i].uploadProgress = loaded
-                    data.chunks[i].total = total
-                }).then(() => {
-                    resolve()
-                })
-            }))
-        }
-        const t = setInterval(() => {
-            countSpeed(data)
-        }, 300)
-        Promise.all(promises).then(async () => {
-            files.push(data)
-            clearInterval(t)
-            if (response.uploadId) {
-                await mergeMultipartUpload({
+        console.log(response)
+        data.url = response.objectName
+
+        if (!response.quick) {
+            const uploadUrls = response.uploadUrls
+
+            const promises = [];
+            data.uploadTime = new Date().getTime()
+            console.log('开始上传:', data.uploadTime)
+            for (let i = 0; i < uploadUrls.length; i++) {
+                promises.push(new Promise((resolve) => {
+                    upload(uploadUrls[i], data.chunks[i].file, (loaded, total) => {
+                        data.chunks[i].uploadProgress = loaded
+                        data.chunks[i].total = total
+                    }).then(() => {
+                        resolve()
+                    })
+                }))
+            }
+            const t = setInterval(() => {
+                countSpeed(data)
+            }, 300)
+            Promise.all(promises).then(async () => {
+                files.push(data)
+                clearInterval(t)
+                mergeMultipartUpload({
                     uploadId: response.uploadId,
-                    objectName: response.objectName
+                    objectName: response.objectName,
+                    md5: data.md5
                 })
                 console.log('文件合并完成!')
-            }
-            data.url = response.objectName
-            if (files.length === f.length) {
-                files = []
-                cb({...data.file, url: data.url}, true)
-            } else {
-                cb({...data.file, url: data.url}, false)
-            }
-        })
+                checkOver(data,f,cb)
+            })
+        } else {
+            files.push(data)
+            checkOver(data,f,cb)
+        }
     }
 
+}
+
+const checkOver = (data,target,cb) => {
+    if (files.length === target.length) {
+        files = []
+        cb({...data.file, url: data.url}, true)
+    } else {
+        cb({...data.file, url: data.url}, false)
+    }
 }
 
 const countSpeed = (data) => {

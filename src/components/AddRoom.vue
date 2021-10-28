@@ -10,7 +10,7 @@
                   height="150"
                   width="150"
                   class="header-img"
-                  src="https://vue-advanced-chat.herokuapp.com/img/account-group.601fe668.svg"
+                  :src="require('@/assets/images/default/account-group.svg')"
               >
                 <v-fade-transition>
                   <v-overlay
@@ -54,7 +54,7 @@
                 <div class="px-1 d-inline">
                   <v-avatar size="36" color="primary" v-bind="attrs"
                             v-on="on" @click="removeUser(item)">
-                    <v-img src="https://cdn.vuetifyjs.com/images/logos/v.png"></v-img>
+                    <v-img :src="item.avatar"></v-img>
                   </v-avatar>
                 </div>
               </template>
@@ -80,16 +80,18 @@
                 <v-list-item :key="i">
                   <template v-slot:default="{ active }">
 
-                    <v-list-item-action>
-                      <v-checkbox :input-value="active"></v-checkbox>
-                    </v-list-item-action>
+<!--                    <v-list-item-action>-->
+<!--                      <v-checkbox :input-value="active"></v-checkbox>-->
+<!--                    </v-list-item-action>-->
 
                     <v-list-item-avatar>
                       <v-img :src="item.avatar"></v-img>
                     </v-list-item-avatar>
+
                     <v-list-item-content>
                       <v-list-item-title v-text="item.username"></v-list-item-title>
                     </v-list-item-content>
+
                     <v-list-item-action>
                       <v-btn small :color="active? 'error':'primary'">
                         {{ active ? '移除' : '添加' }}
