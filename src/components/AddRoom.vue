@@ -1,6 +1,6 @@
 <template>
   <div>
-    <im-drawer title="创建群组" @close="closeAddRoom">
+    <im-drawer title="创建群组" @close="closeAddRoom" :visible="visible">
       <template #content="{}">
         <div class="d-table ma-auto">
           <v-hover>
@@ -80,9 +80,9 @@
                 <v-list-item :key="i">
                   <template v-slot:default="{ active }">
 
-<!--                    <v-list-item-action>-->
-<!--                      <v-checkbox :input-value="active"></v-checkbox>-->
-<!--                    </v-list-item-action>-->
+                    <!--                    <v-list-item-action>-->
+                    <!--                      <v-checkbox :input-value="active"></v-checkbox>-->
+                    <!--                    </v-list-item-action>-->
 
                     <v-list-item-avatar>
                       <v-img :src="item.avatar"></v-img>
@@ -139,14 +139,9 @@ export default {
       waitSelect.value = [...users]
     })
 
-    watch(() => props.visible, (visible) => {
-      if (!visible) {
-        clearData()
-      }
-    })
-
     const closeAddRoom = () => {
       context.emit('close')
+      clearData()
     }
 
     const clearData = () => {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <im-drawer title="添加会话" @close="closeAddChat">
+    <im-drawer title="添加会话" @close="closeAddChat" :visible="visible">
       <template #content="{}">
         <div class="d-flex align-center ">
           <v-text-field
@@ -53,7 +53,8 @@ export default {
         []
       },
       type: Array
-    }
+    },
+    visible: Boolean
   },
   setup(props, context) {
 

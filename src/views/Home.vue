@@ -26,8 +26,8 @@
           <div class="room-header-container">
             <v-avatar color="#b7c1ca">
               <img
-                   :src="curUser.avatar"
-                   :alt="curUser.username"
+                  :src="curUser.avatar"
+                  :alt="curUser.username"
               >
             </v-avatar>
             <h3 class="ml-3">
@@ -81,26 +81,9 @@
           </div>
         </template>
       </chat-window>
-      <v-navigation-drawer
-          v-model="chatAddVisible"
-          absolute
-          temporary
-          hide-overlay
-          width="400"
-      >
-        <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers" @chat="createChat"></add-chat>
-      </v-navigation-drawer>
-      <v-navigation-drawer
-          v-model="roomAddVisible"
-          absolute
-          temporary
-          hide-overlay
-          width="400"
-      >
-        <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" @chat="createChat"
-                  :visible="roomAddVisible"></add-room>
-      </v-navigation-drawer>
-
+      <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers" @chat="createChat" :visible="chatAddVisible"></add-chat>
+      <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" :visible="roomAddVisible"></add-room>
+      <user-profile @close="userProfile = !userProfile" ></user-profile>
     </div>
   </div>
 </template>
@@ -124,11 +107,13 @@ import {mdiAccount, mdiChevronDown, mdiWindowClose} from "@mdi/js";
 import AddChat from "@/components/AddChat";
 import AddRoom from "@/components/AddRoom";
 import {addFiles} from "@/utils/file";
+import UserProfile from "@/components/UserProfile";
 
 
 export default {
   name: 'HelloWorld',
   components: {
+    UserProfile,
     AddChat,
     AddRoom,
     TopBar,
