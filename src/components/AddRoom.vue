@@ -1,6 +1,6 @@
 <template>
   <div>
-    <im-drawer title="创建群组" @close="closeAddRoom" :visible="visible">
+    <im-drawer title="创建群组" @close="closeAddRoom" :visible="visible" :temporary="drawerTemporary">
       <template #content="{}">
         <div class="d-table ma-auto">
           <v-hover>
@@ -10,7 +10,7 @@
                   height="150"
                   width="150"
                   class="header-img"
-                  :src="require('@/assets/images/default/account-group.svg')"
+                  :src="roomAvatar ? picUrl +roomAvatar :require('@/assets/images/default/account-group.svg')"
               >
                 <v-fade-transition>
                   <v-overlay
@@ -26,6 +26,7 @@
             </template>
           </v-hover>
         </div>
+        <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
         <div class="d-flex align-center py-2">
           <v-text-field v-model="roomName"
                         light
@@ -106,7 +107,41 @@
         </div>
       </template>
     </im-drawer>
+    <v-dialog
+        hide-overlay
+        persistent
+        v-model="dialog"
+        width="500"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Use Google's location service?
+        </v-card-title>
+        <v-card-text>
+          <cropper class="cropper"
+                   ref="cropper"
+                   :src="img"
+                   :stencilProps="{aspectRatio: 1}"
+                   @change="cropperFile"></cropper>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              color="primary"
+              @click="dialog = false"
+          >
+            取消
+          </v-btn>
+          <v-btn
+              color="primary"
+              @click="sure"
+          >
+            确定
+          </v-btn>
+        </v-card-actions>
+      </v-card>
 
+    </v-dialog>
   </div>
 </template>
 
@@ -119,6 +154,7 @@ import {
 import {ref, watch} from "@vue/composition-api";
 import ImDrawer from "@/components/ImDrawer";
 import {createGroup} from "@/net/message";
+import {addFiles} from "@/utils/file";
 
 export default {
   name: "AddRoom",
@@ -133,6 +169,13 @@ export default {
     const waitSelect = ref([])
     const userSelect = ref([])
     const roomName = ref('')
+    const dialog = ref(false)
+    const img = ref('')
+    const drawerTemporary = ref(true)
+    const cropper = ref(null)
+    const file = ref(null)
+    const roomAvatar = ref('')
+    const picUrl = ref(process.env.VUE_APP_PIC_URL)
 
     watch(() => props.users, (users) => {
       console.log('watch', users)
@@ -150,6 +193,44 @@ export default {
       userSelectIndex.value = []
       errorVisible.value = false
       roomName.value = ''
+      roomAvatar.value = ''
+    }
+
+    const onFileChange = (files) => {
+      drawerTemporary.value = false
+      console.log(files)
+      dialog.value = true
+
+      img.value = URL.createObjectURL(files[0])
+    }
+
+    const cropperFile = ({coordinates, canvas}) => {
+      console.log({coordinates, canvas})
+    }
+
+    const sure = () => {
+      drawerTemporary.value = true
+      const {canvas} = cropper.value.getResult();
+      if (canvas) {
+        canvas.toBlob(blob => {
+          const file = {
+            blob: blob,
+            name: 'header',
+            size: blob.size,
+            type: 'image/jpeg',
+            extension: 'jpeg',
+          }
+          console.log(file, 'wait upload')
+          addFiles([file], '', (file, over) => {
+            console.log(file, over)
+            if (over) {
+              dialog.value = false
+              roomAvatar.value = file.url
+            }
+          })
+        }, 'image/jpeg')
+      }
+      console.log(canvas, 'canvas')
     }
 
     const createRoom = () => {
@@ -162,13 +243,14 @@ export default {
           _id: x._id
         }
       })
-      createGroup({isFriend: false, roomName: roomName.value, users: users})
+      createGroup({isFriend: false, roomName: roomName.value, avatar: roomAvatar.value, users: users})
       clearData()
       closeAddRoom()
     }
 
     const openUpload = () => {
       console.log('open')
+      file.value.click()
     }
 
     const operationUser = item => {
@@ -190,16 +272,26 @@ export default {
     }
 
     return {
+      img,
+      cropper,
+      file,
+      dialog,
       errorVisible,
       roomName,
       waitSelect,
       userSelect,
       userSelectIndex,
+      drawerTemporary,
+      roomAvatar,
+      picUrl,
+      sure,
+      cropperFile,
       closeAddRoom,
       createRoom,
       operationUser,
       openUpload,
       removeUser,
+      onFileChange,
       icons: {
         mdiArrowRight,
         mdiMagnify,
@@ -224,5 +316,10 @@ export default {
 .header-img {
   border-radius: 150px;
   background-color: $v-grey-lighten1;
+}
+
+.cropper {
+  height: 300px;
+  background: #DDD;
 }
 </style>

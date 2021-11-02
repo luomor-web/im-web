@@ -9,3 +9,11 @@ $toolbar-content-padding-x: 0px;
 .v-input__icon--append .v-icon, .v-input__icon--prepend .v-icon {
   color: $v-grey-lighten1 !important;
 }
+
+.v-overlay--active {
+  z-index: 10 !important;
+}
+
+.v-navigation-drawer--temporary{
+  z-index: 10 !important;
+}

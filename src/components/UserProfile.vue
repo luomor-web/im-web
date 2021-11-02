@@ -35,13 +35,15 @@
                         single-line>
           </v-text-field>
           <v-spacer></v-spacer>
-          <v-btn color="primary" :disabled="curUser.username === username || username === ''" @click="changeUserProfile(null)">
+          <v-btn color="primary" :disabled="curUser.username === username || username === ''"
+                 @click="changeUserProfile(null)">
             确认
           </v-btn>
         </div>
       </template>
     </im-drawer>
     <v-dialog
+        hide-overlay
         persistent
         v-model="dialog"
         width="500"
@@ -61,7 +63,7 @@
           <v-spacer></v-spacer>
           <v-btn
               color="primary"
-              @click="dialog = false"
+              @click="closeDialog"
           >
             取消
           </v-btn>
@@ -115,7 +117,7 @@ export default {
     })
 
     watch(() => props.user, () => {
-        curUser.value = {...props.user}
+      curUser.value = {...props.user}
     })
 
     const onFileChange = (files) => {
@@ -128,6 +130,12 @@ export default {
 
     const changeUserProfile = (url) => {
       editProfile({roomId: curUser.value._id, isGroup: false, avatar: url, name: username.value})
+    }
+
+    const closeDialog = () => {
+      drawerTemporary.value = true
+      dialog.value = false
+      img.value = ''
     }
 
     const sure = () => {
@@ -166,7 +174,6 @@ export default {
       console.log(file.value)
       file.value.click()
       console.log('upload pic ')
-
     }
 
     return {
@@ -176,13 +183,14 @@ export default {
       dialog,
       img,
       cropper,
-      onFileChange,
       drawerTemporary,
+      onFileChange,
       sure,
       changeUserProfile,
       openUpload,
       closeUserProfile,
       cropperFile,
+      closeDialog,
 
       icons: {
         mdiCamera

@@ -49,6 +49,7 @@ const createGroup = (data) => {
     let param = {
         cmd: 22,
         isFriend: data.isFriend,
+        avatar: data.avatar,
         users: data.users,
         roomName: data.roomName
     }

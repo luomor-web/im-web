@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-navigation-drawer
+        hide-overlay
         v-model="drawerVisible"
         absolute
         :temporary="temporary"
