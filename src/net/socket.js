@@ -62,6 +62,10 @@ const webSocket = (username, password) => {
             case 29:
                 msg.$emit("COMMAND_SEND_MESSAGE_REACTION_RESP", data)
                 break;
+            // 修改信息返回
+            case 31:
+                msg.$emit("COMMAND_EDIT_PROFILE_REST", data)
+                break;
             default:
                 break
         }

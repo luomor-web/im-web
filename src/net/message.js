@@ -67,6 +67,18 @@ const messageReaction = ({ reaction, remove, messageId, roomId }) => {
     sendMsg(param)
 }
 
+// 修改用户资料
+const editProfile = ({roomId,isGroup,avatar,name}) => {
+    const param = {
+        cmd: 30,
+        isGroup,
+        avatar,
+        name,
+        roomId
+    }
+    sendMsg(param)
+}
+
 const quitSystem = () => {
   close()
 }
@@ -92,5 +104,6 @@ export {
     buildLastMessage,
     createGroup,
     quitSystem,
-    messageReaction
+    messageReaction,
+    editProfile
 }

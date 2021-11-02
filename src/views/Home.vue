@@ -24,12 +24,18 @@
       >
         <template #rooms-header="{}">
           <div class="room-header-container">
-            <v-avatar color="#b7c1ca">
-              <img
-                  :src="curUser.avatar"
-                  :alt="curUser.username"
-              >
-            </v-avatar>
+            <v-btn
+                icon
+                x-large
+                @click="editUserProfile"
+            >
+              <v-avatar color="#b7c1ca">
+                <img
+                    :src="curUser.avatar"
+                    :alt="curUser.username"
+                >
+              </v-avatar>
+            </v-btn>
             <h3 class="ml-3">
               {{ curUser.username }}
             </h3>
@@ -81,9 +87,10 @@
           </div>
         </template>
       </chat-window>
-      <add-chat @close="chatAddVisible = !chatAddVisible" :users="systemUsers" @chat="createChat" :visible="chatAddVisible"></add-chat>
-      <add-room @close="roomAddVisible = !roomAddVisible" :users="systemUsers" :visible="roomAddVisible"></add-room>
-      <user-profile @close="userProfile = !userProfile" ></user-profile>
+      <add-chat @close="chatAddVisible = false" :users="systemUsers" @chat="createChat"
+                :visible="chatAddVisible"></add-chat>
+      <add-room @close="roomAddVisible = false" :users="systemUsers" :visible="roomAddVisible"></add-room>
+      <user-profile @close="userProfileVisible = false" :user="curUser" :visible="userProfileVisible"></user-profile>
     </div>
   </div>
 </template>
@@ -134,6 +141,11 @@ export default {
     const messageLoaded = ref(false)
     // 新建房间是否展示
     const roomAddVisible = ref(false)
+    // 用户信息是否展示
+    const userProfileVisible = ref(false)
+    const editUserProfile = () => {
+      userProfileVisible.value = true
+    }
     // 加载动画
     const loadingRooms = ref(false)
     const roomsLoaded = ref(true)
@@ -240,12 +252,25 @@ export default {
 
       // 用户状态变化消息
       msg.$on("COMMAND_USER_STATUS_RESP", (data) => {
-        const {group} = data.data
-        loadedRooms.value.forEach(room => {
-          if (room.roomId === group.roomId) {
-            room.users = [...group.users]
+        const {group, user} = data.data
+
+        const roomIndex = loadedRooms.value.findIndex(r => r.roomId === group.roomId)
+        if (roomIndex !== -1) {
+
+          if(loadedRooms.value[roomIndex].friendId === user._id){
+            loadedRooms.value[roomIndex].avatar = user.avatar
+            loadedRooms.value[roomIndex].roomName = user.username
           }
-        })
+
+          const userIndex = loadedRooms.value[roomIndex].users.findIndex(r => r._id === user._id)
+          if (userIndex !== -1) {
+            console.log(loadedRooms.value[roomIndex].users[userIndex],'change')
+            loadedRooms.value[roomIndex].users[userIndex] = user
+            console.log(loadedRooms.value[roomIndex].users[userIndex],'change after')
+            loadedRooms.value[roomIndex].users = [...loadedRooms.value[roomIndex].users]
+          }
+          loadedRooms.value = [...loadedRooms.value]
+        }
 
       })
 
@@ -302,6 +327,13 @@ export default {
         }
         messages.value = [...messages.value]
       })
+
+      msg.$on("COMMAND_EDIT_PROFILE_REST", (data) => {
+        const {user} = data.data
+        console.log(user,'change而第三天')
+        curUser.value = {...user}
+      })
+
     }
 
     init()
@@ -322,6 +354,7 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
+      console.log(files, 'sendFile')
       let reply;
       if (replyMessage) {
         reply = {
@@ -443,6 +476,8 @@ export default {
       systemUsers,
       messageActions,
       roomAddVisible,
+      userProfileVisible,
+      editUserProfile,
       createChat,
       sendMessage,
       addRoom,

@@ -3,8 +3,7 @@
     <v-navigation-drawer
         v-model="drawerVisible"
         absolute
-        temporary
-        hide-overlay
+        :temporary="temporary"
         width="400"
         @input="changeVisible"
     >
@@ -34,7 +33,11 @@ export default {
   name: "ImDrawer",
   props: {
     title: String,
-    visible: Boolean
+    visible: Boolean,
+    temporary: {
+      type: Boolean,
+      default: true
+    }
   },
   setup(props, context) {
     const drawerVisible = ref(false)
