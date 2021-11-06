@@ -104,10 +104,13 @@ import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
 import {
   buildLastMessage,
-  clearUnReadMessage, createGroup,
+  clearUnReadMessage,
+  createGroup,
   getHistoryMessage,
   getUserInfo,
-  getUserList, messageReaction, quitSystem,
+  getUserList,
+  messageReaction,
+  quitSystem,
   sendChatMessage
 } from "@/net/message";
 import {mdiAccount, mdiChevronDown, mdiWindowClose} from "@mdi/js";
@@ -225,19 +228,16 @@ export default {
 
           if (!loadedRooms.value[roomIndex].lastMessage) {
 
-            const room = {
+            loadedRooms.value[roomIndex] = {
               ...loadedRooms.value[roomIndex],
               lastMessage
             }
-
-            loadedRooms.value[roomIndex] = room
           } else {
             loadedRooms.value[roomIndex].lastMessage = lastMessage
           }
 
           loadedRooms.value = [...loadedRooms.value]
         }
-
         if (message.roomId === roomId.value) {
           clearUnReadMessage(roomId.value)
           messages.value.push(message)
@@ -247,7 +247,6 @@ export default {
         upRoom(message.roomId)
         loadedRooms.value[roomIndex].unreadCount = message.unreadCount
         loadedRooms.value = [...loadedRooms.value]
-
       })
 
       // 用户状态变化消息
@@ -264,9 +263,7 @@ export default {
 
           const userIndex = loadedRooms.value[roomIndex].users.findIndex(r => r._id === user._id)
           if (userIndex !== -1) {
-            console.log(loadedRooms.value[roomIndex].users[userIndex],'change')
             loadedRooms.value[roomIndex].users[userIndex] = user
-            console.log(loadedRooms.value[roomIndex].users[userIndex],'change after')
             loadedRooms.value[roomIndex].users = [...loadedRooms.value[roomIndex].users]
           }
           loadedRooms.value = [...loadedRooms.value]
@@ -330,7 +327,6 @@ export default {
 
       msg.$on("COMMAND_EDIT_PROFILE_REST", (data) => {
         const {user} = data.data
-        console.log(user,'change而第三天')
         curUser.value = {...user}
       })
 
@@ -342,19 +338,16 @@ export default {
     const sendFileMessage = (file, roomId, isLast) => {
       const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
       if (index === -1) {
-        console.log('未找到')
         return
       }
       waitSendMessage.value[index].files.push(file)
       if (isLast) {
-        console.log('最后一个 发送消息', waitSendMessage.value[index])
         sendChatMessage(waitSendMessage.value[index])
         waitSendMessage.value.splice(index, 1)
       }
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
-      console.log(files, 'sendFile')
       let reply;
       if (replyMessage) {
         reply = {
@@ -388,14 +381,12 @@ export default {
     }
 
     const addRoom = () => {
-      console.log('addroom')
       roomAddVisible.value = !roomAddVisible.value
       getUserList()
     }
 
     const changeRoom = item => {
       roomId.value = item
-
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
