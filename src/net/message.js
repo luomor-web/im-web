@@ -13,7 +13,7 @@ const getUserInfo = (data) => {
 const getHistoryMessage = (data) => {
     let param = {
         cmd: 19,
-        roomId: data
+        ...data
     }
     sendMsg(param)
 }

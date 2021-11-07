@@ -48,34 +48,7 @@
         v-model="dialog"
         width="500"
     >
-      <v-card>
-        <v-card-title class="text-h5">
-          Use Google's location service?
-        </v-card-title>
-        <v-card-text>
-          <cropper class="cropper"
-                   ref="cropper"
-                   :src="img"
-                   :stencilProps="{aspectRatio: 1}"
-                   @change="cropperFile"></cropper>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              color="primary"
-              @click="closeDialog"
-          >
-            取消
-          </v-btn>
-          <v-btn
-              color="primary"
-              @click="sure"
-          >
-            确定
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-
+      <im-cropper :img="img" @sure="sure" @center="closeDialog"></im-cropper>
     </v-dialog>
   </div>
 </template>
@@ -84,17 +57,14 @@
 import ImDrawer from "@/components/ImDrawer";
 import {mdiCamera} from "@mdi/js";
 import {ref, watch} from "@vue/composition-api";
-import {Cropper} from 'vue-advanced-cropper'
-import 'vue-advanced-cropper/dist/style.css';
-import 'vue-advanced-cropper/dist/theme.compact.css';
-import {addFiles} from "@/utils/file";
+import ImCropper from "@/components/ImCropper";
 import {editProfile} from "@/net/message";
 
 export default {
   name: "UserProfile",
   components: {
     ImDrawer,
-    Cropper
+    ImCropper
   },
   props: {
     visible: Boolean,
@@ -107,7 +77,6 @@ export default {
     const dialog = ref(false)
     const img = ref('')
     const drawerTemporary = ref(true)
-    const cropper = ref(null)
 
     watch(() => props.visible, (visible) => {
       if (visible) {
@@ -138,33 +107,10 @@ export default {
       img.value = ''
     }
 
-    const sure = () => {
+    const sure = (url) => {
       drawerTemporary.value = true
-      const {canvas} = cropper.value.getResult();
-      if (canvas) {
-        canvas.toBlob(blob => {
-          const file = {
-            blob: blob,
-            name: 'header',
-            size: blob.size,
-            type: 'image/jpeg',
-            extension: 'jpeg',
-          }
-          console.log(file, 'wait upload')
-          addFiles([file], '', (file, over) => {
-            console.log(file, over)
-            if (over) {
-              dialog.value = false
-              changeUserProfile(file.url)
-            }
-          })
-        }, 'image/jpeg')
-      }
-      console.log(canvas, 'canvas')
-    }
-
-    const cropperFile = ({coordinates, canvas}) => {
-      console.log({coordinates, canvas})
+      dialog.value = false
+      changeUserProfile(url)
     }
 
     const closeUserProfile = () => {
@@ -182,14 +128,12 @@ export default {
       curUser,
       dialog,
       img,
-      cropper,
       drawerTemporary,
       onFileChange,
       sure,
       changeUserProfile,
       openUpload,
       closeUserProfile,
-      cropperFile,
       closeDialog,
 
       icons: {
@@ -209,8 +153,5 @@ export default {
   background-color: $v-grey-lighten1;
 }
 
-.cropper {
-  height: 300px;
-  background: #DDD;
-}
+
 </style>

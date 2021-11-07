@@ -146,6 +146,8 @@ export default {
     const roomAddVisible = ref(false)
     // 用户信息是否展示
     const userProfileVisible = ref(false)
+    const page = ref(0)
+    const number = ref(20)
     const editUserProfile = () => {
       userProfileVisible.value = true
     }
@@ -208,10 +210,14 @@ export default {
 
       // 获取历史消息响应
       msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
-        messages.value = [...data.data]
-
-        setTimeout(() => {
-          messageLoaded.value = true
+        if(data.data.length === 0){
+          setTimeout(() => {
+            messageLoaded.value = true
+          })
+          return
+        }
+        data.data.forEach(x => {
+          messages.value.unshift(x)
         })
       })
 
@@ -256,7 +262,7 @@ export default {
         const roomIndex = loadedRooms.value.findIndex(r => r.roomId === group.roomId)
         if (roomIndex !== -1) {
 
-          if(loadedRooms.value[roomIndex].friendId === user._id){
+          if (loadedRooms.value[roomIndex].friendId === user._id) {
             loadedRooms.value[roomIndex].avatar = user.avatar
             loadedRooms.value[roomIndex].roomName = user.username
           }
@@ -319,8 +325,7 @@ export default {
         if (messages.value[messageIndex].reactions) {
           messages.value[messageIndex].reactions = reaction.reactions
         } else {
-          const message = {...messages.value[messageIndex], reactions: reaction.reactions}
-          messages.value[messageIndex] = message
+          messages.value[messageIndex] = {...messages.value[messageIndex], reactions: reaction.reactions}
         }
         messages.value = [...messages.value]
       })
@@ -386,14 +391,16 @@ export default {
     }
 
     const changeRoom = item => {
+      messages.value = messages.value.splice(0,messages.value.length)
+      messages.value = []
+      messageLoaded.value = false
+      page.value = 0
       roomId.value = item
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
 
-      messages.value = []
-      messageLoaded.value = false
-      getHistoryMessage(roomId.value)
+      getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
       clearUnReadMessage(roomId.value)
     }
 
@@ -414,11 +421,14 @@ export default {
       changeRoom(loadedRooms.value[roomIndex].roomId)
     }
 
-    const fetchMessage = (item) => {
-      if (item.room.roomId === roomId.value) {
+    const fetchMessage = ({ room, options = {} }) => {
+      console.log("更多消息",room, options)
+      if (room.roomId !== roomId.value) {
+        changeRoom(room.roomId)
         return
       }
-      changeRoom(item.room.roomId)
+      page.value += 1
+      getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
     }
 
     /**

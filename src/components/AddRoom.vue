@@ -48,12 +48,12 @@
           >需要至少除您之外的两个用户
           </v-alert>
         </div>
-        <div class="pb-3 mt-2">
+        <div class="pb-3" :class="{'mt-9':userSelect.length===0}">
           <template v-for="(item,index) in userSelect">
             <v-tooltip :key="index" top>
               <template v-slot:activator="{ on, attrs }">
                 <div class="px-1 d-inline">
-                  <v-avatar size="36" color="primary" v-bind="attrs"
+                  <v-avatar size="36" v-bind="attrs"
                             v-on="on" @click="removeUser(item)">
                     <v-img :src="item.avatar"></v-img>
                   </v-avatar>
@@ -113,34 +113,7 @@
         v-model="dialog"
         width="500"
     >
-      <v-card>
-        <v-card-title class="text-h5">
-          Use Google's location service?
-        </v-card-title>
-        <v-card-text>
-          <cropper class="cropper"
-                   ref="cropper"
-                   :src="img"
-                   :stencilProps="{aspectRatio: 1}"
-                   @change="cropperFile"></cropper>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              color="primary"
-              @click="dialog = false"
-          >
-            取消
-          </v-btn>
-          <v-btn
-              color="primary"
-              @click="sure"
-          >
-            确定
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-
+      <im-cropper :img="img" @sure="sure" @center="closeDialog"></im-cropper>
     </v-dialog>
   </div>
 </template>
@@ -154,11 +127,11 @@ import {
 import {ref, watch} from "@vue/composition-api";
 import ImDrawer from "@/components/ImDrawer";
 import {createGroup} from "@/net/message";
-import {addFiles} from "@/utils/file";
+import ImCropper from "@/components/ImCropper";
 
 export default {
   name: "AddRoom",
-  components: {ImDrawer},
+  components: {ImDrawer, ImCropper},
   props: {
     users: Array,
     visible: Boolean
@@ -204,33 +177,16 @@ export default {
       img.value = URL.createObjectURL(files[0])
     }
 
-    const cropperFile = ({coordinates, canvas}) => {
-      console.log({coordinates, canvas})
+    const closeDialog = () => {
+      drawerTemporary.value = true
+      dialog.value = false
+      img.value = ''
     }
 
-    const sure = () => {
+    const sure = (url) => {
+      dialog.value = false
+      roomAvatar.value = url
       drawerTemporary.value = true
-      const {canvas} = cropper.value.getResult();
-      if (canvas) {
-        canvas.toBlob(blob => {
-          const file = {
-            blob: blob,
-            name: 'header',
-            size: blob.size,
-            type: 'image/jpeg',
-            extension: 'jpeg',
-          }
-          console.log(file, 'wait upload')
-          addFiles([file], '', (file, over) => {
-            console.log(file, over)
-            if (over) {
-              dialog.value = false
-              roomAvatar.value = file.url
-            }
-          })
-        }, 'image/jpeg')
-      }
-      console.log(canvas, 'canvas')
     }
 
     const createRoom = () => {
@@ -284,8 +240,8 @@ export default {
       drawerTemporary,
       roomAvatar,
       picUrl,
+      closeDialog,
       sure,
-      cropperFile,
       closeAddRoom,
       createRoom,
       operationUser,
