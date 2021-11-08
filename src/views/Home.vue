@@ -17,6 +17,8 @@
           :rooms-loaded="roomsLoaded"
           :text-messages="textMessages"
           :message-actions="messageActions"
+          :room-info-enabled="true"
+          @room-info="roomInfo"
           @send-message="sendMessage"
           @add-room="addRoom"
           @fetch-messages="fetchMessage"
@@ -87,10 +89,39 @@
           </div>
         </template>
       </chat-window>
-      <add-chat @close="chatAddVisible = false" :users="systemUsers" @chat="createChat"
-                :visible="chatAddVisible"></add-chat>
-      <add-room @close="roomAddVisible = false" :users="systemUsers" :visible="roomAddVisible"></add-room>
-      <user-profile @close="userProfileVisible = false" :user="curUser" :visible="userProfileVisible"></user-profile>
+
+      <add-chat
+          :users="systemUsers"
+          :visible="chatAddVisible"
+          @chat="createChat"
+          @close="chatAddVisible = false"
+      ></add-chat>
+
+      <add-room
+          :users="systemUsers"
+          :visible="roomAddVisible"
+      ></add-room>
+
+      <user-profile
+          :user="curUser"
+          :visible="userProfileVisible"
+          @close="userProfileVisible = false"
+      ></user-profile>
+
+      <user-info
+          :direction="true"
+          :visible="userInfoVisible"
+          :room="clickRoom"
+          @close="userInfoVisible = false"
+      ></user-info>
+
+      <group-info
+          :direction="true"
+          :visible="groupInfoVisible"
+          @close="groupInfoVisible = false"
+      >
+
+      </group-info>
     </div>
   </div>
 </template>
@@ -98,7 +129,7 @@
 <script>
 import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
-import {nextTick, ref} from "@vue/composition-api";
+import {nextTick, onMounted, computed, ref} from "@vue/composition-api";
 import TopBar from "../components/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
@@ -118,11 +149,16 @@ import AddChat from "@/components/AddChat";
 import AddRoom from "@/components/AddRoom";
 import {addFiles} from "@/utils/file";
 import UserProfile from "@/components/UserProfile";
-
+import UserInfo from "@/components/UserInfo";
+import GroupInfo from "@/components/GroupInfo";
+import textMessage from "@/locales/text-message";
+import messageAction from "@/locales/message-action";
 
 export default {
   name: 'HelloWorld',
   components: {
+    GroupInfo,
+    UserInfo,
     UserProfile,
     AddChat,
     AddRoom,
@@ -146,50 +182,39 @@ export default {
     const roomAddVisible = ref(false)
     // 用户信息是否展示
     const userProfileVisible = ref(false)
+    // 新建chat组件是否可见
+    const chatAddVisible = ref(false)
+    // 用户信息展示组件
+    const userInfoVisible = ref(false)
+    // 群组信息展示组件
+    const groupInfoVisible = ref(false)
+    // 当前消息页数
     const page = ref(0)
+    // 当前消息分页数
     const number = ref(20)
-    const editUserProfile = () => {
-      userProfileVisible.value = true
-    }
     // 加载动画
     const loadingRooms = ref(false)
+    // 房间列表是否价值完成
     const roomsLoaded = ref(true)
-    const textMessages = ref({
-      ROOMS_EMPTY: '去创建一些聊天吧',
-      ROOM_EMPTY: '暂无会话被选择',
-      NEW_MESSAGES: 'New Messages',
-      MESSAGE_DELETED: '消息已删除',
-      MESSAGES_EMPTY: '暂无消息',
-      CONVERSATION_STARTED: '会话开始于',
-      TYPE_MESSAGE: '输入消息',
-      SEARCH: '搜索',
-      IS_ONLINE: '当前在线',
-      LAST_SEEN: '最后上线时间 ',
-      IS_TYPING: 'is writing...'
+    // 消息内容
+    const textMessages = computed(() => {
+      return {...textMessage}
     })
-    const messageActions = ref([
-      {
-        name: 'replyMessage',
-        title: '回复'
-      },
-      {
-        name: 'editMessage',
-        title: '编辑',
-        onlyMe: true
-      },
-      {
-        name: 'deleteMessage',
-        title: '删除',
-        onlyMe: true
-      }
-    ])
+    // 消息操作按钮
+    const messageActions = computed(() => {
+      return [...messageAction]
+    })
+    // 系统用户列表
     const systemUsers = ref([])
 
+    const waitSendMessage = ref([])
+    // 当前点击的用户,有可能时房间,有可能时用户
+    const clickRoom = ref({})
+
     let isElectron = ref(process.env.IS_ELECTRON);
-    const chatAddVisible = ref(false)
 
-    const init = () => {
 
+    onMounted(() => {
       currentUserId.value = localStoreUtil.getValue('userId')
       getUserInfo(currentUserId.value)
 
@@ -210,7 +235,7 @@ export default {
 
       // 获取历史消息响应
       msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
-        if(data.data.length === 0){
+        if (data.data.length === 0) {
           setTimeout(() => {
             messageLoaded.value = true
           })
@@ -335,10 +360,11 @@ export default {
         curUser.value = {...user}
       })
 
-    }
+    })
 
-    init()
-    const waitSendMessage = ref([])
+    const editUserProfile = () => {
+      userProfileVisible.value = true
+    }
 
     const sendFileMessage = (file, roomId, isLast) => {
       const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
@@ -391,7 +417,7 @@ export default {
     }
 
     const changeRoom = item => {
-      messages.value = messages.value.splice(0,messages.value.length)
+      messages.value = messages.value.splice(0, messages.value.length)
       messages.value = []
       messageLoaded.value = false
       page.value = 0
@@ -421,8 +447,8 @@ export default {
       changeRoom(loadedRooms.value[roomIndex].roomId)
     }
 
-    const fetchMessage = ({ room, options = {} }) => {
-      console.log("更多消息",room, options)
+    const fetchMessage = ({room, options = {}}) => {
+      console.log("更多消息", room, options)
       if (room.roomId !== roomId.value) {
         changeRoom(room.roomId)
         return
@@ -448,6 +474,16 @@ export default {
       messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
     }
 
+    const roomInfo = (room) => {
+      if(room.isFriend){
+        userInfoVisible.value = true
+        clickRoom.value = {...room}
+        return
+      }
+      groupInfoVisible.value = true
+      console.log(room)
+    }
+
     const quit = () => {
       quitSystem()
     }
@@ -458,7 +494,7 @@ export default {
       }
     })
 
-    const pageHeight = isElectron ? 'calc(100vh - 32px)' : '100vh'
+    const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
       currentUserId,
@@ -478,6 +514,9 @@ export default {
       messageActions,
       roomAddVisible,
       userProfileVisible,
+      userInfoVisible,
+      clickRoom,
+      groupInfoVisible,
       editUserProfile,
       createChat,
       sendMessage,
@@ -486,6 +525,7 @@ export default {
       sendMessageReaction,
       fetchMessage,
       quit,
+      roomInfo,
 
       icons: {
         mdiWindowClose,

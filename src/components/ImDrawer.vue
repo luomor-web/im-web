@@ -7,6 +7,7 @@
         :temporary="temporary"
         width="400"
         @input="changeVisible"
+        :right="direction"
     >
       <v-toolbar class="pl-4 pr-4" flat color="#1976d2">
         <v-toolbar-title class="font-weight-bold white--text">
@@ -38,6 +39,10 @@ export default {
     temporary: {
       type: Boolean,
       default: true
+    },
+    direction: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, context) {
