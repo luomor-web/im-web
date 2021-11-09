@@ -54,10 +54,10 @@
 </template>
 
 <script>
-import ImDrawer from "@/components/ImDrawer";
+import ImDrawer from "@/components/drawer/ImDrawer";
 import {mdiCamera} from "@mdi/js";
 import {ref, watch} from "@vue/composition-api";
-import ImCropper from "@/components/ImCropper";
+import ImCropper from "@/components/system/ImCropper";
 import {editProfile} from "@/net/message";
 
 export default {
@@ -146,7 +146,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import "../styles/theme.scss";
+@import "../../styles/theme";
 
 .header-img {
   border-radius: 150px;

@@ -42,7 +42,7 @@
 <script>
 import {mdiMagnify, mdiChatOutline} from "@mdi/js";
 import {ref} from "@vue/composition-api";
-import ImDrawer from "@/components/ImDrawer";
+import ImDrawer from "@/components/drawer/ImDrawer";
 
 export default {
   name: "AddChat",

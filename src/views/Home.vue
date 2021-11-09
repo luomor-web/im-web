@@ -17,111 +17,32 @@
           :rooms-loaded="roomsLoaded"
           :text-messages="textMessages"
           :message-actions="messageActions"
-          :room-info-enabled="true"
-          @room-info="roomInfo"
+          :room-info-enabled="false"
           @send-message="sendMessage"
-          @add-room="addRoom"
           @fetch-messages="fetchMessage"
           @send-message-reaction="sendMessageReaction"
       >
+
         <template #rooms-header="{}">
-          <div class="room-header-container">
-            <v-btn
-                icon
-                x-large
-                @click="editUserProfile"
-            >
-              <v-avatar color="#b7c1ca">
-                <img
-                    :src="curUser.avatar"
-                    :alt="curUser.username"
-                >
-              </v-avatar>
-            </v-btn>
-            <h3 class="ml-3">
-              {{ curUser.username }}
-            </h3>
-            <v-spacer></v-spacer>
-            <v-menu bottom left offset-y>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn icon
-                       v-bind="attrs"
-                       v-on="on"
-                >
-                  <v-icon>
-                    {{ icons.mdiChevronDown }}
-                  </v-icon>
-                </v-btn>
-              </template>
-              <v-card>
-                <v-list-item-content class="justify-center">
-                  <div class="mx-auto text-center pl-3 pr-3">
-                    <v-btn
-                        depressed
-                        rounded
-                        text
-                        @click="addRoom"
-                    >
-                      创建群组
-                    </v-btn>
-                    <v-divider class="my-3"></v-divider>
-                    <v-btn
-                        depressed
-                        rounded
-                        text
-                        @click="addChat"
-                    >
-                      添加会话
-                    </v-btn>
-                    <v-divider class="my-3"></v-divider>
-                    <v-btn
-                        depressed
-                        rounded
-                        text
-                        @click="quit"
-                    >
-                      退出
-                    </v-btn>
-                  </div>
-                </v-list-item-content>
-              </v-card>
-            </v-menu>
-          </div>
+          <rooms-header
+              :cur-user="curUser"
+              :system-users="systemUsers"
+              :loaded-rooms="loadedRooms"
+              @up-room="upRoom"
+              @change-room="changeRoom"
+          >
+          </rooms-header>
+        </template>
+        <template #room-options="{}">
+          <room-options
+          :room-id="roomId"
+          :loaded-rooms="loadedRooms"
+          >
+          </room-options>
         </template>
       </chat-window>
 
-      <add-chat
-          :users="systemUsers"
-          :visible="chatAddVisible"
-          @chat="createChat"
-          @close="chatAddVisible = false"
-      ></add-chat>
 
-      <add-room
-          :users="systemUsers"
-          :visible="roomAddVisible"
-      ></add-room>
-
-      <user-profile
-          :user="curUser"
-          :visible="userProfileVisible"
-          @close="userProfileVisible = false"
-      ></user-profile>
-
-      <user-info
-          :direction="true"
-          :visible="userInfoVisible"
-          :room="clickRoom"
-          @close="userInfoVisible = false"
-      ></user-info>
-
-      <group-info
-          :direction="true"
-          :visible="groupInfoVisible"
-          @close="groupInfoVisible = false"
-      >
-
-      </group-info>
     </div>
   </div>
 </template>
@@ -130,38 +51,30 @@
 import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 import {nextTick, onMounted, computed, ref} from "@vue/composition-api";
-import TopBar from "../components/TopBar";
+import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/localStoreUtil";
 import {
   buildLastMessage,
   clearUnReadMessage,
-  createGroup,
   getHistoryMessage,
   getUserInfo,
-  getUserList,
   messageReaction,
-  quitSystem,
   sendChatMessage
 } from "@/net/message";
-import {mdiAccount, mdiChevronDown, mdiWindowClose} from "@mdi/js";
-import AddChat from "@/components/AddChat";
-import AddRoom from "@/components/AddRoom";
+import {mdiAccount, mdiWindowClose} from "@mdi/js";
+
 import {addFiles} from "@/utils/file";
-import UserProfile from "@/components/UserProfile";
-import UserInfo from "@/components/UserInfo";
-import GroupInfo from "@/components/GroupInfo";
 import textMessage from "@/locales/text-message";
 import messageAction from "@/locales/message-action";
+import RoomsHeader from "@/components/RoomsHeader";
+import RoomOptions from "@/components/RoomOptions";
 
 export default {
-  name: 'HelloWorld',
+  name: 'Home',
   components: {
-    GroupInfo,
-    UserInfo,
-    UserProfile,
-    AddChat,
-    AddRoom,
+    RoomOptions,
+    RoomsHeader,
     TopBar,
     ChatWindow
   },
@@ -178,23 +91,13 @@ export default {
     const messages = ref([])
     // 消息是否加载完成
     const messageLoaded = ref(false)
-    // 新建房间是否展示
-    const roomAddVisible = ref(false)
-    // 用户信息是否展示
-    const userProfileVisible = ref(false)
-    // 新建chat组件是否可见
-    const chatAddVisible = ref(false)
-    // 用户信息展示组件
-    const userInfoVisible = ref(false)
-    // 群组信息展示组件
-    const groupInfoVisible = ref(false)
     // 当前消息页数
     const page = ref(0)
     // 当前消息分页数
     const number = ref(20)
     // 加载动画
     const loadingRooms = ref(false)
-    // 房间列表是否价值完成
+    // 房间列表是否加载完成
     const roomsLoaded = ref(true)
     // 消息内容
     const textMessages = computed(() => {
@@ -204,12 +107,12 @@ export default {
     const messageActions = computed(() => {
       return [...messageAction]
     })
+
     // 系统用户列表
     const systemUsers = ref([])
 
     const waitSendMessage = ref([])
-    // 当前点击的用户,有可能时房间,有可能时用户
-    const clickRoom = ref({})
+
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
@@ -362,10 +265,6 @@ export default {
 
     })
 
-    const editUserProfile = () => {
-      userProfileVisible.value = true
-    }
-
     const sendFileMessage = (file, roomId, isLast) => {
       const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
       if (index === -1) {
@@ -410,12 +309,6 @@ export default {
       }
       upRoom(roomId)
     }
-
-    const addRoom = () => {
-      roomAddVisible.value = !roomAddVisible.value
-      getUserList()
-    }
-
     const changeRoom = item => {
       messages.value = messages.value.splice(0, messages.value.length)
       messages.value = []
@@ -428,23 +321,6 @@ export default {
 
       getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
       clearUnReadMessage(roomId.value)
-    }
-
-    const addChat = () => {
-      chatAddVisible.value = !chatAddVisible.value
-      getUserList()
-    }
-
-    const createChat = item => {
-      chatAddVisible.value = !chatAddVisible.value
-      const roomIndex = loadedRooms.value.findIndex(r => item._id === r.friendId)
-      if (roomIndex === -1) {
-        createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
-        return
-      }
-
-      upRoom(loadedRooms.value[roomIndex].roomId)
-      changeRoom(loadedRooms.value[roomIndex].roomId)
     }
 
     const fetchMessage = ({room, options = {}}) => {
@@ -462,6 +338,7 @@ export default {
      * @param roomId 会话Id
      */
     const upRoom = (roomId) => {
+      console.log('find', roomId)
       const roomIndex = loadedRooms.value.findIndex(r => roomId === r.roomId)
       if (roomIndex === -1) {
         return
@@ -474,24 +351,10 @@ export default {
       messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
     }
 
-    const roomInfo = (room) => {
-      if(room.isFriend){
-        userInfoVisible.value = true
-        clickRoom.value = {...room}
-        return
-      }
-      groupInfoVisible.value = true
-      console.log(room)
-    }
-
-    const quit = () => {
-      quitSystem()
-    }
-
     const styles = ref({
       container: {
         boxShadow: ''
-      }
+      },
     })
 
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
@@ -508,28 +371,19 @@ export default {
       roomsLoaded,
       styles,
       textMessages,
-      chatAddVisible,
       curUser,
       systemUsers,
       messageActions,
-      roomAddVisible,
-      userProfileVisible,
-      userInfoVisible,
-      clickRoom,
-      groupInfoVisible,
-      editUserProfile,
-      createChat,
+
       sendMessage,
-      addRoom,
-      addChat,
       sendMessageReaction,
       fetchMessage,
-      quit,
-      roomInfo,
+
+      upRoom,
+      changeRoom,
 
       icons: {
         mdiWindowClose,
-        mdiChevronDown,
         mdiAccount,
       }
     }
@@ -539,14 +393,6 @@ export default {
 <style lang="scss" scoped>
 
 @import "../styles/theme.scss";
-
-.room-header-container {
-  position: sticky;
-  display: flex;
-  align-items: center;
-  height: 64px;
-  padding: 0 15px;
-}
 
 .account-img {
   border-radius: 32px;

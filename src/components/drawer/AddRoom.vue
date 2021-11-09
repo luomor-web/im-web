@@ -125,9 +125,9 @@ import {
   mdiArrowRight, mdiTicketAccount, mdiCamera
 } from "@mdi/js";
 import {ref, watch} from "@vue/composition-api";
-import ImDrawer from "@/components/ImDrawer";
+import ImDrawer from "@/components/drawer/ImDrawer";
 import {createGroup} from "@/net/message";
-import ImCropper from "@/components/ImCropper";
+import ImCropper from "@/components/system/ImCropper";
 
 export default {
   name: "AddRoom",
@@ -263,7 +263,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import "../styles/theme.scss";
+@import "../../styles/theme";
 
 .no-drag {
   -webkit-app-region: no-drag;

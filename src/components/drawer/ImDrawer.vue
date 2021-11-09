@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-navigation-drawer
+        app
         hide-overlay
         v-model="drawerVisible"
         absolute

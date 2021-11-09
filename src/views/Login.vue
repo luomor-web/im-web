@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import TopBar from "../components/TopBar";
+import TopBar from "../components/system/TopBar";
 import { mdiFacebook, mdiTwitter, mdiGithub, mdiGoogle, mdiEyeOutline, mdiEyeOffOutline } from '@mdi/js'
 import { ref } from '@vue/composition-api'
 import {webSocket} from "@/net/socket";
