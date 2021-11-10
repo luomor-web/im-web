@@ -1,6 +1,6 @@
 <template>
   <div>
-    <im-drawer title="用户信息" @close="closeUserInfo" :direction="direction" :visible="visible"
+    <im-drawer title="用户信息" @close="closeUserInfo" :direction="true" :visible="visible"
                :temporary="drawerTemporary">
       <template #content="{}">
         <v-card flat>
@@ -44,7 +44,6 @@ export default {
   name: "UserInfo",
   props: {
     visible: Boolean,
-    direction: Boolean,
     room: Object
   },
   components: {

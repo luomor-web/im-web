@@ -71,11 +71,13 @@ const webSocket = (username, password) => {
         }
     }
     socket.onclose = () => {
-        localStoreUtil.clear()
+        localStoreUtil.removeKey('userId')
+        localStoreUtil.removeKey('token')
         router.push('/Login')
     }
     socket.onreconnect = () => {
         console.log('reconnecting...')
+        msg.$emit("RECONNECTING")
     }
 
     socket.onerror = () => {
@@ -89,12 +91,29 @@ const close = () => {
 }
 
 const sendMsg = (data) => {
-    socket.send(JSON.stringify(data))
+    try{
+        socket.send(JSON.stringify(data))
+    }catch (e){
+        initWebSocket()
+    }
+
 }
 
 const initWebSocket = () => {
+    console.log('异常')
     const username = getValue('username')
-    if (!socket && username != null) {
+    console.log('处理',username)
+    if(username === '' || username === undefined){
+        try{
+            socket.close()
+        }catch (e) {
+            console.log('socket当前连接失败..即将前往登录页')
+        }
+        console.log('前往登录页')
+        localStoreUtil.clear()
+        router.push('/Login')
+    }
+    if (socket == null && username) {
         webSocket(username, 'a')
     }
 }

@@ -126,7 +126,7 @@
 <script>
 import TopBar from "../components/system/TopBar";
 import { mdiFacebook, mdiTwitter, mdiGithub, mdiGoogle, mdiEyeOutline, mdiEyeOffOutline } from '@mdi/js'
-import { ref } from '@vue/composition-api'
+import {onMounted, ref} from '@vue/composition-api'
 import {webSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
 import router from "@/router";
@@ -172,8 +172,7 @@ export default {
       webSocket(username.value, password.value)
     }
 
-    const init = () => {
-      console.log(process.env)
+    onMounted(()=>{
       const value = localStoreUtil.getValue('username');
       if(value){
         username.value = value
@@ -186,9 +185,7 @@ export default {
           router.push('/')
         }
       })
-    }
-
-    init()
+    })
 
     const pageHeight = isElectron ?  'calc(100vh - 48px)' : '100vh'
 

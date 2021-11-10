@@ -17,4 +17,8 @@ export const clear = () => {
     sessionStorage.clear()
 }
 
-export default {setValue, setJsonValue, getValue, clear}
+export const removeKey = (key) => {
+    sessionStorage.removeItem(key)
+}
+
+export default {setValue, setJsonValue, getValue, clear,removeKey}

@@ -18,6 +18,7 @@
           :text-messages="textMessages"
           :message-actions="messageActions"
           :room-info-enabled="false"
+          :show-audio="false"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
           @send-message-reaction="sendMessageReaction"
@@ -35,8 +36,9 @@
         </template>
         <template #room-options="{}">
           <room-options
-          :room-id="roomId"
-          :loaded-rooms="loadedRooms"
+              :system-users="systemUsers"
+              :room-id="roomId"
+              :loaded-rooms="loadedRooms"
           >
           </room-options>
         </template>
@@ -133,7 +135,6 @@ export default {
         if (loadedRooms.value.length > 0) {
           changeRoom(loadedRooms.value[0].roomId)
         }
-
       })
 
       // 获取历史消息响应
@@ -145,7 +146,10 @@ export default {
           return
         }
         data.data.forEach(x => {
-          messages.value.unshift(x)
+          const index = messages.value.findIndex(r => r._id === x._id);
+          if(index === -1){
+            messages.value.unshift(x)
+          }
         })
       })
 

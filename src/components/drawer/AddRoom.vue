@@ -214,7 +214,6 @@ export default {
         return waitSelect.value[x]
       })
       userSelect.value = [...items]
-      console.log(item)
     }
 
     const removeUser = (item) => {
