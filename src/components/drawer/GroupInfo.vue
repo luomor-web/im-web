@@ -20,14 +20,14 @@
           <v-list dense>
             <v-list-item-title class="font-weight-black">群组资料</v-list-item-title>
             <!--            <v-subheader>群组成员</v-subheader>-->
-            <v-list-item>
+            <v-list-item class="pa-2">
               <!--                <v-list-item-icon>
                                 <v-icon v-text="mdiIceCream"></v-icon>
                               </v-list-item-icon>-->
               <v-list-item-content>
-                <div class="pb-3 d-flex flex-row">
+                <div class="pb-3 d-flex flex-row flex-wrap">
                   <template v-for="(item,index) in room.users">
-                    <div class="px-2  d-flex flex-column " :key="index">
+                    <div class="px-2 d-flex flex-column " :key="index">
                       <v-menu
                           bottom
                           min-width="200px"
@@ -47,9 +47,9 @@
                                 dot
                                 overlap
                             >
-                            <v-avatar size="36" class="align-self-center">
-                              <v-img :src="item.avatar"></v-img>
-                            </v-avatar>
+                              <v-avatar size="36" class="align-self-center">
+                                <v-img :src="item.avatar"></v-img>
+                              </v-avatar>
                             </v-badge>
                           </v-btn>
                         </template>
@@ -65,6 +65,7 @@
                                   depressed
                                   rounded
                                   text
+                                  @click="startChat(item)"
                               >
                                 开始会话
                               </v-btn>
@@ -74,8 +75,19 @@
                                   rounded
                                   text
                                   color="error"
+                                  v-if="curUserId !== item._id"
+                                  @click="removeRoom(item)"
                               >
-                                移除群聊
+                                移出群聊
+                              </v-btn>
+                              <v-btn
+                                  depressed
+                                  rounded
+                                  text
+                                  color="error"
+                                  v-if="curUserId === item._id"
+                              >
+                                退出群聊
                               </v-btn>
                             </div>
                           </v-list-item-content>
@@ -100,6 +112,8 @@
 <script>
 import ImDrawer from "@/components/drawer/ImDrawer";
 import {ref} from "@vue/composition-api";
+import localStoreUtil from "@/utils/localStoreUtil";
+import {removeUserGroup} from "@/net/message";
 
 export default {
   name: "GroupInfo",
@@ -116,9 +130,22 @@ export default {
       context.emit('close')
     }
 
+    const curUserId = ref(localStoreUtil.getValue('userId'))
+
+    const removeRoom = (item) => {
+      removeUserGroup({roomId: props.room.roomId, userId: item._id})
+    }
+
+    const startChat = (item) => {
+      context.emit('chat',item)
+    }
+
     return {
+      curUserId,
       drawerTemporary,
-      closeGroupInfo
+      closeGroupInfo,
+      removeRoom,
+      startChat,
     }
   }
 }

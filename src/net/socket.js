@@ -66,6 +66,10 @@ const webSocket = (username, password) => {
             case 31:
                 msg.$emit("COMMAND_EDIT_PROFILE_REST", data)
                 break;
+            // 群组移除用户返回
+            case 33:
+                msg.$emit("COMMAND_REMOVE_GROUP_USER_RESP", data)
+                break;
             default:
                 break
         }
@@ -91,9 +95,9 @@ const close = () => {
 }
 
 const sendMsg = (data) => {
-    try{
+    try {
         socket.send(JSON.stringify(data))
-    }catch (e){
+    } catch (e) {
         initWebSocket()
     }
 
@@ -102,18 +106,24 @@ const sendMsg = (data) => {
 const initWebSocket = () => {
     console.log('异常')
     const username = getValue('username')
-    console.log('处理',username)
-    if(username === '' || username === undefined){
-        try{
+    console.log('处理', username)
+    if (username === '' || username === undefined || username === null) {
+        try {
             socket.close()
-        }catch (e) {
+        } catch (e) {
             console.log('socket当前连接失败..即将前往登录页')
         }
         console.log('前往登录页')
         localStoreUtil.clear()
-        router.push('/Login')
+        router.push('/login')
     }
-    if (socket == null && username) {
+    const token = localStoreUtil.getValue('token');
+    console.log(token,'token')
+    if(token === '' || token === undefined || token === null){
+        return
+    }
+    if (socket == null && username ) {
+        console.log('重新连接')
         webSocket(username, 'a')
     }
 }

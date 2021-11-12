@@ -1,12 +1,13 @@
 <template>
   <div>
     <v-navigation-drawer
-        app
+        clipped
         hide-overlay
         v-model="drawerVisible"
         absolute
         :temporary="temporary"
         width="400"
+        height="100vh"
         @input="changeVisible"
         :right="direction"
     >

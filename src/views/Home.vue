@@ -39,6 +39,8 @@
               :system-users="systemUsers"
               :room-id="roomId"
               :loaded-rooms="loadedRooms"
+              @up-room="upRoom"
+              @change-room="changeRoom"
           >
           </room-options>
         </template>
@@ -147,7 +149,7 @@ export default {
         }
         data.data.forEach(x => {
           const index = messages.value.findIndex(r => r._id === x._id);
-          if(index === -1){
+          if (index === -1) {
             messages.value.unshift(x)
           }
         })
@@ -216,7 +218,8 @@ export default {
 
       // 群组创建成功
       msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
-        let room = data.data
+        console.log(data)
+/*        let room = data.data
         loadedRooms.value[loadedRooms.value.length] = room
         loadedRooms.value = [...loadedRooms.value]
 
@@ -224,16 +227,21 @@ export default {
           loadingRooms.value = false
           roomsLoaded.value = true
         })
-        changeRoom(room.roomId)
+        changeRoom(room.roomId)*/
       })
 
       // 加入群组返回
       msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
         let room = data.data.group
-
-        loadedRooms.value[loadedRooms.value.length] = room
-        loadedRooms.value = [...loadedRooms.value]
-
+        const index = loadedRooms.value.findIndex(r => r.roomId === room.roomId);
+        if (index === -1) {
+          loadedRooms.value[loadedRooms.value.length] = room
+          loadedRooms.value = [...loadedRooms.value]
+        } else {
+          console.log('查找到群组')
+          loadedRooms.value[index].users = room.users
+          loadedRooms.value = [...loadedRooms.value]
+        }
         setTimeout(() => {
           loadingRooms.value = false
           roomsLoaded.value = true
@@ -262,9 +270,36 @@ export default {
         messages.value = [...messages.value]
       })
 
+      // 编辑用户信息返回
       msg.$on("COMMAND_EDIT_PROFILE_REST", (data) => {
         const {user} = data.data
         curUser.value = {...user}
+      })
+
+      // 群组用户移除返回
+      msg.$on("COMMAND_REMOVE_GROUP_USER_RESP", (data) => {
+        const { userId} = data.data
+        const room_id = data.data.roomId
+        console.log('COMMAND_REMOVE_GROUP_USER_RESP',room_id, userId)
+        const index = loadedRooms.value.findIndex(r => r.roomId === room_id);
+        if (userId === currentUserId.value) {
+          console.log('小丑竟然是我自己?')
+          loadedRooms.value.splice(index, 1)
+          loadedRooms.value = [...loadedRooms.value]
+          if(room_id === roomId.value ){
+            console.log('123')
+            if(loadedRooms.value.length > 0){
+              changeRoom(loadedRooms.value[0].roomId)
+            }
+          }
+
+          return
+        }
+        const userIndex = loadedRooms.value[index].users.findIndex(r => r._id === userId);
+        loadedRooms.value[index].users.splice(userIndex, 1)
+
+        loadedRooms.value = [...loadedRooms.value]
+
       })
 
     })
@@ -378,11 +413,9 @@ export default {
       curUser,
       systemUsers,
       messageActions,
-
       sendMessage,
       sendMessageReaction,
       fetchMessage,
-
       upRoom,
       changeRoom,
 
@@ -402,4 +435,5 @@ export default {
   border-radius: 32px;
   background-color: $v-grey-lighten1;
 }
+
 </style>

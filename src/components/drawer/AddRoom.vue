@@ -48,22 +48,35 @@
           >需要至少除您之外的两个用户
           </v-alert>
         </div>
-        <div class="pb-3" :class="{'mt-9':userSelect.length===0}">
+        <div class="d-flex mb-2">
+          <div>
+            <h3>已选择({{ userSelect.length }})人</h3>
+          </div>
+          <v-spacer></v-spacer>
+        </div>
+        <div class="pb-3 d-flex flex-row flex-wrap">
           <template v-for="(item,index) in userSelect">
-            <v-tooltip :key="index" top>
-              <template v-slot:activator="{ on, attrs }">
-                <div class="px-1 d-inline">
-                  <v-avatar size="36" v-bind="attrs"
-                            v-on="on" @click="removeUser(item)">
+            <div class="mx-1 d-flex flex-column avatar" :key="index">
+              <div class="align-self-center">
+                <v-badge
+                    :color="item.status.state === 'online' ? 'green':'red'"
+                    bordered
+                    bottom
+                    dot
+                    overlap
+                >
+                  <v-avatar size="36" @click="removeUser(item)">
                     <v-img :src="item.avatar"></v-img>
                   </v-avatar>
-                </div>
-              </template>
-              <span>{{ item.username }}</span>
-            </v-tooltip>
+                </v-badge>
+              </div>
+              <span class="subtitle-2 align-self-center">
+              {{ item.username.length > 3 ? item.username.substring(0, 3) + '..' : item.username }}
+            </span>
+            </div>
           </template>
         </div>
-        <div class="d-flex align-center">
+        <div class="d-flex align-center pb-3">
           <v-text-field
               dense
               required
@@ -74,8 +87,8 @@
               :hide-details="true"
           ></v-text-field>
         </div>
-        <div class="overflow-y-auto pt-3">
-          <v-list>
+        <div class="overflow-y-auto" :style="userListStyle()">
+          <v-list >
             <v-list-item-group v-model="userSelectIndex" multiple @change="operationUser">
               <template v-for="(item, i) in waitSelect">
                 <v-list-item :key="i">
@@ -113,7 +126,7 @@
         v-model="dialog"
         width="500"
     >
-      <im-cropper :img="img" @sure="sure" @center="closeDialog"></im-cropper>
+      <im-cropper :img="img" @sure="sure" @cancel="closeDialog"></im-cropper>
     </v-dialog>
   </div>
 </template>
@@ -156,8 +169,8 @@ export default {
     })
 
     const closeAddRoom = () => {
-      context.emit('close')
       clearData()
+      context.emit('close')
     }
 
     const clearData = () => {
@@ -226,6 +239,13 @@ export default {
       userSelect.value.splice(userIndex, 1)
     }
 
+    const userListStyle = () => {
+      const size = userSelect.value.length % 6 === 0 ? ( userSelect.value.length / 6 ): (Math.floor(userSelect.value.length / 6) + 1)
+      console.log(size)
+      const height = size * 58
+      return `max-height: calc(100vh - ${height}px - 424px)`
+    }
+
     return {
       img,
       cropper,
@@ -239,6 +259,7 @@ export default {
       drawerTemporary,
       roomAvatar,
       picUrl,
+      userListStyle,
       closeDialog,
       sure,
       closeAddRoom,
@@ -276,5 +297,9 @@ export default {
 .cropper {
   height: 300px;
   background: #DDD;
+}
+
+.avatar {
+  width: 52px;
 }
 </style>

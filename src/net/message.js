@@ -57,7 +57,7 @@ const createGroup = (data) => {
 }
 
 // 发送表情回复
-const messageReaction = ({ reaction, remove, messageId, roomId }) => {
+const messageReaction = ({reaction, remove, messageId, roomId}) => {
     const param = {
         cmd: 28,
         reaction,
@@ -69,7 +69,7 @@ const messageReaction = ({ reaction, remove, messageId, roomId }) => {
 }
 
 // 修改用户资料
-const editProfile = ({roomId,isGroup,avatar,name}) => {
+const editProfile = ({roomId, isGroup, avatar, name}) => {
     const param = {
         cmd: 30,
         isGroup,
@@ -80,15 +80,35 @@ const editProfile = ({roomId,isGroup,avatar,name}) => {
     sendMsg(param)
 }
 
+// 邀请加入群聊
+const joinUserGroup = ({group, users}) => {
+    const param = {
+        cmd: 7,
+        group,
+        users
+    }
+    sendMsg(param)
+}
+
+// 移出群聊
+const removeUserGroup = ({roomId,userId}) => {
+  const param = {
+      cmd: 32,
+      roomId,
+      userId
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
-  close()
+    close()
 }
 
 // 构建最后一条消息
 const buildLastMessage = (data) => {
     return {
-        content :data.content,
-        senderId : data.senderId,
+        content: data.content,
+        senderId: data.senderId,
         username: data.username,
         timestamp: data.timestamp,
         // saved: true,
@@ -106,5 +126,7 @@ export {
     createGroup,
     quitSystem,
     messageReaction,
-    editProfile
+    editProfile,
+    joinUserGroup,
+    removeUserGroup
 }

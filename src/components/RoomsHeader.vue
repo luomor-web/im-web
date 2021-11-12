@@ -72,6 +72,7 @@
     <add-room
         :users="systemUsers"
         :visible="roomAddVisible"
+        @close="roomAddVisible = false"
     ></add-room>
 
     <user-profile
