@@ -6,6 +6,7 @@ function checkMediaType(types, file) {
 }
 
 export function isImageFile(file) {
+
 	return checkMediaType(IMAGE_TYPES, file)
 }
 
