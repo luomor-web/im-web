@@ -112,7 +112,7 @@
 <script>
 import ImDrawer from "@/components/drawer/ImDrawer";
 import {ref} from "@vue/composition-api";
-import localStoreUtil from "@/utils/localStoreUtil";
+import localStoreUtil from "@/utils/local-store";
 import {removeUserGroup} from "@/net/message";
 
 export default {

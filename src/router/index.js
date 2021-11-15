@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import {getValue} from "@/utils/localStoreUtil.js";
+import {getValue} from "@/utils/local-store.js";
 
 Vue.use(VueRouter)
 

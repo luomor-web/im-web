@@ -91,13 +91,23 @@ const joinUserGroup = ({group, users}) => {
 }
 
 // 移出群聊
-const removeUserGroup = ({roomId,userId}) => {
-  const param = {
-      cmd: 32,
-      roomId,
-      userId
-  }
-  sendMsg(param)
+const removeUserGroup = ({roomId, userId}) => {
+    const param = {
+        cmd: 32,
+        roomId,
+        userId
+    }
+    sendMsg(param)
+}
+
+// 请求历史文件消息
+const messageFileHistory = ({roomId, date}) => {
+    const param = {
+        cmd: 34,
+        roomId,
+        date
+    }
+    sendMsg(param)
 }
 
 const quitSystem = () => {
@@ -128,5 +138,6 @@ export {
     messageReaction,
     editProfile,
     joinUserGroup,
-    removeUserGroup
+    removeUserGroup,
+    messageFileHistory
 }

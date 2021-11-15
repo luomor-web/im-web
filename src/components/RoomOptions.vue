@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex">
       <div class="mr-2">
-        <v-btn icon>
+        <v-btn icon @click="openFileHistory">
           <v-icon>{{ icons.mdiFolderOutline }}</v-icon>
         </v-btn>
       </div>
@@ -12,7 +12,7 @@
         </v-btn>
       </div>
       <div class="mr-2">
-        <v-btn icon>
+        <v-btn icon @click="openMessageHistory">
           <v-icon>{{ icons.mdiAlarm }}</v-icon>
         </v-btn>
       </div>
@@ -43,8 +43,21 @@
         :room="clickRoom"
         @close="inviteUserVisible = false"
     >
-
     </invite-user>
+
+    <message-history
+      :visible="messageHistoryVisible"
+      :room="clickRoom"
+      @close="messageHistoryVisible = false"
+    >
+    </message-history>
+
+    <file-history
+        :visible="fileHistoryVisible"
+        :room="clickRoom"
+        @close="fileHistoryVisible = false"
+    >
+    </file-history>
   </div>
 </template>
 
@@ -61,6 +74,8 @@ import GroupInfo from "@/components/drawer/GroupInfo";
 import UserInfo from "@/components/drawer/UserInfo";
 import InviteUser from "@/components/drawer/InviteUser";
 import {createGroup, getUserList} from "@/net/message";
+import MessageHistory from "@/components/drawer/MessageHistory";
+import FileHistory from "@/components/drawer/FileHistory";
 
 export default {
   name: "RoomOptions",
@@ -70,6 +85,8 @@ export default {
     systemUsers: Array,
   },
   components: {
+    FileHistory,
+    MessageHistory,
     InviteUser,
     GroupInfo,
     UserInfo,
@@ -92,7 +109,10 @@ export default {
     const groupInfoVisible = ref(false)
     // 邀请用户展示组件
     const inviteUserVisible = ref(false)
-
+    // 历史消息
+    const messageHistoryVisible = ref(false)
+    // 历史文件
+    const fileHistoryVisible = ref(false)
     // 当前点击的用户,有可能时房间,有可能时用户
     const clickRoom = ref({})
 
@@ -117,7 +137,7 @@ export default {
         createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
         return
       }
-      console.log("find ROom")
+      console.log("find room")
       context.emit('up-room', props.loadedRooms[roomIndex].roomId)
       context.emit('change-room', props.loadedRooms[roomIndex].roomId)
     }
@@ -127,14 +147,27 @@ export default {
       inviteUserVisible.value = true
     }
 
+    const openMessageHistory=() => {
+      messageHistoryVisible.value = true
+    }
+
+    const openFileHistory = () => {
+      fileHistoryVisible.value = true
+    }
+
+
     return {
       userInfoVisible,
       groupInfoVisible,
       inviteUserVisible,
+      messageHistoryVisible,
+      fileHistoryVisible,
       clickRoom,
       roomInfo,
       inviteUser,
       createChat,
+      openMessageHistory,
+      openFileHistory,
       icons: {
         mdiTextSearch,
         mdiAccount,

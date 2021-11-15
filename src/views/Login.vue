@@ -130,7 +130,7 @@ import {onMounted, ref} from '@vue/composition-api'
 import {webSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
 import router from "@/router";
-import localStoreUtil from "@/utils/localStoreUtil";
+import localStoreUtil from "@/utils/local-store";
 
 export default {
 

@@ -57,7 +57,7 @@ import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 import {nextTick, onMounted, computed, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
-import localStoreUtil from "@/utils/localStoreUtil";
+import localStoreUtil from "@/utils/local-store";
 import {
   buildLastMessage,
   clearUnReadMessage,

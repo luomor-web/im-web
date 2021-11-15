@@ -1,6 +1,6 @@
 import WebsocketHeartbeatJs from 'websocket-heartbeat-js'
 import msg from '../plugins/msg'
-import localStoreUtil, {getValue} from "@/utils/localStoreUtil";
+import localStoreUtil, {getValue} from "@/utils/local-store";
 import router from "@/router";
 
 let socket
@@ -69,6 +69,10 @@ const webSocket = (username, password) => {
             // 群组移除用户返回
             case 33:
                 msg.$emit("COMMAND_REMOVE_GROUP_USER_RESP", data)
+                break;
+            // 获取历史文件响应
+            case 35:
+                msg.$emit("COMMAND_MESSAGE_HISTORY_RESP",data)
                 break;
             default:
                 break
