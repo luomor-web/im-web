@@ -72,6 +72,10 @@ const webSocket = (username, password) => {
                 break;
             // 获取历史文件响应
             case 35:
+                msg.$emit("COMMAND_MESSAGE_FILE_HISTORY_RESP",data)
+                break;
+            // 获取历史消息响应
+            case 37:
                 msg.$emit("COMMAND_MESSAGE_HISTORY_RESP",data)
                 break;
             default:

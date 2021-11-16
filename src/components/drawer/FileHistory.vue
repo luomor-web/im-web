@@ -60,7 +60,9 @@
               class="overflow-y-auto"
           >
             <div v-for="(item,index) of fileList" :key="index" v-scroll:#scroll-target="onScroll" class="mb-4">
-              <span class="subtitle-2">{{ item.date }}</span>
+              <div class="mb-2">
+                <span class="subtitle-2">{{ item.date }}</span>
+              </div>
               <div class="d-flex flex-row flex-wrap">
                 <div v-for="(file,index) of item.files" :key="index" style="width: 110px;">
                   <v-img
@@ -172,7 +174,8 @@ export default {
     }
 
     onMounted(() => {
-      msg.$on("COMMAND_MESSAGE_HISTORY_RESP", (data) => {
+      msg.$on("COMMAND_MESSAGE_FILE_HISTORY_RESP", (data) => {
+        console.log('get file history')
         const {files, hasNext} = data.data
         if (files.length > 0) {
           fileList.value.push({date: moment(nowDate.value).format("YYYY-MM-DD"), files: files})

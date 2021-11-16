@@ -45,8 +45,6 @@
           </room-options>
         </template>
       </chat-window>
-
-
     </div>
   </div>
 </template>
@@ -322,6 +320,7 @@ export default {
         reply = {
           content: replyMessage.content,
           senderId: replyMessage.senderId,
+          files: replyMessage.files
         }
       }
       const message = {

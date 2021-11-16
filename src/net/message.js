@@ -110,6 +110,17 @@ const messageFileHistory = ({roomId, date}) => {
     sendMsg(param)
 }
 
+// 请求历史消息
+const messageHistory = ({roomId,page,number}) => {
+    const param = {
+        cmd: 36,
+        roomId,
+        page,
+        number
+    }
+    sendMsg(param)
+}
+
 const quitSystem = () => {
     close()
 }
@@ -139,5 +150,6 @@ export {
     editProfile,
     joinUserGroup,
     removeUserGroup,
-    messageFileHistory
+    messageFileHistory,
+    messageHistory
 }
