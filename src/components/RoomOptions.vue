@@ -93,7 +93,6 @@ export default {
   },
   setup(props,context) {
     watch(() => props.roomId, (roomId) => {
-      console.log("房间ID发生变化")
       const index = props.loadedRooms.findIndex(r => r.roomId === roomId);
       clickRoom.value = {...props.loadedRooms[index]}
     })
@@ -127,7 +126,6 @@ export default {
         return
       }
       groupInfoVisible.value = true
-      console.log(clickRoom.value)
     }
 
     const createChat = item => {
@@ -137,7 +135,6 @@ export default {
         createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
         return
       }
-      console.log("find room")
       context.emit('up-room', props.loadedRooms[roomIndex].roomId)
       context.emit('change-room', props.loadedRooms[roomIndex].roomId)
     }

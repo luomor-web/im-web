@@ -164,7 +164,6 @@ export default {
     const picUrl = ref(process.env.VUE_APP_PIC_URL)
 
     watch(() => props.users, (users) => {
-      console.log('watch', users)
       waitSelect.value = [...users]
     })
 
@@ -184,7 +183,6 @@ export default {
 
     const onFileChange = (files) => {
       drawerTemporary.value = false
-      console.log(files)
       dialog.value = true
 
       img.value = URL.createObjectURL(files[0])
@@ -218,7 +216,6 @@ export default {
     }
 
     const openUpload = () => {
-      console.log('open')
       file.value.click()
     }
 
@@ -241,7 +238,6 @@ export default {
 
     const userListStyle = () => {
       const size = userSelect.value.length % 6 === 0 ? ( userSelect.value.length / 6 ): (Math.floor(userSelect.value.length / 6) + 1)
-      console.log(size)
       const height = size * 58
       return `max-height: calc(100vh - ${height}px - 424px)`
     }

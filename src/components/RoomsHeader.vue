@@ -137,7 +137,6 @@ export default {
         createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
         return
       }
-      console.log("find ROom")
       context.emit('up-room', props.loadedRooms[roomIndex].roomId)
       context.emit('change-room', props.loadedRooms[roomIndex].roomId)
     }

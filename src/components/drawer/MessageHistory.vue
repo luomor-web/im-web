@@ -111,7 +111,6 @@ export default {
     }
 
     const changePage = (item) => {
-      console.log(item)
       page.value = item
       getMessage()
     }

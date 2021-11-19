@@ -203,6 +203,7 @@ export default {
           if (userIndex !== -1) {
             loadedRooms.value[roomIndex].users[userIndex] = user
             loadedRooms.value[roomIndex].users = [...loadedRooms.value[roomIndex].users]
+            loadedRooms.value[roomIndex].users = sortedUser(loadedRooms.value[roomIndex].users)
           }
           loadedRooms.value = [...loadedRooms.value]
         }
@@ -214,30 +215,18 @@ export default {
         systemUsers.value = data.data
       })
 
-      // 群组创建成功
-      msg.$on("COMMAND_CREATE_GROUP_RESP", (data) => {
-        console.log(data)
-/*        let room = data.data
-        loadedRooms.value[loadedRooms.value.length] = room
-        loadedRooms.value = [...loadedRooms.value]
-
-        setTimeout(() => {
-          loadingRooms.value = false
-          roomsLoaded.value = true
-        })
-        changeRoom(room.roomId)*/
-      })
-
       // 加入群组返回
       msg.$on("COMMAND_JOIN_GROUP_NOTIFY_RESP", (data) => {
         let room = data.data.group
+        let users = data.data.users
         const index = loadedRooms.value.findIndex(r => r.roomId === room.roomId);
         if (index === -1) {
+          room.users = users
           loadedRooms.value[loadedRooms.value.length] = room
           loadedRooms.value = [...loadedRooms.value]
         } else {
-          console.log('查找到群组')
-          loadedRooms.value[index].users = room.users
+          loadedRooms.value[index].users.push(...users)
+          loadedRooms.value[index].users = sortedUser(loadedRooms.value[index].users)
           loadedRooms.value = [...loadedRooms.value]
         }
         setTimeout(() => {
@@ -247,6 +236,16 @@ export default {
         if (loadedRooms.value.length === 1) {
           changeRoom(room.roomId)
         }
+
+        // 如果加入的用户里包含创建者，那么切换位置
+        const userIndex = users.findIndex(r => r._id === currentUserId.value);
+        if (userIndex !== -1) {
+          const user = users[userIndex];
+          if (user.role === 'ADMIN') {
+            changeRoom(room.roomId)
+          }
+        }
+
       })
 
       // 表情回复
@@ -276,17 +275,14 @@ export default {
 
       // 群组用户移除返回
       msg.$on("COMMAND_REMOVE_GROUP_USER_RESP", (data) => {
-        const { userId} = data.data
+        const {userId} = data.data
         const room_id = data.data.roomId
-        console.log('COMMAND_REMOVE_GROUP_USER_RESP',room_id, userId)
         const index = loadedRooms.value.findIndex(r => r.roomId === room_id);
         if (userId === currentUserId.value) {
-          console.log('小丑竟然是我自己?')
           loadedRooms.value.splice(index, 1)
           loadedRooms.value = [...loadedRooms.value]
-          if(room_id === roomId.value ){
-            console.log('123')
-            if(loadedRooms.value.length > 0){
+          if (room_id === roomId.value) {
+            if (loadedRooms.value.length > 0) {
               changeRoom(loadedRooms.value[0].roomId)
             }
           }
@@ -298,6 +294,44 @@ export default {
 
         loadedRooms.value = [...loadedRooms.value]
 
+      })
+
+      // 解散群聊响应
+      msg.$on('COMMAND_DISBAND_GROUP_RESP', (data) => {
+        const {roomId: disbandRoomId} = data.data
+        const index = loadedRooms.value.findIndex(r => r.roomId === disbandRoomId);
+        loadedRooms.value.splice(index, 1)
+        loadedRooms.value = [...loadedRooms.value]
+
+        if (disbandRoomId === roomId.value) {
+          changeRoom(loadedRooms.value[0]?.roomId)
+        }
+      })
+
+      // 移交群主响应
+      msg.$on('COMMAND_HANDOVER_GROUP_RESP', (data) => {
+        const {roomId, oldAdmin, newAdmin} = data.data
+        const index = loadedRooms.value.findIndex(r => r.roomId === roomId);
+
+        const oldAdminIndex = loadedRooms.value[index].users.findIndex(r => r._id === oldAdmin);
+        loadedRooms.value[index].users[oldAdminIndex].role = 'GENERAL'
+
+        const newAdminIndex = loadedRooms.value[index].users.findIndex(r => r._id === newAdmin);
+        loadedRooms.value[index].users[newAdminIndex].role = 'ADMIN'
+
+        loadedRooms.value[index].users = sortedUser(loadedRooms.value[index].users)
+        loadedRooms.value = [...loadedRooms.value]
+
+      })
+
+      // 修改群组信息响应
+      msg.$on('COMMAND_EDIT_GROUP_PROFILE_RESP', (data) => {
+        const {roomId, roomName, avatar} = data.data
+        const index = loadedRooms.value.findIndex(r => r.roomId === roomId);
+        loadedRooms.value[index].roomName = roomName
+        loadedRooms.value[index].avatar = avatar
+
+        loadedRooms.value = [...loadedRooms.value]
       })
 
     })
@@ -354,6 +388,8 @@ export default {
       page.value = 0
       roomId.value = item
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
+      loadedRooms.value[roomIndex].users = sortedUser(loadedRooms.value[roomIndex].users)
+      loadedRooms.value[roomIndex].users = [...loadedRooms.value[roomIndex].users]
       loadedRooms.value[roomIndex].unreadCount = 0;
       loadedRooms.value = [...loadedRooms.value]
 
@@ -361,8 +397,25 @@ export default {
       clearUnReadMessage(roomId.value)
     }
 
-    const fetchMessage = ({room, options = {}}) => {
-      console.log("更多消息", room, options)
+    const sortedUser = (users) => {
+      const sorted = users.sort((x, y) => {
+        // 如果是群主，优先在最前面
+        if (x.role === 'ADMIN' || y.role === 'ADMIN') {
+          return x.role === 'ADMIN' ? -1 : 1
+          // 如果两个角色相等 判断在线状态
+        } else if (x.role === y.role) {
+          // 在线的优先于不在线的
+          if (x.status.state !== y.status.state) {
+            return x.status.state === 'online' ? -1 : 1
+          } else {
+            return x.username.localeCompare(y.username, 'zh')
+          }
+        }
+      })
+      return sorted
+    }
+
+    const fetchMessage = ({room}) => {
       if (room.roomId !== roomId.value) {
         changeRoom(room.roomId)
         return
@@ -376,7 +429,6 @@ export default {
      * @param roomId 会话Id
      */
     const upRoom = (roomId) => {
-      console.log('find', roomId)
       const roomIndex = loadedRooms.value.findIndex(r => roomId === r.roomId)
       if (roomIndex === -1) {
         return

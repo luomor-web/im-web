@@ -6,7 +6,6 @@ import router from "@/router";
 let socket
 
 const webSocket = (username, password) => {
-    console.log(process.env.VUE_APP_SOCKET_URL)
     const socketUrl = process.env.VUE_APP_SOCKET_URL
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?account=' + username + '&password=' + password,
@@ -46,7 +45,7 @@ const webSocket = (username, password) => {
             case 21:
                 msg.$emit("COMMAND_USER_STATUS_RESP", data)
                 break
-            // 群组创建成功
+            // 群组创建成功 (暂不关注)
             case 23:
                 msg.$emit("COMMAND_CREATE_GROUP_RESP", data)
                 break
@@ -78,6 +77,18 @@ const webSocket = (username, password) => {
             case 37:
                 msg.$emit("COMMAND_MESSAGE_HISTORY_RESP",data)
                 break;
+            // 解散群聊响应
+            case 39:
+                msg.$emit("COMMAND_DISBAND_GROUP_RESP",data)
+                break;
+            // 移交群主响应
+            case 41:
+                msg.$emit("COMMAND_HANDOVER_GROUP_RESP",data)
+                break;
+            // 修改群组信息响应
+            case 43:
+                msg.$emit("COMMAND_EDIT_GROUP_PROFILE_RESP",data)
+                break;
             default:
                 break
         }
@@ -88,12 +99,12 @@ const webSocket = (username, password) => {
         router.push('/Login')
     }
     socket.onreconnect = () => {
-        console.log('reconnecting...')
+        console.log('连接丢失，正在重连...')
         msg.$emit("RECONNECTING")
     }
 
     socket.onerror = () => {
-        console.log('error')
+        console.log('链接错误....')
     }
 }
 
@@ -112,26 +123,22 @@ const sendMsg = (data) => {
 }
 
 const initWebSocket = () => {
-    console.log('异常')
     const username = getValue('username')
-    console.log('处理', username)
     if (username === '' || username === undefined || username === null) {
         try {
             socket.close()
         } catch (e) {
             console.log('socket当前连接失败..即将前往登录页')
         }
-        console.log('前往登录页')
         localStoreUtil.clear()
         router.push('/login')
     }
     const token = localStoreUtil.getValue('token');
-    console.log(token,'token')
     if(token === '' || token === undefined || token === null){
         return
     }
     if (socket == null && username ) {
-        console.log('重新连接')
+        console.log('执行重新建立新连接')
         webSocket(username, 'a')
     }
 }

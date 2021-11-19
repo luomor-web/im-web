@@ -90,12 +90,33 @@ const joinUserGroup = ({group, users}) => {
     sendMsg(param)
 }
 
-// 移出群聊
-const removeUserGroup = ({roomId, userId}) => {
+// 移出群聊 和 退出群聊
+const removeUserGroup = ({roomId, userId, type}) => {
     const param = {
         cmd: 32,
         roomId,
+        userId,
+        type
+    }
+    sendMsg(param)
+}
+
+
+// 移交群主
+const handoverUserGroup = ({roomId, userId}) => {
+    const param = {
+        cmd: 40,
+        roomId,
         userId
+    }
+    sendMsg(param)
+}
+
+// 解散群聊
+const disbandGroup = ({roomId}) => {
+    const param = {
+        cmd: 38,
+        roomId
     }
     sendMsg(param)
 }
@@ -111,7 +132,7 @@ const messageFileHistory = ({roomId, date}) => {
 }
 
 // 请求历史消息
-const messageHistory = ({roomId,page,number}) => {
+const messageHistory = ({roomId, page, number}) => {
     const param = {
         cmd: 36,
         roomId,
@@ -119,6 +140,17 @@ const messageHistory = ({roomId,page,number}) => {
         number
     }
     sendMsg(param)
+}
+
+// 修改群组信息
+const editGroupProfile = ({roomId, roomName, avatar}) => {
+  const param = {
+      cmd: 42,
+      roomId,
+      roomName,
+      avatar
+  }
+  sendMsg(param)
 }
 
 const quitSystem = () => {
@@ -138,6 +170,8 @@ const buildLastMessage = (data) => {
 }
 
 export {
+    handoverUserGroup,
+    disbandGroup,
     getUserInfo,
     getHistoryMessage,
     clearUnReadMessage,
@@ -151,5 +185,6 @@ export {
     joinUserGroup,
     removeUserGroup,
     messageFileHistory,
-    messageHistory
+    messageHistory,
+    editGroupProfile
 }

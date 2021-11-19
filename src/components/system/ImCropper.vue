@@ -68,16 +68,13 @@ export default {
             type: 'image/jpeg',
             extension: 'jpeg',
           }
-          console.log(file, 'wait upload')
           addFiles([file], '', (file, over) => {
-            console.log(file, over)
             if (over) {
               context.emit("sure",file.url)
             }
           })
         }, 'image/jpeg')
       }
-      console.log(canvas, 'canvas')
     }
 
     return {

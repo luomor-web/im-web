@@ -13,7 +13,6 @@ export function upload(url, data,cb) {
     url: url,
     method: 'put',
     onUploadProgress: (event) => {
-      // console.log(event,'upload')
       cb(event.loaded, event.total)
     },
     headers: {

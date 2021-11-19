@@ -175,7 +175,6 @@ export default {
 
     onMounted(() => {
       msg.$on("COMMAND_MESSAGE_FILE_HISTORY_RESP", (data) => {
-        console.log('get file history')
         const {files, hasNext} = data.data
         if (files.length > 0) {
           fileList.value.push({date: moment(nowDate.value).format("YYYY-MM-DD"), files: files})

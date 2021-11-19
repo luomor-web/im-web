@@ -93,7 +93,6 @@ export default {
     ImDrawer
   },
   setup(props, context) {
-    console.log(props, context)
 
     const userSelect = ref([])
     const userSelectIndex = ref([])
@@ -101,7 +100,6 @@ export default {
 
     watch(() => props.users, (users) => {
       waitSelect.value = [...users]
-      console.log(props.room)
       waitSelect.value.forEach(x => {
         x.isClud = props.room.users?.findIndex(r => r._id === x._id) !== -1
       })
@@ -151,7 +149,6 @@ export default {
 
     const userListStyle = () => {
       const size = userSelect.value.length % 6 === 0 ? ( userSelect.value.length / 6 ): (Math.floor(userSelect.value.length / 6) + 1)
-      console.log(size)
       const height = size * 58
       return `max-height: calc(100vh - ${height}px - 64px - 52px - 28px - 16px - 12px - 16px)`
     }

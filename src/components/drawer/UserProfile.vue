@@ -91,7 +91,6 @@ export default {
 
     const onFileChange = (files) => {
       drawerTemporary.value = false
-      console.log(files)
       dialog.value = true
 
       img.value = URL.createObjectURL(files[0])
@@ -117,9 +116,7 @@ export default {
       context.emit('close')
     }
     const openUpload = () => {
-      console.log(file.value)
       file.value.click()
-      console.log('upload pic ')
     }
 
     return {
