@@ -12,6 +12,7 @@
 import {watch, onMounted, ref} from "@vue/composition-api";
 import ImageViewer from "@/components/system/ImageViewer";
 import {isImageFile} from "@/utils/media-file";
+import {downloadForUrl} from "@/utils/download"
 
 export default {
   name: "MessageViewer",
@@ -23,15 +24,16 @@ export default {
     ImageViewer,
   },
 
-  setup(props,context) {
+  setup(props, context) {
     const imageViewVisible = ref(false)
     const urlList = ref([])
 
     watch(() => props.file, file => {
       console.log(file)
-      if(!file) return
+      if (!file) return
 
-      if(file.action === 'download'){
+      if (file.action === 'download') {
+        downloadForUrl(file.file.url,file.file.name)
         return
       }
 
