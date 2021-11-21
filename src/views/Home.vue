@@ -22,6 +22,8 @@
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
           @send-message-reaction="sendMessageReaction"
+          @delete-message="deleteMessage"
+          @open-file="openFile"
       >
 
         <template #rooms-header="{}">
@@ -46,13 +48,14 @@
         </template>
       </chat-window>
     </div>
+    <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
   </div>
 </template>
 
 <script>
 import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
-import {nextTick, onMounted, computed, ref} from "@vue/composition-api";
+import {computed, nextTick, onMounted, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/local-store";
@@ -60,7 +63,7 @@ import {
   buildLastMessage,
   clearUnReadMessage,
   getHistoryMessage,
-  getUserInfo,
+  getUserInfo, messageDelete,
   messageReaction,
   sendChatMessage
 } from "@/net/message";
@@ -71,10 +74,12 @@ import textMessage from "@/locales/text-message";
 import messageAction from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
+import MessageViewer from "@/components/message/MessageViewer";
 
 export default {
   name: 'Home',
   components: {
+    MessageViewer,
     RoomOptions,
     RoomsHeader,
     TopBar,
@@ -95,6 +100,7 @@ export default {
     const messageLoaded = ref(false)
     // 当前消息页数
     const page = ref(0)
+    const sendPage = ref(-1)
     // 当前消息分页数
     const number = ref(20)
     // 加载动画
@@ -112,9 +118,11 @@ export default {
 
     // 系统用户列表
     const systemUsers = ref([])
-
     const waitSendMessage = ref([])
-
+    // 点击文件时的消息
+    const clickMessage = ref(null)
+    // 点击的文件
+    const clickFile = ref(null)
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
@@ -145,6 +153,7 @@ export default {
           })
           return
         }
+        page.value += 1
         data.data.forEach(x => {
           const index = messages.value.findIndex(r => r._id === x._id);
           if (index === -1) {
@@ -334,6 +343,18 @@ export default {
         loadedRooms.value = [...loadedRooms.value]
       })
 
+      // 删除群组信息响应
+      msg.$on('COMMAND_MESSAGE_DELETE_RESP', (data) => {
+        const {_id, roomId: messageRoomId} = data.data
+        if (messageRoomId === roomId.value) {
+          const index = messages.value.findIndex(r => r._id === _id);
+          if (index !== -1) {
+            messages.value[index].deleted = true
+            messages.value = [...messages.value]
+          }
+        }
+      })
+
     })
 
     const sendFileMessage = (file, roomId, isLast) => {
@@ -368,6 +389,7 @@ export default {
       // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
       if (files) {
         waitSendMessage.value.push(message)
+        console.log(files,'files')
         await addFiles(files, roomId, (file, isOver) => {
           sendFileMessage({
             name: file.name + '.' + file.extension,
@@ -386,6 +408,7 @@ export default {
       messages.value = []
       messageLoaded.value = false
       page.value = 0
+      sendPage.value = 0
       roomId.value = item
       const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
       loadedRooms.value[roomIndex].users = sortedUser(loadedRooms.value[roomIndex].users)
@@ -398,7 +421,7 @@ export default {
     }
 
     const sortedUser = (users) => {
-      const sorted = users.sort((x, y) => {
+      return users.sort((x, y) => {
         // 如果是群主，优先在最前面
         if (x.role === 'ADMIN' || y.role === 'ADMIN') {
           return x.role === 'ADMIN' ? -1 : 1
@@ -412,15 +435,19 @@ export default {
           }
         }
       })
-      return sorted
     }
 
+    // 查找更多消息
     const fetchMessage = ({room}) => {
+      console.log('查找系统消息')
       if (room.roomId !== roomId.value) {
         changeRoom(room.roomId)
         return
       }
-      page.value += 1
+      if (page.value === sendPage.value) {
+        return
+      }
+      sendPage.value = page.value
       getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
     }
 
@@ -441,6 +468,22 @@ export default {
       messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
     }
 
+    const deleteMessage = ({message}) => {
+      console.log(message, 'message')
+      messageDelete({messageId: message._id});
+    }
+
+    const openFile = ({message, file}) => {
+      console.log(message, file)
+      clickMessage.value = message
+      clickFile.value = file
+    }
+
+    const closeMessageViewer = () => {
+      clickMessage.value = null
+      clickFile.value = null
+    }
+
     const styles = ref({
       container: {
         boxShadow: ''
@@ -450,6 +493,8 @@ export default {
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
+      clickMessage,
+      clickFile,
       currentUserId,
       loadedRooms,
       roomId,
@@ -464,6 +509,9 @@ export default {
       curUser,
       systemUsers,
       messageActions,
+      closeMessageViewer,
+      deleteMessage,
+      openFile,
       sendMessage,
       sendMessageReaction,
       fetchMessage,

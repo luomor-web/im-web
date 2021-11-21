@@ -45,7 +45,8 @@ const addFiles = async (f, roomId, cb) => {
         const response = await init({
             filename: file.name + '.' + file.extension,
             partCount: data.chunks.length,
-            md5: data.md5
+            md5: data.md5,
+            contentType: file.type,
         })
         console.log(response)
         data.url = response.objectName

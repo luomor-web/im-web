@@ -153,6 +153,15 @@ const editGroupProfile = ({roomId, roomName, avatar}) => {
   sendMsg(param)
 }
 
+// 撤回消息
+const messageDelete = ({messageId}) => {
+  const param = {
+      cmd: 44,
+      messageId
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
     close()
 }
@@ -186,5 +195,6 @@ export {
     removeUserGroup,
     messageFileHistory,
     messageHistory,
-    editGroupProfile
+    editGroupProfile,
+    messageDelete
 }
