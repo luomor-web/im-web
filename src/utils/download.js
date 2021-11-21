@@ -27,6 +27,7 @@ export const downloadForUrl = async (url, name) => {
     }
 }
 
+
 export default {
     downloadForUrl
 }
