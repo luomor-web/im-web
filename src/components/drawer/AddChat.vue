@@ -2,38 +2,12 @@
   <div>
     <im-drawer title="添加会话" @close="closeAddChat" :visible="visible">
       <template #content="{}">
-        <div class="d-flex align-center ">
-          <v-text-field
-              dense
-              required
-              rounded
-              outlined
-              :prepend-inner-icon="icons.mdiMagnify"
-              placeholder="搜索"
-              :hide-details="true"
-          ></v-text-field>
-        </div>
-        <div class="overflow-y-auto pt-3">
-          <v-list>
-            <v-list-item
-                v-for="(item, i) in users"
-                :key="i"
-                @click="showUserInfo"
-            >
-              <v-list-item-avatar>
-                <v-img :src="item.avatar"></v-img>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title v-text="item.username"></v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon @click="startChat(item)">
-                  <v-icon>{{ icons.mdiChatOutline }}</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-        </div>
+        <user-select v-if="visible"
+                     :multiple="false"
+                     :height="96"
+                     @action="startChat"
+                     @contentClick="showUserInfo">
+        </user-select>
       </template>
     </im-drawer>
   </div>
@@ -41,52 +15,38 @@
 
 <script>
 import {mdiMagnify, mdiChatOutline} from "@mdi/js";
-import {ref} from "@vue/composition-api";
 import ImDrawer from "@/components/drawer/ImDrawer";
+import UserSelect from "@/components/user/UserSelect";
 
 export default {
   name: "AddChat",
-  components: {ImDrawer},
+  components: {UserSelect, ImDrawer},
   props: {
-    users: {
-      default: () => {
-        []
-      },
-      type: Array
-    },
     visible: Boolean
   },
   setup(props, context) {
-
-    const items = ref([])
-    const clock = ref(false)
 
     const closeAddChat = () => {
       context.emit('close')
     }
 
-    const showUserInfo = () => {
-      if (!clock.value) {
-        console.log('showUserInfo')
-      }
-      clock.value = false
+    const showUserInfo = (item) => {
+      console.log('展示用户信息待处理:', item)
     }
 
     const startChat = item => {
-      console.log('startChat')
       context.emit('chat', item)
-      clock.value = true
     }
 
     return {
+      startChat,
       closeAddChat,
       showUserInfo,
+
       icons: {
         mdiMagnify,
         mdiChatOutline,
       },
-      items,
-      startChat
     }
   }
 }

@@ -70,7 +70,6 @@
     ></add-chat>
 
     <add-room
-        :users="systemUsers"
         :visible="roomAddVisible"
         @close="roomAddVisible = false"
     ></add-room>
@@ -118,7 +117,6 @@ export default {
 
     const addRoom = () => {
       roomAddVisible.value = !roomAddVisible.value
-      getUserList()
     }
 
     const addChat = () => {

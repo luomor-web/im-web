@@ -216,12 +216,6 @@ export default {
           }
           loadedRooms.value = [...loadedRooms.value]
         }
-
-      })
-
-      // 用户列表
-      msg.$on("COMMAND_USER_LIST_RESP", (data) => {
-        systemUsers.value = data.data
       })
 
       // 加入群组返回
