@@ -153,6 +153,7 @@ export default {
 
       // 获取历史消息响应
       msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
+        console.log(data.data,'data.data')
         if (data.data.length === 0) {
           setTimeout(() => {
             messageLoaded.value = true
