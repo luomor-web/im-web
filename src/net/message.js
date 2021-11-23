@@ -1,4 +1,5 @@
 import {close, sendMsg} from "@/net/socket";
+import moment from "moment";
 
 const getUserInfo = (data) => {
     // 发送获取用户信息
@@ -144,22 +145,22 @@ const messageHistory = ({roomId, page, number}) => {
 
 // 修改群组信息
 const editGroupProfile = ({roomId, roomName, avatar}) => {
-  const param = {
-      cmd: 42,
-      roomId,
-      roomName,
-      avatar
-  }
-  sendMsg(param)
+    const param = {
+        cmd: 42,
+        roomId,
+        roomName,
+        avatar
+    }
+    sendMsg(param)
 }
 
 // 撤回消息
 const messageDelete = ({messageId}) => {
-  const param = {
-      cmd: 44,
-      messageId
-  }
-  sendMsg(param)
+    const param = {
+        cmd: 44,
+        messageId
+    }
+    sendMsg(param)
 }
 
 const quitSystem = () => {
@@ -168,14 +169,40 @@ const quitSystem = () => {
 
 // 构建最后一条消息
 const buildLastMessage = (data) => {
-    return {
-        content: data.content,
+
+    let content = data.content;
+    if (!data.content && data.files.length > 0) {
+        content += ("[文件] - " + data.files[0].name)
+        content += (data.files.length === 1 ? '' : '等多个文件')
+    }
+
+    return buildLastMessageTime({
+        content: content,
         senderId: data.senderId,
         username: data.username,
         timestamp: data.timestamp,
+        date: data.date
         // saved: true,
         // distributed: true,
+    })
+}
+
+// 构建最后一条消息时间
+const buildLastMessageTime = (lastMessage) => {
+    if (lastMessage?.date) {
+        const diffDay = moment().diff(moment(lastMessage.date), 'days');
+        let charset = lastMessage.date + ' ,   '
+        if (diffDay === 0) {
+            charset = ''
+        } else if (diffDay === 1) {
+            charset = '昨天 ,   '
+        } else if (diffDay > 1 && diffDay < 365) {
+            charset = moment(lastMessage.date).format("MM-DD") + ' ,   '
+        }
+        lastMessage.timestamp = charset + lastMessage.timestamp
     }
+
+    return lastMessage
 }
 
 export {
@@ -196,5 +223,6 @@ export {
     messageFileHistory,
     messageHistory,
     editGroupProfile,
-    messageDelete
+    messageDelete,
+    buildLastMessageTime
 }

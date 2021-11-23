@@ -8,7 +8,7 @@
         :temporary="temporary"
         width="400"
         height="100vh"
-        mobile-breakpoint="600"
+        mobile-breakpoint="400"
         @input="changeVisible"
         :right="direction"
     >

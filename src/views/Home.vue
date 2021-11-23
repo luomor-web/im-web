@@ -60,7 +60,7 @@ import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/local-store";
 import {
-  buildLastMessage,
+  buildLastMessage, buildLastMessageTime,
   clearUnReadMessage,
   getHistoryMessage,
   getUserInfo, messageDelete,
@@ -133,8 +133,14 @@ export default {
 
       // 获取用户信息响应
       msg.$on("COMMAND_GET_USER_RESP", (data) => {
+        const {groups} = data.data
+
         curUser.value = data.data
-        loadedRooms.value = data.data.groups
+        console.log('groups', groups)
+        loadedRooms.value = groups
+        groups.forEach(x => {
+          x.lastMessage = buildLastMessageTime(x.lastMessage)
+        })
         nextTick(() => {
           loadingRooms.value = false
           roomsLoaded.value = true
@@ -383,7 +389,7 @@ export default {
       // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
       if (files) {
         waitSendMessage.value.push(message)
-        console.log(files,'files')
+        console.log(files, 'files')
         await addFiles(files, roomId, (file, isOver) => {
           sendFileMessage({
             name: file.name + '.' + file.extension,
