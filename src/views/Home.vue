@@ -351,13 +351,20 @@ export default {
 
       // 删除群组信息响应
       msg.$on('COMMAND_MESSAGE_DELETE_RESP', (data) => {
-        const {_id, roomId: messageRoomId} = data.data
+        const {_id, roomId: messageRoomId, isLastMessage,deleteUserName} = data.data
         if (messageRoomId === roomId.value) {
           const index = messages.value.findIndex(r => r._id === _id);
           if (index !== -1) {
             messages.value[index].deleted = true
             messages.value = [...messages.value]
           }
+          if(isLastMessage){
+            const lastMessage =  buildLastMessage(data.data,deleteUserName)
+            const roomIndex = loadedRooms.value.findIndex(r => r.roomId === messageRoomId);
+            loadedRooms.value[roomIndex].lastMessage = lastMessage
+            loadedRooms.value = [...loadedRooms.value]
+          }
+
         }
       })
 
