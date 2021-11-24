@@ -31,11 +31,14 @@ function createWindow() {
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         // 开发环境打开控制台
-        win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-        if (!process.env.IS_TEST) win.webContents.toggleDevTools()
+        win.loadURL(process.env.WEBPACK_DEV_SERVER_URL).then(() => {
+            if (!process.env.IS_TEST) win.webContents.toggleDevTools()
+        })
     } else {
         createProtocol('app')
-        win.loadURL('app://./index.html')
+        win.loadURL('app://./index.html').then(() => {
+            console.log('Start Success By ' + new Date())
+        })
     }
 
     win.on('closed', () => {
@@ -119,7 +122,7 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
                 title: '清除缓存',
                 buttons: ['OK'],
                 message: '清除缓存成功'
-            })
+            }).then(() => {})
         }
     }
 ]))

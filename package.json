@@ -5,14 +5,15 @@
   "scripts": {
     "serve": "vue-cli-service serve --mode dev",
     "build": "vue-cli-service build",
-    "build:prod": "vue-cli-service build --mode prod",
     "lint": "vue-cli-service lint",
-    "electron:build": "vue-cli-service electron:build",
+    "build:prod": "vue-cli-service build --mode prod",
+    "electron:build": "vue-cli-service electron:build --mode prod",
     "electron:serve": "vue-cli-service electron:serve --mode dev",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "web:serve": "vue-cli-service serve"
   },
+  "main": "background.js",
   "dependencies": {
     "@mdi/js": "^6.5.95",
     "@vue/composition-api": "^1.4.0",
@@ -41,7 +42,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
-    "vue-cli-plugin-electron-builder": "^2.1.1",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-cli-plugin-vuetify": "^2.4.3",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"

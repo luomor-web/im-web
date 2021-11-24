@@ -4,6 +4,7 @@
       <top-bar></top-bar>
     </div>
     <div>
+      <audio class="d-none" id="audio" controls="controls" :src="require('@/assets/music/tip.wav')"></audio>
       <chat-window
           :height="pageHeight"
           :styles="styles"
@@ -27,6 +28,7 @@
       >
 
         <template #rooms-header="{}">
+
           <rooms-header
               :cur-user="curUser"
               :system-users="systemUsers"
@@ -55,7 +57,7 @@
 <script>
 import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css'
-import {computed, nextTick, onMounted, ref} from "@vue/composition-api";
+import {onUnmounted, computed, nextTick, onMounted, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/local-store";
@@ -136,7 +138,7 @@ export default {
         const {groups} = data.data
 
         curUser.value = data.data
-        console.log('groups', groups)
+        console.log('用户信息', groups)
         groups.forEach(x => {
           x.lastMessage = buildLastMessageTime(x.lastMessage)
         })
@@ -153,7 +155,7 @@ export default {
 
       // 获取历史消息响应
       msg.$on("COMMAND_GET_MESSAGE_RESP", (data) => {
-        console.log(data.data,'data.data')
+        console.log(data.data, 'data.data')
         if (data.data.length === 0) {
           setTimeout(() => {
             messageLoaded.value = true
@@ -172,7 +174,9 @@ export default {
       // 聊天请求
       msg.$on("COMMAND_CHAT_RESP", (data) => {
         const message = data.data
-
+        if (message.senderId !== curUser.value._id) {
+          ding()
+        }
         const roomIndex = loadedRooms.value.findIndex(
             r => message.roomId === r.roomId
         )
@@ -192,6 +196,7 @@ export default {
 
           loadedRooms.value = [...loadedRooms.value]
         }
+
         if (message.roomId === roomId.value) {
           clearUnReadMessage(roomId.value)
           messages.value.push(message)
@@ -489,6 +494,36 @@ export default {
       container: {
         boxShadow: ''
       },
+    })
+
+    const ding = () => {
+      console.log('顶')
+      const element = document.getElementById('audio');
+      element.currentTime = 0
+      element.play()
+    }
+
+    onUnmounted(() => {
+      msg.$off('COMMAND_LOGIN_RESP')
+      msg.$off('COMMAND_JOIN_GROUP_NOTIFY_RESP')
+      msg.$off('COMMAND_CHAT_RESP')
+      msg.$off('COMMAND_HEARTBEAT_RESP')
+      msg.$off('COMMAND_GET_USER_RESP')
+      msg.$off('COMMAND_GET_MESSAGE_RESP')
+      msg.$off('COMMAND_USER_STATUS_RESP')
+      msg.$off('COMMAND_CREATE_GROUP_RESP')
+      msg.$off('COMMAND_MESSAGE_READ_RESP')
+      msg.$off('COMMAND_USER_LIST_RESP')
+      msg.$off('COMMAND_SEND_MESSAGE_REACTION_RESP')
+      msg.$off('COMMAND_EDIT_PROFILE_REST')
+      msg.$off('COMMAND_REMOVE_GROUP_USER_RESP')
+      msg.$off('COMMAND_MESSAGE_FILE_HISTORY_RESP')
+      msg.$off('COMMAND_MESSAGE_HISTORY_RESP')
+      msg.$off('COMMAND_DISBAND_GROUP_RESP')
+      msg.$off('COMMAND_HANDOVER_GROUP_RESP')
+      msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')
+      msg.$off('COMMAND_MESSAGE_DELETE_RESP')
+      console.log('销毁')
     })
 
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
