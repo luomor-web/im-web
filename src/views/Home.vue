@@ -137,10 +137,10 @@ export default {
 
         curUser.value = data.data
         console.log('groups', groups)
-        loadedRooms.value = groups
         groups.forEach(x => {
           x.lastMessage = buildLastMessageTime(x.lastMessage)
         })
+        loadedRooms.value = [...groups]
         nextTick(() => {
           loadingRooms.value = false
           roomsLoaded.value = true
