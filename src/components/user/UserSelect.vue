@@ -7,7 +7,7 @@
       <v-spacer></v-spacer>
       <v-btn small color="primary" :disabled="userSelect.length===0" @click="aloneClick" v-if="useAlone">确定</v-btn>
     </div>
-    <div class="pb-3 d-flex flex-row flex-wrap">
+    <div class="pb-3 d-flex flex-row flex-wrap" id="users">
       <template v-for="(item,index) in userSelect">
         <div class="mx-1 d-flex flex-column avatar" :key="index">
           <div class="align-self-center">
@@ -102,11 +102,13 @@ export default {
     }
   },
   setup(props, context) {
+    const isElectron = ref(process.env.IS_ELECTRON)
     const userSelect = ref([])
     const userSelectIndex = ref([])
     const filterSelect = ref([])
     const waitSelect = ref([])
     const searchName = ref('')
+    const otherFlag = ref(0)
 
     const removeUser = (item) => {
       const index = waitSelect.value.findIndex(r => r._id === item._id);
@@ -118,6 +120,7 @@ export default {
       userSelect.value.splice(userIndex, 1)
     }
 
+    // 点击人员列表
     const operationUser = item => {
       if (!props.multiple) {
         context.emit('contentClick', waitSelect.value[item])
@@ -128,13 +131,21 @@ export default {
         return waitSelect.value[x]
       })
       userSelect.value = [...items]
+      console.log();
       context.emit('operationUser', userSelect.value)
     }
 
     const userListStyle = () => {
+      const el = document.getElementById('users')
+      if(el){
+        const lineCount = Math.floor(el.offsetWidth / 54)
+        console.log(lineCount)
+        otherFlag.value = lineCount * 2
+      }
+
       const size = userSelect.value.length % 6 === 0 ? (userSelect.value.length / 6) : (Math.floor(userSelect.value.length / 6) + 1)
       const height = size * 58
-      return `max-height: calc(100vh - ${props.height}px - ${height}px - 92px)`
+      return `max-height: calc(100vh - ${props.height}px - ${height}px - 92px - ${isElectron.value ? 32 : 0}px)`
     }
 
     const onlyAction = (item) => {
@@ -158,7 +169,7 @@ export default {
 
     onMounted(() => {
       getUserList()
-
+      console.log(document.getElementById('users').offsetWidth)
       // 用户列表
       msg.$on("COMMAND_USER_LIST_RESP", (data) => {
         waitSelect.value = data.data
@@ -194,6 +205,6 @@ export default {
 <style lang="scss" scoped>
 
 .avatar {
-  width: 52px;
+  width: 50px;
 }
 </style>

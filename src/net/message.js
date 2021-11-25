@@ -168,9 +168,8 @@ const quitSystem = () => {
 }
 
 // 构建最后一条消息
-const buildLastMessage = (data,operationUser) => {
-
-    let content = data.deleted ? operationUser + ' - 删除了一条消息' : data.content;
+const buildLastMessage = (data) => {
+    let content = data.deleted ?  '删除了一条消息' : data.content
     if (!data.content && data.files.length > 0) {
         content += ("[文件] - " + data.files[0].name)
         content += (data.files.length === 1 ? '' : '等多个文件')
