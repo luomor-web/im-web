@@ -49,7 +49,43 @@
           >需要至少除您之外的两个用户
           </v-alert>
         </div>
-        <user-select v-if="visible" :height="errorVisible ? 392 : 332" @operationUser="operationUser"></user-select>
+        <div>
+          <div class="d-flex mb-2 my-3">
+            <div>
+              <h3>已选择({{ userSelect.length }})人</h3>
+            </div>
+            <v-spacer></v-spacer>
+          </div>
+          <div>
+            <div class="pb-3 d-flex flex-row flex-wrap">
+              <add-user-icon :title="'添加'" @click="userSelectModelOpen"></add-user-icon>
+              <template v-for="(item, index) in userSelect">
+                <div class="px-2 d-flex flex-column" :key="index">
+                  <div class="align-center avatar">
+                    <v-badge
+                        :color="item.status.state === 'online' ? 'green':'red'"
+                        bordered
+                        bottom
+                        dot
+                        overlap
+                    >
+                      <v-avatar size="36" @click="removeUser(item)">
+                        <v-img :src="item.avatar"></v-img>
+                      </v-avatar>
+                    </v-badge>
+                  </div>
+                  <span class="subtitle-2 align-self-center text--secondary">
+                    {{ item.username.length > 3 ? item.username.substring(0, 3) + '..' : item.username }}
+                  </span>
+                </div>
+              </template>
+            </div>
+          </div>
+          <user-select :visible="userSelectModel"
+                       :filter="userSelect"
+                       @close="userSelectModelClose"
+                       @sure="operationUser"></user-select>
+        </div>
       </template>
     </im-drawer>
     <v-dialog
@@ -64,20 +100,22 @@
 </template>
 
 <script>
-import {mdiArrowRight, mdiTicketAccount, mdiCamera} from "@mdi/js";
+import {mdiArrowRight, mdiTicketAccount, mdiCamera, mdiPlus} from "@mdi/js";
 import {ref} from "@vue/composition-api";
 import ImDrawer from "@/components/drawer/ImDrawer";
 import {createGroup} from "@/net/message";
 import ImCropper from "@/components/system/ImCropper";
 import UserSelect from "@/components/user/UserSelect";
+import AddUserIcon from "@/components/user/AddUserIcon";
 
 export default {
   name: "AddRoom",
-  components: {UserSelect, ImDrawer, ImCropper},
+  components: {AddUserIcon, UserSelect, ImDrawer, ImCropper},
   props: {
     visible: Boolean
   },
   setup(props, context) {
+    const userSelectModel = ref(false)
     const errorVisible = ref(false)
     const userSelect = ref([])
     const roomName = ref('')
@@ -135,15 +173,33 @@ export default {
       closeAddRoom()
     }
 
+    const removeUser = (item) => {
+      const index = userSelect.value.findIndex(r => r._id === item._id);
+      userSelect.value.splice(index, 1)
+    }
+
     const openUpload = () => {
       file.value.click()
     }
 
     const operationUser = items => {
-      userSelect.value = [...items]
+      userSelect.value = [...userSelect.value, ...items]
+      userSelectModel.value = false
+      drawerTemporary.value = true
+    }
+
+    const userSelectModelOpen = () => {
+      drawerTemporary.value = false
+      userSelectModel.value = true
+    }
+
+    const userSelectModelClose = () => {
+      drawerTemporary.value = true
+      userSelectModel.value = false
     }
 
     return {
+      userSelectModel,
       img,
       cropper,
       file,
@@ -154,6 +210,9 @@ export default {
       drawerTemporary,
       roomAvatar,
       picUrl,
+      userSelectModelClose,
+      userSelectModelOpen,
+      removeUser,
       closeDialog,
       sure,
       closeAddRoom,
@@ -164,7 +223,8 @@ export default {
       icons: {
         mdiArrowRight,
         mdiTicketAccount,
-        mdiCamera
+        mdiCamera,
+        mdiPlus,
       },
 
     }
@@ -178,6 +238,14 @@ export default {
 
 .no-drag {
   -webkit-app-region: no-drag;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .header-img {

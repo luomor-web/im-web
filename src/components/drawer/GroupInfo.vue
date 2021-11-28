@@ -38,13 +38,6 @@
             </v-img>
           </div>
           <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
-
-          <!--        <div class="d-flex align-center">
-                        {{ room.roomName }}
-                        <v-btn icon>
-                          <v-icon>{{ icons.mdiPencilBoxMultipleOutline }}</v-icon>
-                        </v-btn>
-                      </div>-->
           <v-text-field
               v-if="isAdmin"
               v-model="roomName"
@@ -62,13 +55,10 @@
         <v-card flat>
           <v-list dense>
             <v-list-item-title class="font-weight-black">群组资料</v-list-item-title>
-            <!--            <v-subheader>群组成员</v-subheader>-->
             <v-list-item class="pa-2">
-              <!--                <v-list-item-icon>
-                                <v-icon v-text="mdiIceCream"></v-icon>
-                              </v-list-item-icon>-->
               <v-list-item-content>
                 <div class="pb-3 d-flex flex-row flex-wrap">
+                  <add-user-icon :title="'邀请'" @click="userSelectModelOpen"></add-user-icon>
                   <template v-for="(item,index) in room.users">
                     <div class="px-2 d-flex flex-column " :key="index">
                       <v-menu
@@ -216,7 +206,7 @@
                         </v-card>
                       </v-menu>
 
-                      <span class="subtitle-2 align-self-center">
+                      <span class="subtitle-2 align-self-center text--secondary">
                         {{ item.username.length > 3 ? item.username.substring(0, 3) + '..' : item.username }}
                       </span>
                     </div>
@@ -228,6 +218,12 @@
         </v-card>
       </template>
     </im-drawer>
+    <user-select
+        :visible="userSelectModel"
+        :filter="room.users"
+        @close="userSelectModelClose"
+        @sure="joinGroup">
+    </user-select>
     <v-dialog
         hide-overlay
         persistent
@@ -243,16 +239,18 @@
 import ImDrawer from "@/components/drawer/ImDrawer";
 import {ref, watch} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
-import {disbandGroup, editGroupProfile, handoverUserGroup, removeUserGroup} from "@/net/message";
+import {disbandGroup, editGroupProfile, handoverUserGroup, joinUserGroup, removeUserGroup} from "@/net/message";
 import {
   mdiArrowRight,
   mdiCamera,
   mdiPencil,
   mdiPencilBox,
-  mdiPencilBoxMultipleOutline,
+  mdiPencilBoxMultipleOutline, mdiPlus,
   mdiTicketAccount
 } from "@mdi/js";
 import ImCropper from "@/components/system/ImCropper";
+import UserSelect from "@/components/user/UserSelect";
+import AddUserIcon from "@/components/user/AddUserIcon";
 
 export default {
   name: "GroupInfo",
@@ -261,19 +259,29 @@ export default {
     room: Object
   },
   components: {
+    AddUserIcon,
+    UserSelect,
     ImDrawer,
     ImCropper
   },
   setup(props, context) {
+    // 是否允许点击外部区域关闭
     const drawerTemporary = ref(true)
+    // 当前用户ID
     const curUserId = ref(localStoreUtil.getValue('userId'))
+    // 当前用汉语
     const curUser = ref(null)
+    // 是否管理员
     const isAdmin = ref(false)
+    // 房间头像
     const roomAvatar = ref('')
+    // 图片预览地址
     const picUrl = ref(process.env.VUE_APP_PIC_URL)
     const file = ref(null)
     const dialog = ref(false)
     const img = ref('')
+    // 是否打开
+    const userSelectModel = ref(false)
 
     const roomName = ref('')
 
@@ -394,6 +402,31 @@ export default {
       img.value = ''
     }
 
+    const userSelectModelOpen = () => {
+      drawerTemporary.value = false
+      userSelectModel.value = true
+    }
+
+    const userSelectModelClose = () => {
+      drawerTemporary.value = true
+      userSelectModel.value = false
+    }
+
+    const joinGroup = (items) => {
+      const users = items.map(x => {
+        return {
+          _id: x._id
+        }
+      })
+      const group = {
+        roomId: props.room.roomId
+      }
+      joinUserGroup({group, users})
+
+      drawerTemporary.value = true
+      userSelectModel.value = false
+    }
+
     return {
       file,
       img,
@@ -406,6 +439,10 @@ export default {
       curUserId,
       action,
       drawerTemporary,
+      userSelectModel,
+      userSelectModelClose,
+      joinGroup,
+      userSelectModelOpen,
       closeDialog,
       sure,
       onFileChange,
@@ -431,7 +468,8 @@ export default {
         mdiPencilBoxMultipleOutline,
         mdiTicketAccount,
         mdiArrowRight,
-        mdiCamera
+        mdiCamera,
+        mdiPlus
       }
     }
   }
@@ -446,5 +484,6 @@ export default {
   border-radius: 150px;
   background-color: $v-grey-lighten1;
 }
+
 
 </style>

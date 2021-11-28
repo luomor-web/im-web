@@ -23,7 +23,7 @@
           </v-icon>
         </v-btn>
       </v-toolbar>
-      <div class="pl-4 pr-4 pt-4">
+      <div class="pa-3">
         <slot name="content"></slot>
       </div>
     </v-navigation-drawer>

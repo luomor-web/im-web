@@ -6,11 +6,6 @@
           <v-icon>{{ icons.mdiFolderOutline }}</v-icon>
         </v-btn>
       </div>
-      <div class="mr-2" @click="inviteUser" v-if="!clickRoom.isFriend">
-        <v-btn icon>
-          <v-icon>{{ icons.mdiAccountPlusOutline }}</v-icon>
-        </v-btn>
-      </div>
       <div class="mr-2">
         <v-btn icon @click="openMessageHistory">
           <v-icon>{{ icons.mdiAlarm }}</v-icon>
@@ -37,18 +32,10 @@
     >
     </group-info>
 
-    <invite-user
-        :users="systemUsers"
-        :visible="inviteUserVisible"
-        :room="clickRoom"
-        @close="inviteUserVisible = false"
-    >
-    </invite-user>
-
     <message-history
-      :visible="messageHistoryVisible"
-      :room="clickRoom"
-      @close="messageHistoryVisible = false"
+        :visible="messageHistoryVisible"
+        :room="clickRoom"
+        @close="messageHistoryVisible = false"
     >
     </message-history>
 
@@ -64,15 +51,13 @@
 <script>
 import {
   mdiAccount,
-  mdiAccountPlusOutline, mdiAlarm, mdiBookOpenOutline,
+  mdiAlarm,
   mdiDotsHorizontal,
   mdiFolderOutline,
-  mdiMessageBookmark, mdiTextSearch
 } from "@mdi/js";
 import {onMounted, ref, watch} from "@vue/composition-api";
 import GroupInfo from "@/components/drawer/GroupInfo";
 import UserInfo from "@/components/drawer/UserInfo";
-import InviteUser from "@/components/drawer/InviteUser";
 import {createGroup, getUserList} from "@/net/message";
 import MessageHistory from "@/components/drawer/MessageHistory";
 import FileHistory from "@/components/drawer/FileHistory";
@@ -87,11 +72,10 @@ export default {
   components: {
     FileHistory,
     MessageHistory,
-    InviteUser,
     GroupInfo,
     UserInfo,
   },
-  setup(props,context) {
+  setup(props, context) {
     watch(() => props.roomId, (roomId) => {
       const index = props.loadedRooms.findIndex(r => r.roomId === roomId);
       clickRoom.value = {...props.loadedRooms[index]}
@@ -144,7 +128,7 @@ export default {
       inviteUserVisible.value = true
     }
 
-    const openMessageHistory=() => {
+    const openMessageHistory = () => {
       messageHistoryVisible.value = true
     }
 
@@ -166,13 +150,9 @@ export default {
       openMessageHistory,
       openFileHistory,
       icons: {
-        mdiTextSearch,
         mdiAccount,
-        mdiAccountPlusOutline,
         mdiFolderOutline,
-        mdiMessageBookmark,
         mdiDotsHorizontal,
-        mdiBookOpenOutline,
         mdiAlarm,
       }
     }

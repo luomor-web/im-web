@@ -111,6 +111,13 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
         }
     },
     {
+        label: 'reload',
+        accelerator: 'CmdOrCtrl+r',
+        click: (item, focusedWindow) => {
+            focusedWindow.webContents.reload()
+        }
+    },
+    {
         label: 'Clear Cache',
         accelerator: 'CmdOrCtrl+Shift+Delete',
         click: (item, focusedWindow) => {
