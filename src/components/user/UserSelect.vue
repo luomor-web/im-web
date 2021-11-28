@@ -187,7 +187,6 @@ export default {
     }
 
     const inputChange = (item) => {
-      console.log(item)
       waitSelect.value.forEach(r => {
             r.isFilter = r.username.includes(item);
           }
@@ -201,7 +200,6 @@ export default {
     })
 
     const filterUser = (items) => {
-      console.log('filter', items)
       waitSelect.value.forEach(x => {
         x.isClud = false
         x.isFilter = true

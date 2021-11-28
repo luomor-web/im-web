@@ -3,9 +3,10 @@
 // Write your variable overrides
 $toolbar-content-padding-x: 0px;
 
-.v-input__slot:before{
+.v-input__slot:before {
   border-color: $v-grey-lighten1 !important;
 }
+
 .v-input__icon--append .v-icon, .v-input__icon--prepend .v-icon {
   color: $v-grey-lighten1 !important;
 }
@@ -14,10 +15,33 @@ $toolbar-content-padding-x: 0px;
   z-index: 10 !important;
 }
 
-.v-navigation-drawer--temporary{
+.v-navigation-drawer--temporary {
   z-index: 10 !important;
 }
 
 .vac-room-footer {
   z-index: 9 !important;
+}
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+  background-color: #F5F5F5;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #F5F5F5;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+  background-color: #c8c8c8;
 }

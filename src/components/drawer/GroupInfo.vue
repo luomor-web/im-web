@@ -317,6 +317,7 @@ export default {
 
     watch(() => props.room, (room) => {
       const index = room.users.findIndex(r => r._id === curUserId.value);
+      console.log(index,'查找用户')
       curUser.value = room.users[index]
       isAdmin.value = curUser.value.role === 'ADMIN'
       roomName.value = room.roomName

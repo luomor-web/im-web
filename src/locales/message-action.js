@@ -1,4 +1,6 @@
-export default [
+import {ref} from "@vue/composition-api";
+
+export const messageActions = ref([
     {
         name: 'replyMessage',
         title: '回复'
@@ -13,5 +15,5 @@ export default [
         title: '删除',
         onlyMe: true
     }
-]
+])
 

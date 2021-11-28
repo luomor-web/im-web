@@ -1,4 +1,6 @@
-export default {
+import {ref} from "@vue/composition-api";
+
+export const textMessages =  ref({
     ROOMS_EMPTY: '去创建一些聊天吧',
     ROOM_EMPTY: '暂无会话被选择',
     NEW_MESSAGES: 'New Messages',
@@ -10,4 +12,4 @@ export default {
     IS_ONLINE: '当前在线',
     LAST_SEEN: '最后上线时间 ',
     IS_TYPING: 'is writing...'
-}
+})

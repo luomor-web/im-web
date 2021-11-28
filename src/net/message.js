@@ -176,13 +176,15 @@ const buildLastMessage = (data) => {
     }
 
     return buildLastMessageTime({
+        messageId: data._id,
         content: content,
         senderId: data.senderId,
         username: data.username,
         timestamp: data.timestamp,
-        date: data.date
-        // saved: true,
-        // distributed: true,
+        date: data.date,
+        saved: data.saved,
+        distributed: data.distributed,
+        seen: data.seen
     })
 }
 
