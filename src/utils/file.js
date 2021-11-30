@@ -5,7 +5,7 @@ const CHUNK_SIZE = 5 * 1024 * 1024
 
 export let files = []
 
-const addFiles = async (f, roomId, cb) => {
+const addFiles = async (f, cb) => {
     for (let file of f) {
         const data = {
             // 文件名
@@ -40,7 +40,6 @@ const addFiles = async (f, roomId, cb) => {
             const listLen = list.length
             data.chunkedProgress = listLen <= 0 ? 0 : Math.round((listLen / len) * 10000) / 100.0
         })
-        console.log('切片完成:', data.md5)
 
         const response = await init({
             filename: file.name + '.' + file.extension,
@@ -48,7 +47,6 @@ const addFiles = async (f, roomId, cb) => {
             md5: data.md5,
             contentType: file.type,
         })
-        console.log(response)
         data.url = response.objectName
 
         if (!response.quick) {
@@ -56,7 +54,6 @@ const addFiles = async (f, roomId, cb) => {
 
             const promises = [];
             data.uploadTime = new Date().getTime()
-            console.log('开始上传:', data.uploadTime)
             for (let i = 0; i < uploadUrls.length; i++) {
                 promises.push(new Promise((resolve) => {
                     upload(uploadUrls[i], data.chunks[i].file, (loaded, total) => {
@@ -68,7 +65,9 @@ const addFiles = async (f, roomId, cb) => {
                 }))
             }
             const t = setInterval(() => {
+                if (data.percentage === 100) return
                 countSpeed(data)
+                cb({...data.file, progress: data.percentage}, false)
             }, 300)
             Promise.all(promises).then(async () => {
                 files.push(data)
@@ -78,23 +77,22 @@ const addFiles = async (f, roomId, cb) => {
                     objectName: response.objectName,
                     md5: data.md5
                 })
-                console.log('文件合并完成!')
-                checkOver(data,f,cb)
+                checkOver(data, f, cb)
             })
         } else {
             files.push(data)
-            checkOver(data,f,cb)
+            checkOver(data, f, cb)
         }
     }
 
 }
 
-const checkOver = (data,target,cb) => {
+const checkOver = (data, target, cb) => {
     if (files.length === target.length) {
         files = []
-        cb({...data.file, url: data.url}, true)
+        cb({...data.file, url: data.url, progress: undefined}, true)
     } else {
-        cb({...data.file, url: data.url}, false)
+        cb({...data.file, url: data.url, progress: undefined}, false)
     }
 }
 
@@ -154,7 +152,7 @@ const getFileChunkMd5 = (fileChunkList) => {
             try {
                 spark.append(e.target.result)
             } catch (error) {
-                console.log('获取Md5错误，错误位置：' + currentChunk)
+                // console.log('获取Md5错误，错误位置：' + currentChunk)
             }
             currentChunk++
 
@@ -165,7 +163,6 @@ const getFileChunkMd5 = (fileChunkList) => {
             }
         }
         fileReader.onerror = function () {
-            console.warn('Md5：文件读取错误')
         }
 
         function loadNext() {

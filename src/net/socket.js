@@ -103,12 +103,10 @@ const webSocket = (username, password) => {
         router.push('/Login')
     }
     socket.onreconnect = () => {
-        console.log('连接丢失，正在重连...')
         msg.$emit("RECONNECTING")
     }
 
     socket.onerror = () => {
-        console.log('链接错误....')
     }
 }
 
@@ -132,7 +130,7 @@ const initWebSocket = () => {
         try {
             socket.close()
         } catch (e) {
-            console.log('socket当前连接失败..即将前往登录页')
+            console.error(e)
         }
         localStoreUtil.clear()
         router.push('/login')
@@ -142,7 +140,6 @@ const initWebSocket = () => {
         return
     }
     if (socket == null && username ) {
-        console.log('执行重新建立新连接')
         webSocket(username, 'a')
     }
 }

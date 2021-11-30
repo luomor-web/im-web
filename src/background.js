@@ -37,7 +37,6 @@ function createWindow() {
     } else {
         createProtocol('app')
         win.loadURL('app://./index.html').then(() => {
-            console.log('Start Success By ' + new Date())
         })
     }
 
@@ -64,9 +63,6 @@ app.on('activate', () => {
 })
 
 app.on('ready', async () => {
-    if (isDevelopment && !process.env.IS_TEST) {
-        console.log('开发环境')
-    }
     createWindow()
     bindTray()
     // updateHandle()

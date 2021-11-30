@@ -150,7 +150,6 @@ export default {
       return index.value === props.urlList.length - 1;
     })
     const currentImg = computed(() => {
-      console.log('当前Url')
       return props.urlList[index.value];
     })
 
@@ -257,7 +256,6 @@ export default {
     }
 
     const handleMouseDown = (e) => {
-      console.log('mouse', e)
       if (loading.value || e.button !== 0) return
 
       const {offsetX, offsetY} = transform.value;
@@ -330,8 +328,6 @@ export default {
 
     onMounted(() => {
       deviceSupportInstall()
-
-      console.log("onMounted", index.value, props.urlList, imageViewerWrapper)
 
       imageViewerWrapper.value.focus()
     })

@@ -9,7 +9,7 @@
                ref="cropper"
                :src="img"
                :stencilProps="{aspectRatio: 1}"
-               @change="cropperFile"></cropper>
+      ></cropper>
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
@@ -49,10 +49,6 @@ export default {
   setup(props, context){
     const cropper = ref(null)
 
-    const cropperFile = ({coordinates, canvas}) => {
-      console.log({coordinates, canvas})
-    }
-
     const cancel = () => {
       context.emit("cancel")
     }
@@ -79,7 +75,6 @@ export default {
 
     return {
       cropper,
-      cropperFile,
       cancel,
       sure
     }

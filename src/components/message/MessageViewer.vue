@@ -29,7 +29,6 @@ export default {
     const urlList = ref([])
 
     watch(() => props.file, file => {
-      console.log(file)
       if (!file) return
 
       if (file.action === 'download') {

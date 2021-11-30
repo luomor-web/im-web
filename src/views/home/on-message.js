@@ -107,13 +107,9 @@ const COMMAND_CHAT_RESP = (data) => {
         clearUnReadMessage(roomId.value)
         if (currentUserId.value === message.senderId) {
             const checkIndex = messages.value.findIndex(r => r._id === message._id)
-            console.log(checkIndex, 'checkIndex', message, messages.value[checkIndex])
             if (checkIndex !== -1) {
-                // setTimeout(() => {
-                // messages.value.splice(checkIndex, 1, messages)
                 messages.value[checkIndex] = message
                 messages.value = [...messages.value]
-                // }, 500)
             } else {
                 messages.value.push(message)
             }
@@ -292,13 +288,9 @@ const COMMAND_MESSAGE_DELETE_RESP = (data) => {
 const COMMAND_MESSAGE_READ_RESP = (data) => {
     const {roomId: messageRoomId, messageId} = data.data
 
-    console.log(messageRoomId, messageId, '已读消息')
-
     if (messageRoomId === roomId.value) {
-        console.log('当前房间', messages.value)
         const index = messages.value.findIndex(r => r._id === messageId);
         if (index !== -1) {
-            console.log(index, messages.value[index])
             messages.value[index].seen = true
             messages.value = [...messages.value]
         }

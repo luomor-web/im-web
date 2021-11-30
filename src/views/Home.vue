@@ -116,12 +116,33 @@ export default {
       init()
     })
 
-    const sendFileMessage = (file, roomId, isLast) => {
-      const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
+    const sendFileMessage = (file, param, isLast) => {
+      const index = waitSendMessage.value.findIndex(r => r.roomId === param.roomId)
       if (index === -1) {
         return
       }
-      waitSendMessage.value[index].files.push(file)
+      console.log('回调文件:', file.progress)
+      const fileIndex = waitSendMessage.value[index].files.findIndex(f => f.id === file.id);
+      if (fileIndex === -1) {
+        return
+      }
+
+      // 如果文件进度存在,则更新当前消息列表中的消息进度
+      if (file.progress !== undefined) {
+        // 可能存在没找到的情况
+        const message = messages.value.find(r => r._id === param.messageId);
+        console.log('查找到消息内容', message)
+        if (!message || !message.files) return
+
+        console.log('查找文件', message.files[fileIndex], file.progress)
+        message.files[fileIndex].progress = file.progress
+
+        messages.value = [...messages.value]
+        console.log(messages.value[messages.value.length-1])
+        return
+      }
+
+      waitSendMessage.value[index].files[fileIndex] = file
       if (isLast) {
         sendChatMessage(waitSendMessage.value[index])
         waitSendMessage.value.splice(index, 1)
@@ -129,51 +150,51 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
-      let reply;
-      if (replyMessage) {
-        reply = {
-          content: replyMessage.content,
-          senderId: replyMessage.senderId,
-          files: replyMessage.files
-        }
-      }
+
+      // 如果发送了文件, 那么给每一个文件生成一个ID
+      files?.forEach(x => {
+        x.id = uuid()
+        // x.url = x.localUrl
+      })
+
       const message = {
         senderId: currentUserId.value,
         content,
         roomId,
-        replyMessage: reply,
-        files: []
+        replyMessage: replyMessage,
+        files: files
       }
 
       // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
+
+      // 构建消息, 添加到消息列表中
+      message._id = uuid()
+      message.system = false
+      message.date = moment().format("YYYY-MM-DD")
+      message.username = curUser.value.username
+      message.avatar = curUser.value.avatar
+      message.timestamp = '...'
+
+      messages.value.push(message)
+
       if (files) {
         waitSendMessage.value.push(message)
-        await addFiles(files, roomId, (file, isOver) => {
+        await addFiles(files, (file, isOver) => {
+          console.log('回调', file.progress, {roomId, messageId: message._id}, isOver)
           sendFileMessage({
+            id: file.id,
             name: file.name + '.' + file.extension,
             size: file.size,
             type: file.type,
             url: file.url,
-          }, roomId, isOver)
+            progress: file.progress
+          }, {roomId, messageId: message._id}, isOver)
         })
       } else {
-        // 构建消息, 添加到消息列表中
-        message.checkId = uuid()
-        message._id = uuid()
-        message.system = false
-        message.date = moment().format("YYYY-MM-DD")
-        message.username = curUser.value.username
-        message.avatar = curUser.value.avatar
-        message.timestamp = '...'
-
-        console.log(message, 'message')
-
-        messages.value.push(message)
-
         sendChatMessage(message)
       }
-      upRoom(roomId)
     }
+    upRoom(roomId)
 
     // 查找更多消息
     const fetchMessage = ({room}) => {

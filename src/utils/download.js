@@ -1,10 +1,8 @@
 import request from "@/utils/request";
 
 export const downloadForUrl = async (url, name) => {
-    console.log(url, name)
     let res = await request.get(url, {responseType: 'blob'})
 
-    console.log('返回完成', res)
     const blob = new Blob([res], {type: 'application/octet-stream;charset=utf-8'}); //application/vnd.ms-excel这里表示xls类型文件
     // const contentDisposition = res.headers['content-disposition']; //从response的headers中获取filename, 后端response.setHeader("Content-disposition", "attachment; filename=xxxx.docx") 设置的文件名;
     // const pat = new RegExp("filename=([^;]+\\.[^\\.;]+);*");
