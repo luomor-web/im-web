@@ -179,7 +179,7 @@ const buildLastMessage = (data) => {
         messageId: data._id,
         content: content,
         senderId: data.senderId,
-        username: data.username,
+        username: data.system ? '' : data.username,
         timestamp: data.timestamp,
         date: data.date,
         saved: data.saved,

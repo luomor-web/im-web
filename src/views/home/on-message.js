@@ -9,7 +9,7 @@ import {
     messageLoaded,
     messages,
     page, roomId,
-    roomsLoaded, sortedUser, upRoom
+    roomsLoaded, sortedUser, upRoom, waitSendMessage
 } from "@/views/home/home";
 
 export const init = () => {
@@ -87,20 +87,16 @@ const COMMAND_CHAT_RESP = (data) => {
         r => message.roomId === r.roomId
     )
 
-    if (!message.isSystem) {
-        const lastMessage = buildLastMessage(message)
+    const lastMessage = buildLastMessage(message)
 
-        if (!loadedRooms.value[roomIndex].lastMessage) {
+    if (!loadedRooms.value[roomIndex].lastMessage) {
 
-            loadedRooms.value[roomIndex] = {
-                ...loadedRooms.value[roomIndex],
-                lastMessage
-            }
-        } else {
-            loadedRooms.value[roomIndex].lastMessage = lastMessage
+        loadedRooms.value[roomIndex] = {
+            ...loadedRooms.value[roomIndex],
+            lastMessage
         }
-
-        loadedRooms.value = [...loadedRooms.value]
+    } else {
+        loadedRooms.value[roomIndex].lastMessage = lastMessage
     }
 
     if (message.roomId === roomId.value) {
@@ -113,6 +109,12 @@ const COMMAND_CHAT_RESP = (data) => {
             } else {
                 messages.value.push(message)
             }
+            // 检查等待发送列表
+            const waitIndex = waitSendMessage.value.findIndex(r => r._id === message._id)
+            if (waitIndex !== -1) {
+                waitSendMessage.value.splice(waitIndex, 1)
+            }
+            console.log(waitSendMessage.value, 'waitSendMessage')
         } else {
             messages.value.push(message)
         }
@@ -129,21 +131,21 @@ const COMMAND_USER_STATUS_RESP = (data) => {
     const {group, user} = data.data
 
     const roomIndex = loadedRooms.value.findIndex(r => r.roomId === group.roomId)
-    if (roomIndex !== -1) {
+    if (roomIndex === -1) return
 
-        if (loadedRooms.value[roomIndex].friendId === user._id) {
-            loadedRooms.value[roomIndex].avatar = user.avatar
-            loadedRooms.value[roomIndex].roomName = user.username
-        }
-
-        const userIndex = loadedRooms.value[roomIndex].users.findIndex(r => r._id === user._id)
-        if (userIndex !== -1) {
-            loadedRooms.value[roomIndex].users[userIndex] = user
-            loadedRooms.value[roomIndex].users = [...loadedRooms.value[roomIndex].users]
-            loadedRooms.value[roomIndex].users = sortedUser(loadedRooms.value[roomIndex].users)
-        }
-        loadedRooms.value = [...loadedRooms.value]
+    if (loadedRooms.value[roomIndex].friendId === user._id) {
+        loadedRooms.value[roomIndex].avatar = user.avatar
+        loadedRooms.value[roomIndex].roomName = user.username
     }
+
+    const userIndex = loadedRooms.value[roomIndex].users.findIndex(r => r._id === user._id)
+    if (userIndex !== -1) {
+        loadedRooms.value[roomIndex].users[userIndex] = user
+        loadedRooms.value[roomIndex].users = [...loadedRooms.value[roomIndex].users]
+        loadedRooms.value[roomIndex].users = sortedUser(loadedRooms.value[roomIndex].users)
+    }
+    loadedRooms.value = [...loadedRooms.value]
+
 }
 
 // 加入群组返回

@@ -1,10 +1,10 @@
-
 // 已加载的房间列表
 import {ref} from "@vue/composition-api";
 import {clearUnReadMessage, getHistoryMessage} from "@/net/message";
 
 // 当前用户ID
 export const currentUserId = ref('')
+// 已加载完成的房间列表
 export const loadedRooms = ref([])
 // 当前用户
 export const curUser = ref({})
@@ -23,10 +23,18 @@ export const sendPage = ref(-1)
 export const number = ref(20)
 // 当前房间ID
 export const roomId = ref('')
+// 等待发送的消息
+export const waitSendMessage = ref([])
 
 export const changeRoom = item => {
     messages.value = messages.value.splice(0, messages.value.length)
     messages.value = []
+
+    const filter = waitSendMessage.value.filter(x => x.roomId === item);
+    filter.forEach(x => {
+        messages.value.push(x)
+    })
+
     messageLoaded.value = false
     page.value = 0
     sendPage.value = 0

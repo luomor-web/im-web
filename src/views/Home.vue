@@ -83,7 +83,7 @@ import {
   page,
   roomId, roomsLoaded,
   sendPage,
-  upRoom
+  upRoom, waitSendMessage
 } from "@/views/home/home";
 import {init} from "@/views/home/on-message";
 import {uuid} from "@/utils/id-util";
@@ -102,7 +102,6 @@ export default {
 
     // 系统用户列表
     const systemUsers = ref([])
-    const waitSendMessage = ref([])
     // 点击文件时的消息
     const clickMessage = ref(null)
     // 点击的文件
@@ -116,45 +115,65 @@ export default {
       init()
     })
 
-    const sendFileMessage = (file, param, isLast) => {
-      const index = waitSendMessage.value.findIndex(r => r.roomId === param.roomId)
-      if (index === -1) {
-        return
-      }
-      console.log('回调文件:', file.progress)
+    const sendFileMessage = (file, roomId, isLast) => {
+      const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
+      if (index === -1) return
+
       const fileIndex = waitSendMessage.value[index].files.findIndex(f => f.id === file.id);
-      if (fileIndex === -1) {
-        return
-      }
-
-      // 如果文件进度存在,则更新当前消息列表中的消息进度
-      if (file.progress !== undefined) {
-        // 可能存在没找到的情况
-        const message = messages.value.find(r => r._id === param.messageId);
-        console.log('查找到消息内容', message)
-        if (!message || !message.files) return
-
-        console.log('查找文件', message.files[fileIndex], file.progress)
-        message.files[fileIndex].progress = file.progress
-
-        messages.value = [...messages.value]
-        console.log(messages.value[messages.value.length-1])
-        return
-      }
+      if (fileIndex === -1) return
 
       waitSendMessage.value[index].files[fileIndex] = file
-      if (isLast) {
-        sendChatMessage(waitSendMessage.value[index])
-        waitSendMessage.value.splice(index, 1)
+      if (!isLast) return
+
+      sendChatMessage(waitSendMessage.value[index])
+
+      // waitSendMessage.value.splice(index, 1)
+    }
+
+    const updateProgress = (file, messageId) => {
+      const message = messages.value.find(r => r._id === messageId);
+      if (!message || !message.files) return
+
+      message.files.find(r => r.id === file.id).progress = file.progress
+      messages.value = [...messages.value]
+    }
+
+    const operationMessage = async message => {
+
+      messages.value.push(message)
+      waitSendMessage.value.push(message)
+
+      if (!message.files) {
+        sendChatMessage(message)
+        return
       }
+
+      await addFiles(message.files, (file, isOver) => {
+
+        if (file.progress) {
+          updateProgress(file, message._id)
+          return
+        }
+
+        console.log('回调', file.progress, isOver)
+
+        sendFileMessage({
+          id: file.id,
+          name: file.name + '.' + file.extension,
+          size: file.size,
+          type: file.type,
+          url: file.url,
+          progress: file.progress
+        }, message.roomId, isOver)
+
+      })
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
-
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()
-        // x.url = x.localUrl
+        x.url = x.localUrl
       })
 
       const message = {
@@ -175,26 +194,12 @@ export default {
       message.avatar = curUser.value.avatar
       message.timestamp = '...'
 
-      messages.value.push(message)
+      upRoom(roomId)
 
-      if (files) {
-        waitSendMessage.value.push(message)
-        await addFiles(files, (file, isOver) => {
-          console.log('回调', file.progress, {roomId, messageId: message._id}, isOver)
-          sendFileMessage({
-            id: file.id,
-            name: file.name + '.' + file.extension,
-            size: file.size,
-            type: file.type,
-            url: file.url,
-            progress: file.progress
-          }, {roomId, messageId: message._id}, isOver)
-        })
-      } else {
-        sendChatMessage(message)
-      }
+      await operationMessage(message)
+
+
     }
-    upRoom(roomId)
 
     // 查找更多消息
     const fetchMessage = ({room}) => {

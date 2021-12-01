@@ -1,16 +1,5 @@
 <template>
-  <div>
-    <user-select :visible="visible" :multiple="false" @close="closeAddChat" @action="startChat"></user-select>
-<!--    <im-drawer title="添加会话" @close="closeAddChat" :visible="visible">
-      <template #content="{}">
-        <user-select v-if="visible"
-                     :multiple="false"
-                     :height="96"
-                     @action="startChat">
-        </user-select>
-      </template>
-    </im-drawer>-->
-  </div>
+  <user-select key="ind" :visible="visible" :multiple="false" @close="closeAddChat" @action="startChat"></user-select>
 </template>
 
 <script>

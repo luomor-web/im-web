@@ -20,9 +20,9 @@
           <v-list>
             <v-list-item-group v-model="userSelectIndex" :multiple="multiple" @change="operationUser">
               <template v-for="(item, i) in waitSelect">
-                <v-list-item :key="i" :disabled="item.isClud" :class="item.isFilter ? '':'d-none'">
-                  <template v-slot:default="{ active }">
+                <v-list-item :key="i" :disabled="item.disabled" :class="item.hide ? 'd-none':''">
 
+                  <template v-slot:default="{ active }">
                     <v-list-item-avatar>
                       <v-img :src="item.avatar"></v-img>
                     </v-list-item-avatar>
@@ -32,7 +32,7 @@
                     </v-list-item-content>
 
                     <v-list-item-action>
-                      <v-btn small :color="active? 'error':'primary'" v-if="multiple" :disabled="item.isClud">
+                      <v-btn small :color="active? 'error':'primary'" v-if="multiple" :disabled="item.disabled">
                         {{ active ? '移除' : '添加' }}
                       </v-btn>
                     </v-list-item-action>
@@ -141,7 +141,6 @@ export default {
     // 仅可选择一个时选择的用户
     const selectUser = ref({})
 
-
     const removeUser = (item) => {
       const index = waitSelect.value.findIndex(r => r._id === item._id);
       // 移除下标列表的数据
@@ -187,27 +186,28 @@ export default {
     }
 
     const inputChange = (item) => {
-      waitSelect.value.forEach(r => {
-            r.isFilter = r.username.includes(item);
-          }
-      )
+      waitSelect.value.forEach(r => r.hide = !r.username.includes(item))
     }
 
     watch(() => props.visible, (visible) => {
-      if(visible){
-        filterUser(props.filter)
-      }
+      filterUser(props.filter, !visible)
+      console.log(visible, 'visible')
+      // filterUser(props.filter, !visible)
     })
 
-    const filterUser = (items) => {
-      waitSelect.value.forEach(x => {
-        x.isClud = false
-        x.isFilter = true
+    const filterUser = (items, reset) => {
+      console.log('调用')
+
+      const filter = waitSelect.value.map(x => {
+        return {
+          ...x,
+          disabled: reset ? false : items?.findIndex(r => r._id === x._id) !== -1,
+          hide: false
+        }
       })
-      waitSelect.value.forEach(x => {
-        x.isClud = items?.findIndex(r => r._id === x._id) !== -1
-        x.isFilter = true
-      })
+
+      waitSelect.value = filter
+      console.log(filter, 'filter')
     }
 
     onMounted(() => {
@@ -215,9 +215,6 @@ export default {
       // 用户列表
       msg.$on("COMMAND_USER_LIST_RESP", (data) => {
         waitSelect.value = data.data
-        if (props.multiple) {
-          filterUser(props.filter)
-        }
       })
     })
 

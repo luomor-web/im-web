@@ -71,27 +71,27 @@ const webSocket = (username, password) => {
                 break;
             // 获取历史文件响应
             case 35:
-                msg.$emit("COMMAND_MESSAGE_FILE_HISTORY_RESP",data)
+                msg.$emit("COMMAND_MESSAGE_FILE_HISTORY_RESP", data)
                 break;
             // 获取历史消息响应
             case 37:
-                msg.$emit("COMMAND_MESSAGE_HISTORY_RESP",data)
+                msg.$emit("COMMAND_MESSAGE_HISTORY_RESP", data)
                 break;
             // 解散群聊响应
             case 39:
-                msg.$emit("COMMAND_DISBAND_GROUP_RESP",data)
+                msg.$emit("COMMAND_DISBAND_GROUP_RESP", data)
                 break;
             // 移交群主响应
             case 41:
-                msg.$emit("COMMAND_HANDOVER_GROUP_RESP",data)
+                msg.$emit("COMMAND_HANDOVER_GROUP_RESP", data)
                 break;
             // 修改群组信息响应
             case 43:
-                msg.$emit("COMMAND_EDIT_GROUP_PROFILE_RESP",data)
+                msg.$emit("COMMAND_EDIT_GROUP_PROFILE_RESP", data)
                 break;
             // 删除信息响应
             case 45:
-                msg.$emit("COMMAND_MESSAGE_DELETE_RESP",data)
+                msg.$emit("COMMAND_MESSAGE_DELETE_RESP", data)
                 break;
             default:
                 break
@@ -127,19 +127,21 @@ const sendMsg = (data) => {
 const initWebSocket = () => {
     const username = getValue('username')
     if (username === '' || username === undefined || username === null) {
-        try {
-            socket.close()
-        } catch (e) {
-            console.error(e)
+        if (socket) {
+            try {
+                socket.close()
+            } catch (e) {
+                console.log('Socket 关闭异常')
+            }
         }
         localStoreUtil.clear()
         router.push('/login')
     }
     const token = localStoreUtil.getValue('token');
-    if(token === '' || token === undefined || token === null){
+    if (token === '' || token === undefined || token === null) {
         return
     }
-    if (socket == null && username ) {
+    if (socket == null && username) {
         webSocket(username, 'a')
     }
 }

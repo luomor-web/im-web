@@ -316,10 +316,10 @@ export default {
     }
 
     watch(() => props.room, (room) => {
-      const index = room.users.findIndex(r => r._id === curUserId.value);
-      curUser.value = room.users[index]
+      const index = room?.users.findIndex(r => r._id === curUserId.value);
+      curUser.value = room?.users[index]
       isAdmin.value = curUser.value.role === 'ADMIN'
-      roomName.value = room.roomName
+      roomName.value = room?.roomName
     })
 
     const closeGroupInfo = () => {
