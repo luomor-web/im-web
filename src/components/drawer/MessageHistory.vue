@@ -15,11 +15,14 @@
                 {{ item.username }}
               </span>
                 <v-spacer></v-spacer>
-                <span class="body-2 text--secondary">
-                {{ item.date }} {{ item.timestamp }}
-              </span>
+                <span class="body-2 text--secondary pr-2">
+                  {{ item.timestamp }}
+                </span>
               </div>
-              <div>
+              <v-card flat>
+                <div v-if="item.deleted">
+                  消息已删除
+                </div>
                 <div v-for="(file,index) of item.files" :key="index" style="width: 110px;">
                   <v-img
                       aspect-ratio="1"
@@ -27,15 +30,11 @@
                       max-width="110"
                       :src="isImg(file) ? file.url: require('@/assets/images/default/tray-arrow-down.png')">
                   </v-img>
-                  <!--                  <span class="body-2">-->
-                  <!--                  {{ file.name.length > 8 ? (file.name.substring(0, 8) + '..') : file.name }}-->
-                  <!--                  {{ file.name }}-->
-                  <!--                </span>-->
                 </div>
-                <span class="body-1">
-                {{ item.content }}
-              </span>
-              </div>
+                <span style="white-space: pre-line">
+                  {{ item.content }}
+                </span>
+              </v-card>
             </div>
           </div>
           <v-row justify="center">
@@ -59,7 +58,7 @@
 <script>
 import ImDrawer from "@/components/drawer/ImDrawer";
 import {onMounted, ref, watch} from "@vue/composition-api";
-import {messageHistory} from "@/net/message";
+import {buildLastMessageTime, messageHistory} from "@/net/message";
 import msg from "@/plugins/msg";
 import {isImageFile} from "@/utils/media-file";
 
@@ -85,9 +84,14 @@ export default {
       }
     })
 
+    const dateFormat = (item) => {
+      return buildLastMessageTime(item).timestamp
+    }
+
     onMounted(() => {
       msg.$on("COMMAND_MESSAGE_HISTORY_RESP", (data) => {
-        messages.value = [...data.data]
+        messages.value = []
+        data.data.forEach(x => messages.value.push(buildLastMessageTime(x)))
         pageCount.value = data.page
       })
     })
@@ -133,6 +137,7 @@ export default {
       page,
       pageCount,
       messages,
+      dateFormat,
       nextPage,
       previousPage,
       isImg,
@@ -145,7 +150,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::-webkit-scrollbar {
-  display: none
-}
 </style>
