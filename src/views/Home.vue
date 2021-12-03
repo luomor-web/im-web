@@ -223,6 +223,7 @@ export default {
     }
 
     const openFile = ({message, file}) => {
+      console.log(message, file,'111')
       clickMessage.value = message
       clickFile.value = file
     }
