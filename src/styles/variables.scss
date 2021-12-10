@@ -2,25 +2,20 @@
 
 // Write your variable overrides
 $toolbar-content-padding-x: 0px;
+$text-field-border-radius: 10px;
 
-.v-input__slot:before {
-  border-color: $v-grey-lighten1 !important;
+.v-text-field--outlined fieldset {
+  border-color: $v-grey-lighten3;
 }
 
-.v-input__icon--append .v-icon, .v-input__icon--prepend .v-icon {
-  color: $v-grey-lighten1 !important;
+.v-text-field--outlined fieldset:hover {
+  border-color: blue;
 }
 
-.v-overlay--active {
-  z-index: 10 !important;
-}
-
-.v-navigation-drawer--temporary {
-  z-index: 10 !important;
-}
-
-.vac-room-footer {
-  z-index: 9 !important;
+.im-list-item:hover {
+  border-radius: 10px;
+  background-color: $v-grey-lighten2;
+  cursor: pointer;
 }
 
 /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/

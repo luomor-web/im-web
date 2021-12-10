@@ -1,0 +1,66 @@
+<template>
+  <div>
+    <v-toolbar class="pl-4 pr-4" flat>
+      <v-btn class="no-drag" icon @click="close">
+        <v-icon>
+          {{ sub ? icons.mdiArrowLeft : icons.mdiWindowClose }}
+        </v-icon>
+      </v-btn>
+      <slot>
+        <v-toolbar-title class="font-weight-bold ">
+          {{ title }}
+        </v-toolbar-title>
+      </slot>
+      <v-spacer></v-spacer>
+      <v-btn class="no-drag" icon @click="editProp" v-if="edit">
+        <v-icon>
+          {{ icons.mdiPencilOutline }}
+        </v-icon>
+      </v-btn>
+    </v-toolbar>
+  </div>
+</template>
+
+<script>
+import {mdiArrowLeft, mdiPencilOutline, mdiWindowClose} from "@mdi/js";
+
+export default {
+  name: "DrawerTop",
+
+  props: {
+    title: {type: String, default: ''},
+    sub: {type: Boolean, default: false},
+    edit: {type: Boolean, default: false}
+  },
+
+  setup(props, {emit}) {
+
+    const close = () => {
+      emit('close')
+    }
+
+    const editProp = () => {
+      emit('edit')
+    }
+
+    return {
+
+      close,
+      editProp,
+
+      icons: {
+        mdiWindowClose,
+        mdiPencilOutline,
+        mdiArrowLeft,
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+
+@import "../../styles/theme";
+
+
+</style>

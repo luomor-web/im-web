@@ -1,19 +1,15 @@
 <template>
+
   <div>
     <div class="d-flex">
       <div class="mr-2">
-        <v-btn icon @click="openFileHistory">
-          <v-icon>{{ icons.mdiFolderOutline }}</v-icon>
-        </v-btn>
-      </div>
-      <div class="mr-2">
         <v-btn icon @click="openMessageHistory">
-          <v-icon>{{ icons.mdiAlarm }}</v-icon>
+          <v-icon>{{ icons.mdiMagnify }}</v-icon>
         </v-btn>
       </div>
       <div class="mr-2">
         <v-btn icon @click="roomInfo">
-          <v-icon>{{ icons.mdiDotsHorizontal }}</v-icon>
+          <v-icon>{{ icons.mdiDotsVertical  }}</v-icon>
         </v-btn>
       </div>
     </div>
@@ -24,13 +20,13 @@
         @close="userInfoVisible = false"
     ></user-info>
 
-    <group-info
-        :visible="groupInfoVisible"
-        :room="clickRoom"
-        @chat="createChat"
-        @close="groupInfoVisible = false"
-    >
-    </group-info>
+<!--    <group-info-->
+<!--        :visible="groupInfoVisible"-->
+<!--        :room="clickRoom"-->
+<!--        @chat="createChat"-->
+<!--        @close="groupInfoVisible = false"-->
+<!--    >-->
+<!--    </group-info>-->
 
     <message-history
         :visible="messageHistoryVisible"
@@ -45,18 +41,14 @@
         @close="fileHistoryVisible = false"
     >
     </file-history>
+
+
   </div>
 </template>
 
 <script>
-import {
-  mdiAccount,
-  mdiAlarm,
-  mdiDotsHorizontal,
-  mdiFolderOutline,
-} from "@mdi/js";
+import {mdiDotsVertical, mdiMagnify,} from "@mdi/js";
 import {onMounted, ref, watch} from "@vue/composition-api";
-import GroupInfo from "@/components/drawer/GroupInfo";
 import UserInfo from "@/components/drawer/UserInfo";
 import {createGroup, getUserList} from "@/net/message";
 import MessageHistory from "@/components/drawer/MessageHistory";
@@ -72,7 +64,6 @@ export default {
   components: {
     FileHistory,
     MessageHistory,
-    GroupInfo,
     UserInfo,
   },
   setup(props, context) {
@@ -150,10 +141,8 @@ export default {
       openMessageHistory,
       openFileHistory,
       icons: {
-        mdiAccount,
-        mdiFolderOutline,
-        mdiDotsHorizontal,
-        mdiAlarm,
+        mdiMagnify ,
+        mdiDotsVertical ,
       }
     }
   }

@@ -1,14 +1,16 @@
 <template>
   <div>
-    <im-drawer title="用户信息" @close="closeUserProfile" :visible="visible" :temporary="drawerTemporary">
-      <template #content="{}">
+    <drawer-top :title="'编辑资料'" @close="close"></drawer-top>
+    <div class="pt-2">
+      <div class="mx-2">
         <div class="d-table ma-auto">
-          <v-hover>
+          <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
+          <v-hover >
             <template v-slot:default="{ hover }">
               <v-img
                   aspect-ratio="1"
-                  height="150"
-                  width="150"
+                  height="120"
+                  width="120"
                   class="header-img"
                   :src="curUser.avatar"
               >
@@ -17,7 +19,7 @@
                       v-if="hover"
                       absolute
                   >
-                    <v-btn icon @click="openUpload" height="150" width="150">
+                    <v-btn icon @click="openUpload" height="120" width="120">
                       <v-icon>{{ icons.mdiCamera }}</v-icon>
                     </v-btn>
                   </v-overlay>
@@ -26,22 +28,17 @@
             </template>
           </v-hover>
         </div>
-        <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
-        <div class="d-flex align-center py-2">
-          <v-text-field v-model="username"
-                        small
-                        light
-                        label="用户名称"
-                        single-line>
+        <div class="mx-2 mb-2 mt-8">
+          <v-text-field
+              v-model="username"
+              label="用户名称"
+              hide-details="auto"
+              outlined
+          >
           </v-text-field>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" :disabled="curUser.username === username || username === ''"
-                 @click="changeUserProfile(null)">
-            确认
-          </v-btn>
         </div>
-      </template>
-    </im-drawer>
+      </div>
+    </div>
     <v-dialog
         hide-overlay
         persistent
@@ -54,40 +51,28 @@
 </template>
 
 <script>
-import ImDrawer from "@/components/drawer/ImDrawer";
 import {mdiCamera} from "@mdi/js";
-import {ref, watch} from "@vue/composition-api";
+import {ref} from "@vue/composition-api";
 import ImCropper from "@/components/system/ImCropper";
 import {editProfile} from "@/net/message";
+import DrawerTop from "@/components/drawer/DrawerTop";
+import {curUser} from "@/views/home/home";
 
 export default {
   name: "UserProfile",
   components: {
-    ImDrawer,
+    DrawerTop,
     ImCropper
   },
   props: {
-    visible: Boolean,
     user: Object
   },
   setup(props, context) {
     const file = ref(null)
-    const curUser = ref(props.user)
     const username = ref(curUser.value.username)
     const dialog = ref(false)
     const img = ref('')
     const drawerTemporary = ref(true)
-
-    watch(() => props.visible, (visible) => {
-      if (visible) {
-        curUser.value = {...props.user}
-        username.value = curUser.value.username
-      }
-    })
-
-    watch(() => props.user, () => {
-      curUser.value = {...props.user}
-    })
 
     const onFileChange = (files) => {
       drawerTemporary.value = false
@@ -112,11 +97,12 @@ export default {
       changeUserProfile(url)
     }
 
-    const closeUserProfile = () => {
-      context.emit('close')
-    }
     const openUpload = () => {
       file.value.click()
+    }
+
+    const close = () => {
+      context.emit('close','')
     }
 
     return {
@@ -126,11 +112,11 @@ export default {
       dialog,
       img,
       drawerTemporary,
+      close,
       onFileChange,
       sure,
       changeUserProfile,
       openUpload,
-      closeUserProfile,
       closeDialog,
 
       icons: {
@@ -143,10 +129,10 @@ export default {
 
 <style lang="scss" scoped>
 
-@import "../../styles/theme";
+@import "src/styles/theme";
 
 .header-img {
-  border-radius: 150px;
+  border-radius: 120px;
   background-color: $v-grey-lighten1;
 }
 

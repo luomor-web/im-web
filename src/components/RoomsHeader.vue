@@ -1,18 +1,60 @@
 <template>
   <div>
     <div class="room-header-container">
-      <v-btn
-          icon
-          x-large
-          @click="editUserProfile"
+      <v-menu
+          bottom
+          min-width="260px"
+          :rounded="'lg'"
+          offset-y
       >
-        <v-avatar color="#b7c1ca">
-          <img
-              :src="curUser.avatar"
-              :alt="curUser.username"
+        <template v-slot:activator="{ on }">
+          <v-btn
+              v-on="on"
+              icon
+              x-large
           >
-        </v-avatar>
-      </v-btn>
+            <v-avatar color="#b7c1ca">
+              <img
+                  :src="curUser.avatar"
+                  :alt="curUser.username"
+              >
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card flat
+                class="mt-2">
+          <v-list>
+            <v-list-item class="im-list-item" @click="goTo('USER_PROFILE')">
+              <v-list-item-icon>
+                <v-icon>{{ icons.mdiPencilOutline }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                编辑资料
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item class="im-list-item">
+              <v-list-item-icon>
+                <v-icon>{{ icons.mdiCog }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                设置
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item class="im-list-item">
+              <v-list-item-icon>
+                <v-icon>{{ icons.mdiExitToApp }}</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                退出
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-card>
+
+      </v-menu>
+
       <h3 class="ml-3">
         {{ curUser.username }}
       </h3>
@@ -62,33 +104,23 @@
         </v-card>
       </v-menu>
     </div>
-    <add-chat
-        :users="systemUsers"
-        :visible="chatAddVisible"
-        @chat="createChat"
-        @close="chatAddVisible = false"
-    ></add-chat>
+    <!--    <add-chat
+            :users="systemUsers"
+            :visible="chatAddVisible"
+            @chat="createChat"
+            @close="chatAddVisible = false"
+        ></add-chat>
 
-    <add-room
-        :visible="roomAddVisible"
-        @close="roomAddVisible = false"
-    ></add-room>
-
-    <user-profile
-        :user="curUser"
-        :visible="userProfileVisible"
-        @close="userProfileVisible = false"
-    ></user-profile>
-
+        <add-room
+            :visible="roomAddVisible"
+            @close="roomAddVisible = false"
+        ></add-room>-->
   </div>
 </template>
 
 <script>
 import {ref} from "@vue/composition-api";
-import {mdiChevronDown} from "@mdi/js";
-import UserProfile from "@/components/drawer/UserProfile";
-import AddChat from "@/components/drawer/AddChat";
-import AddRoom from "@/components/drawer/AddRoom";
+import {mdiAccountOutline, mdiChevronDown, mdiCog, mdiExitToApp, mdiPencilOutline} from "@mdi/js";
 import {createGroup, getUserList, quitSystem} from "@/net/message";
 
 export default {
@@ -98,11 +130,7 @@ export default {
     systemUsers: Array,
     loadedRooms: Array,
   },
-  components: {
-    UserProfile,
-    AddChat,
-    AddRoom,
-  },
+  components: {},
   setup(props, context) {
     // 用户信息是否展示
     const userProfileVisible = ref(false)
@@ -110,6 +138,10 @@ export default {
     const roomAddVisible = ref(false)
     // 新建chat组件是否可见
     const chatAddVisible = ref(false)
+
+    const goTo = item => {
+      context.emit('goto', item)
+    }
 
     const editUserProfile = () => {
       userProfileVisible.value = true
@@ -148,10 +180,15 @@ export default {
       addRoom,
       createChat,
       addChat,
+      goTo,
 
       quit,
       icons: {
-        mdiChevronDown
+        mdiPencilOutline,
+        mdiAccountOutline,
+        mdiChevronDown,
+        mdiCog,
+        mdiExitToApp
       }
     }
   }

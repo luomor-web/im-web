@@ -18,8 +18,10 @@
           :rooms-loaded="roomsLoaded"
           :text-messages="textMessages"
           :message-actions="messageActions"
-          :room-info-enabled="false"
+          :room-info-enabled="true"
           :show-audio="false"
+          :media-preview-enabled="false"
+          @room-info="roomInfo"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
           @send-message-reaction="sendMessageReaction"
@@ -28,16 +30,31 @@
       >
 
         <template #rooms-header="{}">
-
           <rooms-header
               :cur-user="curUser"
               :system-users="systemUsers"
               :loaded-rooms="loadedRooms"
+              @goto="leftGoTo"
               @up-room="upRoom"
               @change-room="changeRoom"
-          >
-          </rooms-header>
+          />
         </template>
+
+        <template #left-drawer="{}">
+          <left-drawer
+              :active="leftActive"
+              :visible="leftDrawerActive"
+              @close="leftDrawerActive = false"
+          />
+        </template>
+
+        <template #right-drawer="{}">
+          <right-drawer
+              :room="curRoom"
+              :visible="rightDrawerActive"
+              @close="rightDrawerActive = false"/>
+        </template>
+
         <template #room-options="{}">
           <room-options
               :system-users="systemUsers"
@@ -76,7 +93,7 @@ import RoomOptions from "@/components/RoomOptions";
 import MessageViewer from "@/components/message/MessageViewer";
 import {
   changeRoom,
-  currentUserId,
+  currentUserId, curRoom,
   curUser,
   loadedRooms, loadingRooms,
   messageLoaded, messages, number,
@@ -88,10 +105,14 @@ import {
 import {init} from "@/views/home/on-message";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
+import RightDrawer from "@/components/rightDrawer/RightDrawer";
+import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 
 export default {
   name: 'Home',
   components: {
+    LeftDrawer,
+    RightDrawer,
     MessageViewer,
     RoomOptions,
     RoomsHeader,
@@ -106,6 +127,10 @@ export default {
     const clickMessage = ref(null)
     // 点击的文件
     const clickFile = ref(null)
+
+    const leftActive = ref('')
+    const leftDrawerActive = ref(false)
+    const rightDrawerActive = ref(false)
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
@@ -128,6 +153,11 @@ export default {
       sendChatMessage(waitSendMessage.value[index])
 
       // waitSendMessage.value.splice(index, 1)
+    }
+
+    const leftGoTo = item => {
+      leftActive.value = item
+      leftDrawerActive.value = true
     }
 
     const updateProgress = (file, messageId) => {
@@ -198,7 +228,6 @@ export default {
 
       await operationMessage(message)
 
-
     }
 
     // 查找更多消息
@@ -223,7 +252,7 @@ export default {
     }
 
     const openFile = ({message, file}) => {
-      console.log(message, file,'111')
+      console.log(message, file, '111')
       clickMessage.value = message
       clickFile.value = file
     }
@@ -231,6 +260,18 @@ export default {
     const closeMessageViewer = () => {
       clickMessage.value = null
       clickFile.value = null
+    }
+
+    const roomInfo = item => {
+
+      curRoom.value = item
+      console.log(item, 'item')
+      openRightDrawer()
+    }
+
+    const openRightDrawer = (item) => {
+      console.log(item)
+      rightDrawerActive.value = !rightDrawerActive.value
     }
 
     const styles = ref({
@@ -274,12 +315,18 @@ export default {
       messageActions,
       loadingRooms,
       roomsLoaded,
+      curRoom,
+      leftActive,
+      leftDrawerActive,
+      rightDrawerActive,
       clickMessage,
       clickFile,
       isElectron,
       pageHeight,
       styles,
       systemUsers,
+      leftGoTo,
+      roomInfo,
       closeMessageViewer,
       deleteMessage,
       openFile,
