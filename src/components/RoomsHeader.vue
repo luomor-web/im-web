@@ -42,7 +42,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item class="im-list-item">
+            <v-list-item class="im-list-item" @click="quit">
               <v-list-item-icon>
                 <v-icon>{{ icons.mdiExitToApp }}</v-icon>
               </v-list-item-icon>
@@ -59,62 +59,7 @@
         {{ curUser.username }}
       </h3>
       <v-spacer></v-spacer>
-      <v-menu bottom left offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn icon
-                 v-bind="attrs"
-                 v-on="on"
-          >
-            <v-icon>
-              {{ icons.mdiChevronDown }}
-            </v-icon>
-          </v-btn>
-        </template>
-        <v-card>
-          <v-list-item-content class="justify-center">
-            <div class="mx-auto text-center pl-3 pr-3">
-              <v-btn
-                  depressed
-                  rounded
-                  text
-                  @click="addRoom"
-              >
-                创建群组
-              </v-btn>
-              <v-divider class="my-3"></v-divider>
-              <v-btn
-                  depressed
-                  rounded
-                  text
-                  @click="addChat"
-              >
-                添加会话
-              </v-btn>
-              <v-divider class="my-3"></v-divider>
-              <v-btn
-                  depressed
-                  rounded
-                  text
-                  @click="quit"
-              >
-                退出
-              </v-btn>
-            </div>
-          </v-list-item-content>
-        </v-card>
-      </v-menu>
     </div>
-    <!--    <add-chat
-            :users="systemUsers"
-            :visible="chatAddVisible"
-            @chat="createChat"
-            @close="chatAddVisible = false"
-        ></add-chat>
-
-        <add-room
-            :visible="roomAddVisible"
-            @close="roomAddVisible = false"
-        ></add-room>-->
   </div>
 </template>
 

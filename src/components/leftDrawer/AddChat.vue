@@ -1,15 +1,20 @@
 <template>
-  <user-select key="ind" :visible="visible" :multiple="false" @close="closeAddChat" @action="startChat"></user-select>
+  <div>
+    <drawer-top :title="'添加会话'" @close="closeAddChat"></drawer-top>
+    <user-select key="ind" :visible="visible" :multiple="false" @close="closeAddChat" @action="startChat"></user-select>
+  </div>
+
 </template>
 
 <script>
 import {mdiMagnify, mdiChatOutline} from "@mdi/js";
 import UserSelect from "@/components/user/UserSelect";
 import {ref} from "@vue/composition-api";
+import DrawerTop from "@/components/drawer/DrawerTop";
 
 export default {
   name: "AddChat",
-  components: {UserSelect},
+  components: {DrawerTop, UserSelect},
   props: {
     visible: Boolean
   },

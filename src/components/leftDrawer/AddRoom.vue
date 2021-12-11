@@ -1,93 +1,90 @@
 <template>
   <div>
-    <im-drawer title="创建群组" @close="closeAddRoom" :visible="visible" :temporary="drawerTemporary">
-      <template #content="{}">
-        <div class="d-table ma-auto">
-          <v-hover>
-            <template v-slot:default="{ hover }">
-              <v-img
-                  aspect-ratio="1"
-                  height="150"
-                  width="150"
-                  class="header-img"
-                  :src="roomAvatar ? picUrl +roomAvatar :require('@/assets/images/default/account-group.svg')"
+    <drawer-top :close="closeAddRoom"></drawer-top>
+    <div class="d-table ma-auto">
+      <v-hover>
+        <template v-slot:default="{ hover }">d sx1zx
+          <v-img
+              aspect-ratio="1"
+              height="150"
+              width="150"
+              class="header-img"
+              :src="roomAvatar ? picUrl +roomAvatar :require('@/assets/images/default/account-group.svg')"
+          >
+            <v-fade-transition>
+              <v-overlay
+                  v-if="hover"
+                  absolute
               >
-                <v-fade-transition>
-                  <v-overlay
-                      v-if="hover"
-                      absolute
-                  >
-                    <v-btn icon @click="openUpload" height="150" width="150">
-                      <v-icon>{{ icons.mdiCamera }}</v-icon>
-                    </v-btn>
-                  </v-overlay>
-                </v-fade-transition>
-              </v-img>
-            </template>
-          </v-hover>
-        </div>
-        <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
-        <div class="d-flex align-center py-2">
+                <v-btn icon @click="openUpload" height="150" width="150">
+                  <v-icon>{{ icons.mdiCamera }}</v-icon>
+                </v-btn>
+              </v-overlay>
+            </v-fade-transition>
+          </v-img>
+        </template>
+      </v-hover>
+    </div>
+    <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
+    <div class="d-flex align-center py-2">
 
-          <v-text-field v-model="roomName"
-                        light
-                        label="群组名称"
-                        single-line
-                        :prepend-icon="icons.mdiTicketAccount"
-                        :append-icon="roomName ? icons.mdiArrowRight : ''"
-                        @click:append="createRoom">
-          </v-text-field>
+      <v-text-field v-model="roomName"
+                    light
+                    label="群组名称"
+                    single-line
+                    :prepend-icon="icons.mdiTicketAccount"
+                    :append-icon="roomName ? icons.mdiArrowRight : ''"
+                    @click:append="createRoom">
+      </v-text-field>
 
-        </div>
+    </div>
+    <div>
+      <v-alert
+          v-model="errorVisible"
+          border="left"
+          dense
+          dismissible
+          type="error"
+      >需要至少除您之外的两个用户
+      </v-alert>
+    </div>
+    <div>
+      <div class="d-flex mb-2 my-3">
         <div>
-          <v-alert
-              v-model="errorVisible"
-              border="left"
-              dense
-              dismissible
-              type="error"
-          >需要至少除您之外的两个用户
-          </v-alert>
+          <h3>已选择({{ userSelect.length }})人</h3>
         </div>
-        <div>
-          <div class="d-flex mb-2 my-3">
-            <div>
-              <h3>已选择({{ userSelect.length }})人</h3>
-            </div>
-            <v-spacer></v-spacer>
-          </div>
-          <div>
-            <div class="pb-3 d-flex flex-row flex-wrap">
-              <add-user-icon :title="'添加'" @click="userSelectModelOpen"></add-user-icon>
-              <template v-for="(item, index) in userSelect">
-                <div class="px-2 d-flex flex-column" :key="index">
-                  <div class="align-center avatar">
-                    <v-badge
-                        :color="item.status.state === 'online' ? 'green':'red'"
-                        bordered
-                        bottom
-                        dot
-                        overlap
-                    >
-                      <v-avatar size="36" @click="removeUser(item)">
-                        <v-img :src="item.avatar"></v-img>
-                      </v-avatar>
-                    </v-badge>
-                  </div>
-                  <span class="subtitle-2 align-self-center text--secondary">
+        <v-spacer></v-spacer>
+      </div>
+      <div>
+        <div class="pb-3 d-flex flex-row flex-wrap">
+          <add-user-icon :title="'添加'" @click="userSelectModelOpen"></add-user-icon>
+          <template v-for="(item, index) in userSelect">
+            <div class="px-2 d-flex flex-column" :key="index">
+              <div class="align-center avatar">
+                <v-badge
+                    :color="item.status.state === 'online' ? 'green':'red'"
+                    bordered
+                    bottom
+                    dot
+                    overlap
+                >
+                  <v-avatar size="36" @click="removeUser(item)">
+                    <v-img :src="item.avatar"></v-img>
+                  </v-avatar>
+                </v-badge>
+              </div>
+              <span class="subtitle-2 align-self-center text--secondary">
                     {{ item.username.length > 3 ? item.username.substring(0, 3) + '..' : item.username }}
                   </span>
-                </div>
-              </template>
             </div>
-          </div>
-          <user-select :visible="userSelectModel"
-                       :filter="userSelect"
-                       @close="userSelectModelClose"
-                       @sure="operationUser"></user-select>
+          </template>
         </div>
-      </template>
-    </im-drawer>
+      </div>
+      <user-select :visible="userSelectModel"
+                   :filter="userSelect"
+                   @close="userSelectModelClose"
+                   @sure="operationUser"></user-select>
+    </div>
     <v-dialog
         hide-overlay
         persistent
@@ -100,17 +97,17 @@
 </template>
 
 <script>
-import {mdiArrowRight, mdiTicketAccount, mdiCamera, mdiPlus} from "@mdi/js";
+import {mdiArrowRight, mdiCamera, mdiPlus, mdiTicketAccount} from "@mdi/js";
 import {ref} from "@vue/composition-api";
-import ImDrawer from "@/components/drawer/ImDrawer";
 import {createGroup} from "@/net/message";
 import ImCropper from "@/components/system/ImCropper";
 import UserSelect from "@/components/user/UserSelect";
 import AddUserIcon from "@/components/user/AddUserIcon";
+import DrawerTop from "@/components/drawer/DrawerTop";
 
 export default {
   name: "AddRoom",
-  components: {AddUserIcon, UserSelect, ImDrawer, ImCropper},
+  components: {DrawerTop, AddUserIcon, UserSelect, ImCropper},
   props: {
     visible: Boolean
   },
@@ -129,7 +126,7 @@ export default {
 
     const closeAddRoom = () => {
       clearData()
-      context.emit('close')
+      context.emit('close','')
     }
 
     const clearData = () => {
@@ -234,7 +231,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import "../../styles/theme";
+@import "src/styles/theme";
 
 .no-drag {
   -webkit-app-region: no-drag;

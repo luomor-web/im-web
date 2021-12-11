@@ -45,6 +45,7 @@
               :active="leftActive"
               :visible="leftDrawerActive"
               @close="leftDrawerActive = false"
+              @open="leftDrawerActive = true"
           />
         </template>
 

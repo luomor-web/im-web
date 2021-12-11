@@ -1,34 +1,34 @@
 <template>
-<div>
-  <v-card>
-    <v-card-title class="text-h5">
-      裁剪
-    </v-card-title>
-    <v-card-text>
-      <cropper class="cropper"
-               ref="cropper"
-               :src="img"
-               :stencilProps="{aspectRatio: 1}"
-      ></cropper>
-    </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn
-          color="primary"
-          @click="cancel"
-      >
-        取消
-      </v-btn>
-      <v-btn
-          color="primary"
-          @click="sure"
-      >
-        确定
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+  <div>
+    <v-card>
+      <v-card-title class="text-h5">
+        裁剪
+      </v-card-title>
+      <v-card-text>
+        <cropper class="cropper"
+                 ref="cropper"
+                 :src="img"
+                 :stencilProps="{aspectRatio: 1}"
+        ></cropper>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+            color="primary"
+            @click="cancel"
+        >
+          取消
+        </v-btn>
+        <v-btn
+            color="primary"
+            @click="sure"
+        >
+          确定
+        </v-btn>
+      </v-card-actions>
+    </v-card>
 
-</div>
+  </div>
 </template>
 
 <script>
@@ -43,10 +43,10 @@ export default {
   components: {
     Cropper
   },
-  props:{
+  props: {
     img: String
   },
-  setup(props, context){
+  setup(props, context) {
     const cropper = ref(null)
 
     const cancel = () => {
@@ -64,9 +64,9 @@ export default {
             type: 'image/jpeg',
             extension: 'jpeg',
           }
-          addFiles([file], '', (file, over) => {
+          addFiles([file], (file, over) => {
             if (over) {
-              context.emit("sure",file.url)
+              context.emit("sure", file.url)
             }
           })
         }, 'image/jpeg')
@@ -82,7 +82,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped >
+<style lang="scss" scoped>
 .cropper {
   height: 300px;
   background: #DDD;

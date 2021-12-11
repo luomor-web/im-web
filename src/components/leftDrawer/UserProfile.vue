@@ -5,14 +5,14 @@
       <div class="mx-2">
         <div class="d-table ma-auto">
           <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
-          <v-hover >
+          <v-hover>
             <template v-slot:default="{ hover }">
               <v-img
                   aspect-ratio="1"
                   height="120"
                   width="120"
                   class="header-img"
-                  :src="curUser.avatar"
+                  :src="user.avatar"
               >
                 <v-fade-transition>
                   <v-overlay
@@ -31,13 +31,27 @@
         <div class="mx-2 mb-2 mt-8">
           <v-text-field
               v-model="username"
-              label="用户名称"
+              label="昵称"
               hide-details="auto"
               outlined
           >
           </v-text-field>
         </div>
       </div>
+      <v-fab-transition>
+        <v-btn
+            class="mb-16 mr-8"
+            v-show="showSure"
+            absolute
+            fab
+            right
+            bottom
+            color="success"
+            @click="changeUserProfile(null)"
+        >
+          <v-icon>mdi-check</v-icon>
+        </v-btn>
+      </v-fab-transition>
     </div>
     <v-dialog
         hide-overlay
@@ -52,7 +66,7 @@
 
 <script>
 import {mdiCamera} from "@mdi/js";
-import {ref} from "@vue/composition-api";
+import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import ImCropper from "@/components/system/ImCropper";
 import {editProfile} from "@/net/message";
 import DrawerTop from "@/components/drawer/DrawerTop";
@@ -68,16 +82,31 @@ export default {
     user: Object
   },
   setup(props, context) {
+    watch(() => props.user, () => {
+      // username.value = user.username
+      initData()
+    })
+
+    // 当前是否可以确认
+
+    const showSure = computed(() => {
+      return username.value !== props.user.username && username.value !== ''
+    })
+
     const file = ref(null)
-    const username = ref(curUser.value.username)
+    const username = ref('')
     const dialog = ref(false)
     const img = ref('')
-    const drawerTemporary = ref(true)
+
+    const initData = () => {
+      username.value = props.user.username
+    }
+
+    onMounted(() => {
+    })
 
     const onFileChange = (files) => {
-      drawerTemporary.value = false
       dialog.value = true
-
       img.value = URL.createObjectURL(files[0])
     }
 
@@ -86,13 +115,11 @@ export default {
     }
 
     const closeDialog = () => {
-      drawerTemporary.value = true
       dialog.value = false
       img.value = ''
     }
 
     const sure = (url) => {
-      drawerTemporary.value = true
       dialog.value = false
       changeUserProfile(url)
     }
@@ -101,17 +128,17 @@ export default {
       file.value.click()
     }
 
-    const close = () => {
-      context.emit('close','')
+    const close = item => {
+      initData()
+      context.emit('close', item)
     }
 
     return {
       file,
       username,
-      curUser,
       dialog,
       img,
-      drawerTemporary,
+      showSure,
       close,
       onFileChange,
       sure,

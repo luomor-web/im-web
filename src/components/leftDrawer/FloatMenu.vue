@@ -1,20 +1,26 @@
 <template>
   <div>
-    <v-speed-dial
-        class="mr-8 mb-8"
+    <v-menu
         v-model="fab"
-        absolute
-        right
-        bottom
-        direction="top"
-        :transition="'slide-y-reverse-transition'"
+        :close-on-content-click="false"
+        nudge-top="10"
+        top
+        left
+        offset-y
+        transition="fab-transition"
+        origin="right bottom"
     >
-      <template v-slot:activator>
+      <template v-slot:activator="{ on, attrs }">
         <v-btn
-            v-model="fab"
+            class="mr-8 mb-16"
             color="blue darken-2"
+            absolute
             dark
+            bottom
+            right
             fab
+            v-bind="attrs"
+            v-on="on"
         >
           <v-icon v-if="fab">
             mdi-close
@@ -24,27 +30,59 @@
           </v-icon>
         </v-btn>
       </template>
-      <v-card>
-        nihao
-      </v-card>
 
-    </v-speed-dial>
+      <v-card width="200" rounded="lg">
+        <v-list>
+          <v-list-item class="im-list-item" @click="goTo('ADD_CHAT')">
+            <v-list-item-icon>
+              <v-icon>
+                {{ icons.mdiAccountOutline }}
+              </v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              添加会话
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item class="im-list-item" @click="goTo('CREATE_GROUP')">
+            <v-list-item-icon>
+              <v-icon>
+                {{ icons.mdiAccountSupervisorOutline }}
+              </v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              创建群组
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-menu>
   </div>
 
 </template>
 
 <script>
 import {ref} from "@vue/composition-api";
+import {mdiAccountOutline, mdiAccountSupervisorOutline} from "@mdi/js";
 
 export default {
   name: "FloatMenu",
-  props:{},
-  setup(){
+  props: {},
+  setup(props, {emit}) {
 
     const fab = ref(false)
 
+    const goTo = item => {
+      emit('close', item)
+    }
+
     return {
-      fab
+      fab,
+      goTo,
+
+      icons: {
+        mdiAccountSupervisorOutline,
+        mdiAccountOutline
+      }
     }
 
   }

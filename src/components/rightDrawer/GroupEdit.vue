@@ -35,7 +35,6 @@
               label="群组名称"
               hide-details="auto"
               outlined
-              @keyup.enter.native="roomNameChange"
           >
           </v-text-field>
         </div>
@@ -260,7 +259,7 @@ export default {
   setup(props, {emit}) {
     // 当前用户ID
     const curUserId = ref(localStoreUtil.getValue('userId'))
-    // 当前用汉语
+    // 当前用户
     const curUser = ref(null)
     // 当前房间名称
     const roomName = ref('')
@@ -333,7 +332,6 @@ export default {
     }
 
     onMounted(() => {
-      console.log(props.room,'room')
       init(props.room)
     })
 
