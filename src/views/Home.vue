@@ -43,9 +43,7 @@
         <template #left-drawer="{}">
           <left-drawer
               :active="leftActive"
-              :visible="leftDrawerActive"
-              @close="leftDrawerActive = false"
-              @open="leftDrawerActive = true"
+              @close="closeLeftDrawer"
           />
         </template>
 
@@ -73,15 +71,15 @@
 </template>
 
 <script>
-import ChatWindow from 'vue-advanced-chat'
-import 'vue-advanced-chat/dist/vue-advanced-chat.css'
+import ChatWindow from 'alispig-advanced-chat'
+import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
 import {onUnmounted, onMounted, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/local-store";
 import {
   getHistoryMessage,
-  getUserInfo, messageDelete,
+  getUserInfo, getUserList, messageDelete,
   messageReaction,
   sendChatMessage
 } from "@/net/message";
@@ -130,7 +128,6 @@ export default {
     const clickFile = ref(null)
 
     const leftActive = ref('')
-    const leftDrawerActive = ref(false)
     const rightDrawerActive = ref(false)
 
     let isElectron = ref(process.env.IS_ELECTRON);
@@ -138,6 +135,7 @@ export default {
     onMounted(() => {
       currentUserId.value = localStoreUtil.getValue('userId')
       getUserInfo(currentUserId.value)
+      getUserList()
       init()
     })
 
@@ -158,7 +156,6 @@ export default {
 
     const leftGoTo = item => {
       leftActive.value = item
-      leftDrawerActive.value = true
     }
 
     const updateProgress = (file, messageId) => {
@@ -253,7 +250,6 @@ export default {
     }
 
     const openFile = ({message, file}) => {
-      console.log(message, file, '111')
       clickMessage.value = message
       clickFile.value = file
     }
@@ -264,10 +260,13 @@ export default {
     }
 
     const roomInfo = item => {
-
       curRoom.value = item
       console.log(item, 'item')
       openRightDrawer()
+    }
+
+    const closeLeftDrawer = item => {
+      leftActive.value = item
     }
 
     const openRightDrawer = (item) => {
@@ -318,7 +317,6 @@ export default {
       roomsLoaded,
       curRoom,
       leftActive,
-      leftDrawerActive,
       rightDrawerActive,
       clickMessage,
       clickFile,
@@ -328,6 +326,7 @@ export default {
       systemUsers,
       leftGoTo,
       roomInfo,
+      closeLeftDrawer,
       closeMessageViewer,
       deleteMessage,
       openFile,

@@ -27,6 +27,8 @@ export const roomId = ref('')
 export const curRoom = ref({})
 // 等待发送的消息
 export const waitSendMessage = ref([])
+// 系统全部人员列表
+export const waitSelectUser = ref([])
 
 export const changeRoom = item => {
     messages.value = messages.value.splice(0, messages.value.length)

@@ -48,6 +48,7 @@ export default {
   },
   setup(props, context) {
     const cropper = ref(null)
+    const picUrl = ref(process.env.VUE_APP_PIC_URL)
 
     const cancel = () => {
       context.emit("cancel")
@@ -66,7 +67,7 @@ export default {
           }
           addFiles([file], (file, over) => {
             if (over) {
-              context.emit("sure", file.url)
+              context.emit("sure", picUrl.value + file.url)
             }
           })
         }, 'image/jpeg')

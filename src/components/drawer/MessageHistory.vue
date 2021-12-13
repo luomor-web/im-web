@@ -24,16 +24,16 @@
                   消息已删除
                 </div>
 
-                <format-message
-                    v-else-if="item.content"
-                    :users="room.users"
-                    :content="item.content"
-                    :link-options="linkOptions"
-                    :text-formatting="textFormatting">
-                  <template v-for="(i, name) in $scopedSlots" #[name]="data">
-                    <slot :name="name" v-bind="data"/>
-                  </template>
-                </format-message>
+<!--                <format-message-->
+<!--                    v-else-if="item.content"-->
+<!--                    :users="room.users"-->
+<!--                    :content="item.content"-->
+<!--                    :link-options="linkOptions"-->
+<!--                    :text-formatting="textFormatting">-->
+<!--                  <template v-for="(i, name) in $scopedSlots" #[name]="data">-->
+<!--                    <slot :name="name" v-bind="data"/>-->
+<!--                  </template>-->
+<!--                </format-message>-->
 
                 <div v-else-if="!item.files || item.files.length > 0" class="d-flex">
                   <div v-for="(file,index) of item.files" :key="index" style="width: 365px;">
@@ -103,7 +103,6 @@ import {buildLastMessageTime, messageHistory} from "@/net/message";
 import msg from "@/plugins/msg";
 import {isImageFile, isVideoFile} from "@/utils/media-file";
 import {textFormatting} from "@/locales/text-formart";
-import FormatMessage from 'vue-advanced-chat/src/components/FormatMessage/FormatMessage'
 import {linkOptions} from "@/locales/link-option";
 import {getValue} from "@/utils/local-store";
 import {mdiDownload} from "@mdi/js";
@@ -118,7 +117,6 @@ export default {
   },
   components: {
     ImDrawer,
-    FormatMessage,
     MessageViewer,
   },
   setup(props, context) {

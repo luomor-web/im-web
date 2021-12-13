@@ -11,12 +11,9 @@
           {{ title }}
         </v-toolbar-title>
       </slot>
-      <v-spacer></v-spacer>
-      <v-btn class="no-drag" icon @click="editProp" v-if="edit">
-        <v-icon>
-          {{ icons.mdiPencilOutline }}
-        </v-icon>
-      </v-btn>
+      <slot name="right">
+
+      </slot>
     </v-toolbar>
   </div>
 </template>
@@ -29,8 +26,7 @@ export default {
 
   props: {
     title: {type: String, default: ''},
-    sub: {type: Boolean, default: false},
-    edit: {type: Boolean, default: false}
+    sub: {type: Boolean, default: false}
   },
 
   setup(props, {emit}) {
@@ -39,14 +35,9 @@ export default {
       emit('close')
     }
 
-    const editProp = () => {
-      emit('edit')
-    }
-
     return {
 
       close,
-      editProp,
 
       icons: {
         mdiWindowClose,

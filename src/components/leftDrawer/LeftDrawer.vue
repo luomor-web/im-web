@@ -1,29 +1,24 @@
 <template>
   <div>
     <float-menu v-show="!visible" @close="goTo">
+
     </float-menu>
-    <v-expand-x-transition>
+    <v-slide-x-transition>
       <div class="im-left-drawer" v-show="visible">
-        <v-window v-model="activeSub" style="height: 100% ">
-          <v-window-item value="USER_PROFILE">
-            <user-profile :user="curUser" @close="goTo"></user-profile>
-          </v-window-item>
-          <v-window-item value="ADD_CHAT">
-            <add-chat @close="goTo"></add-chat>
-          </v-window-item>
-          <v-window-item value="CREATE_GROUP">
-            <add-room @close="goTo"></add-room>
-          </v-window-item>
-        </v-window>
+        <user-profile v-if="activeSub === 'USER_PROFILE'" :user="curUser" @close="goTo"/>
+        <add-chat
+            v-else-if="activeSub === 'ADD_CHAT'"
+            @close="goTo"/>
+        <add-room v-else-if="activeSub === 'CREATE_GROUP'" @close="goTo"/>
       </div>
-    </v-expand-x-transition>
+    </v-slide-x-transition>
   </div>
 </template>
 
 <script>
 import {ref, watch} from "@vue/composition-api";
 import UserProfile from "@/components/leftDrawer/UserProfile";
-import {curUser} from "@/views/home/home";
+import {curUser, loadedRooms} from "@/views/home/home";
 import {mdiPlus} from "@mdi/js";
 import FloatMenu from "@/components/leftDrawer/FloatMenu";
 import AddChat from "@/components/leftDrawer/AddChat";
@@ -35,7 +30,7 @@ export default {
   props: {
     active: {type: String},
   },
-  setup(props) {
+  setup(props,{emit}) {
 
     const activeSub = ref('')
     const visible = ref(false)
@@ -48,13 +43,17 @@ export default {
 
     const goTo = item => {
       console.log('left', item)
-      visible.value = !!item
       activeSub.value = item
+      visible.value = !!item
       console.log(activeSub.value, !activeSub.value)
+      if(!visible.value) {
+        console.log('关闭')
+        emit('close')
+      }
     }
 
-
     return {
+      loadedRooms,
       visible,
       curUser,
       activeSub,

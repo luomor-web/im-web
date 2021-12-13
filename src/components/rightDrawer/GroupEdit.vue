@@ -4,7 +4,7 @@
     <div class="pt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
-          <input type="file" ref="file" class="d-none" accept="image/*" @change="onFileChange($event.target.files)">
+
           <v-hover v-if="isAdmin">
             <template v-slot:default="{ hover }">
               <v-img
@@ -12,7 +12,7 @@
                   height="120"
                   width="120"
                   class="header-img"
-                  :src="roomAvatar ? picUrl + roomAvatar : room.avatar"
+                  :src="roomAvatar ?  roomAvatar : room.avatar"
               >
                 <v-fade-transition>
                   <v-overlay
@@ -274,11 +274,12 @@ export default {
     const isAdmin = ref(false)
 
     watch(() => props.room, (room) => {
-      console.log(room)
+      console.log(room,'房间发生变化')
       init(room)
     })
 
     const init = (room) => {
+      console.log('数据初始化',room)
       curUser.value = room?.users.find(r => r._id === curUserId.value)
       isAdmin.value = curUser.value?.role === 'ADMIN'
       roomName.value = room?.roomName

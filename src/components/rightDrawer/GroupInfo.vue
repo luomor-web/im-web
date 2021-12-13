@@ -2,9 +2,16 @@
   <div>
     <drawer-top
         :title="'资料'"
-        :edit="true"
-        @edit="edit"
-        @close="close"/>
+        @close="close">
+      <template #right>
+        <v-spacer></v-spacer>
+        <v-btn class="no-drag" icon @click="edit">
+          <v-icon>
+            {{ icons.mdiPencilOutline }}
+          </v-icon>
+        </v-btn>
+      </template>
+    </drawer-top>
 
     <div class="pt-2">
       <div class="mx-2">
@@ -36,7 +43,7 @@
       </div>
     </div>
 
-    <div style="height: 12px;background-color: rgb(244 244 245)"></div>
+    <im-driver></im-driver>
 
     <div class="mx-2" style="height: calc(100vh - 296px)">
       <v-list nav>
@@ -61,7 +68,7 @@
           right
           fab
       >
-        <v-icon>mdi-plus</v-icon>
+        <v-icon>{{icons.mdiPlus}}</v-icon>
       </v-btn>
     </v-fab-transition>
   </div>
@@ -70,8 +77,9 @@
 <script>
 import {ref} from "@vue/composition-api";
 import {disbandGroup, handoverUserGroup, joinUserGroup, removeUserGroup} from "@/net/message";
-import {mdiBellOutline} from "@mdi/js";
+import {mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
+import ImDriver from "@/components/system/ImDriver";
 
 export default {
   name: "GroupInfo",
@@ -80,6 +88,7 @@ export default {
     room: Object
   },
   components: {
+    ImDriver,
     DrawerTop,
   },
   setup(props, context) {
@@ -113,7 +122,6 @@ export default {
       }
       action.value[item] = true
     }
-
 
     const closeGroupInfo = () => {
       context.emit('close')
@@ -180,7 +188,9 @@ export default {
       startChat,
 
       icons: {
-        mdiBellOutline
+        mdiBellOutline,
+        mdiPencilOutline,
+        mdiPlus,
       }
     }
   }

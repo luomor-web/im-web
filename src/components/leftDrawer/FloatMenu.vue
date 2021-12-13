@@ -23,10 +23,10 @@
             v-on="on"
         >
           <v-icon v-if="fab">
-            mdi-close
+            {{icons.mdiClose}}
           </v-icon>
           <v-icon v-else>
-            mdi-pencil
+            {{icons.mdiPencil}}
           </v-icon>
         </v-btn>
       </template>
@@ -62,7 +62,7 @@
 
 <script>
 import {ref} from "@vue/composition-api";
-import {mdiAccountOutline, mdiAccountSupervisorOutline} from "@mdi/js";
+import {mdiAccountOutline, mdiAccountSupervisorOutline, mdiClose, mdiPencil} from "@mdi/js";
 
 export default {
   name: "FloatMenu",
@@ -81,7 +81,9 @@ export default {
 
       icons: {
         mdiAccountSupervisorOutline,
-        mdiAccountOutline
+        mdiAccountOutline,
+        mdiPencil,
+        mdiClose,
       }
     }
 

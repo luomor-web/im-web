@@ -9,7 +9,7 @@ import {
     messageLoaded,
     messages,
     page, roomId,
-    roomsLoaded, sortedUser, upRoom, waitSendMessage
+    roomsLoaded, sortedUser, upRoom, waitSelectUser, waitSendMessage
 } from "@/views/home/home";
 
 export const init = () => {
@@ -39,6 +39,8 @@ export const init = () => {
     msg.$on("COMMAND_MESSAGE_DELETE_RESP", COMMAND_MESSAGE_DELETE_RESP)
     // 已读消息响应
     msg.$on("COMMAND_MESSAGE_READ_RESP", COMMAND_MESSAGE_READ_RESP)
+    // 全部人员列表
+    msg.$on("COMMAND_USER_LIST_RESP",COMMAND_USER_LIST_RESP)
 }
 
 // 获取用户信息响应
@@ -304,5 +306,10 @@ const COMMAND_MESSAGE_READ_RESP = (data) => {
         loadedRooms.value = [...loadedRooms.value]
     }
 
+}
+
+// 全部人员列表
+const COMMAND_USER_LIST_RESP = (data) => {
+    waitSelectUser.value = data.data
 }
 
