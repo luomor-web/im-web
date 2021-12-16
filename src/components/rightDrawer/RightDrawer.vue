@@ -1,6 +1,6 @@
 <template>
   <v-expand-x-transition>
-    <div class="im-right-drawer" v-show="visible">
+    <div class="im-right-drawer" v-if="visible">
       <v-window v-model="activeSub" style="height: 100% ">
         <v-window-item value="GROUP_INFO">
           <group-info
@@ -15,6 +15,9 @@
         <v-window-item value="GROUP_USER_MANAGE">
           <group-user-manage :room="room" @close="goTo"></group-user-manage>
         </v-window-item>
+        <v-window-item value="GROUP_HANDOVER_ADMIN">
+          <group-handover-admin :room="room" @close="goTo"></group-handover-admin>
+        </v-window-item>
       </v-window>
     </div>
   </v-expand-x-transition>
@@ -25,10 +28,11 @@ import {ref, watch} from "@vue/composition-api";
 import GroupInfo from "@/components/rightDrawer/GroupInfo";
 import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
+import GroupHandoverAdmin from "@/components/rightDrawer/GroupHandoverAdmin";
 
 export default {
   name: "RightDrawer",
-  components: {GroupUserManage, GroupEdit, GroupInfo},
+  components: {GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
   props: {
     active: {type: String, default: 'GROUP_INFO'},
     visible: {type: Boolean},

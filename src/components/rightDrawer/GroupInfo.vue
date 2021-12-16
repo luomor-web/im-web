@@ -127,10 +127,6 @@ export default {
       context.emit('close')
     }
 
-    const removeRoom = (item) => {
-      action.value.removeAction = false
-      removeUserGroup({roomId: props.room.roomId, userId: item._id, type: 'REMOVE'})
-    }
 
     const outRoom = (item) => {
       action.value.outAction = false
@@ -152,7 +148,6 @@ export default {
     const startChat = (item) => {
       context.emit('chat', item)
     }
-
 
     const joinGroup = (items) => {
       const users = items.map(x => {
@@ -184,7 +179,6 @@ export default {
       handoverRoom,
       disbandRoom,
       closeGroupInfo,
-      removeRoom,
       startChat,
 
       icons: {

@@ -50,7 +50,7 @@ export default {
 
     const toGo = (item, users) => {
       active.value = item
-      console.log(users)
+      if(!users) return
       userSelect.value = [...users]
     }
 

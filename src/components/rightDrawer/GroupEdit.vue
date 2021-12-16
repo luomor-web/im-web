@@ -1,58 +1,72 @@
 <template>
   <div>
     <drawer-top :title="'编辑资料'" :sub="true" @close="close"></drawer-top>
-    <div class="pt-2">
-      <div class="mx-2">
-        <div class="d-table ma-auto">
-
-          <v-hover v-if="isAdmin">
-            <template v-slot:default="{ hover }">
-              <v-img
-                  aspect-ratio="1"
-                  height="120"
-                  width="120"
-                  class="header-img"
-                  :src="roomAvatar ?  roomAvatar : room.avatar"
-              >
-                <v-fade-transition>
-                  <v-overlay
-                      v-if="hover"
-                      absolute
-                  >
-                    <v-btn icon @click="openUpload" height="150" width="150">
-                      <v-icon>{{ icons.mdiCamera }}</v-icon>
-                    </v-btn>
-                  </v-overlay>
-                </v-fade-transition>
-              </v-img>
-            </template>
-          </v-hover>
-        </div>
-        <div class="mx-2 mb-2 mt-8">
-          <v-text-field
-              v-if="isAdmin"
-              v-model="roomName"
-              label="群组名称"
-              hide-details="auto"
-              outlined
-          >
-          </v-text-field>
-        </div>
-      </div>
-      <div class="mx-2">
-        <v-list nav>
-          <v-list-item v-ripple class="im-list-item" @click="close">
-            <v-list-item-icon>
-              <v-icon>{{ icons.mdiLockOutline }}</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>成员管理</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+    <div class="pt-2 mx-2">
+      <div class="d-table ma-auto">
+        <v-hover v-if="isAdmin">
+          <template v-slot:default="{ hover }">
+            <v-img
+                aspect-ratio="1"
+                height="120"
+                width="120"
+                class="header-img"
+                :src="roomAvatar ?  roomAvatar : room.avatar"
+            >
+              <v-fade-transition>
+                <v-overlay
+                    v-if="hover"
+                    absolute
+                >
+                  <v-btn icon @click="openUpload" height="150" width="150">
+                    <v-icon>{{ icons.mdiCamera }}</v-icon>
+                  </v-btn>
+                </v-overlay>
+              </v-fade-transition>
+            </v-img>
+          </template>
+        </v-hover>
       </div>
     </div>
+
+    <im-upload ref="upload" @sure="sure"></im-upload>
+
+    <div class="mx-2 mb-2 mt-8">
+      <v-text-field
+          v-if="isAdmin"
+          v-model="roomName"
+          label="群组名称"
+          hide-details="auto"
+          outlined
+      >
+      </v-text-field>
+    </div>
+
+    <div class="mx-2">
+      <v-list nav>
+        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_USER_MANAGE')">
+          <v-list-item-icon>
+            <v-icon>{{ icons.mdiLockOutline }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>成员管理</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_HANDOVER_ADMIN')">
+          <v-list-item-icon>
+            <v-icon>{{ icons.mdiPoliceBadgeOutline }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>移交群组</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+      </v-list>
+    </div>
+
+
     <v-divider></v-divider>
+
     <div class="mx-2">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item error--text">
@@ -65,193 +79,37 @@
         </v-list-item>
       </v-list>
     </div>
-    <v-dialog
-        hide-overlay
-        persistent
-        v-model="dialog"
-        width="500"
-    >
-      <im-cropper :img="img" @sure="sure" @cancel="closeDialog"></im-cropper>
-    </v-dialog>
+
+    <v-fab-transition>
+      <v-btn
+          class="mb-16 mr-8"
+          v-show="showSure"
+          absolute
+          fab
+          right
+          bottom
+          color="success"
+          @click="roomNameChange"
+      >
+        <v-icon>{{ icons.mdiCheck }}</v-icon>
+      </v-btn>
+    </v-fab-transition>
   </div>
 </template>
-<!--    <v-card flat>-->
-<!--      <v-list dense>-->
-<!--        <v-list-item-title class="font-weight-black">群组资料</v-list-item-title>-->
-<!--        <v-list-item class="pa-2">-->
-<!--          <v-list-item-content>-->
-<!--            <div class="pb-3 d-flex flex-row flex-wrap">-->
-<!--              <add-user-icon :title="'邀请'" @click="userSelectModelOpen"></add-user-icon>-->
-<!--              <template v-for="(item,index) in room.users">-->
-<!--                <div class="px-2 d-flex flex-column " :key="index">-->
-<!--                  <v-menu-->
-<!--                      :key="item._id"-->
-<!--                      :close-on-content-click="false"-->
-<!--                      bottom-->
-<!--                      min-width="200px"-->
-<!--                      rounded-->
-<!--                      offset-y-->
-<!--                      @input="resetActionData(500)"-->
-<!--                  >-->
-<!--                    <template v-slot:activator="{ on: menu, attrs }">-->
-<!--                      <v-tooltip bottom>-->
-<!--                        <template v-slot:activator="{ on: tooltip }">-->
-<!--                          <v-btn-->
-<!--                              icon-->
-<!--                              x-large-->
-<!--                              v-bind="attrs"-->
-<!--                              v-on="{...menu,...tooltip}"-->
-<!--                          >-->
-<!--                            <v-badge-->
-<!--                                :color="item.status.state === 'online' ? 'green':'red'"-->
-<!--                                bordered-->
-<!--                                bottom-->
-<!--                                dot-->
-<!--                                overlap-->
-<!--                            >-->
-<!--                              <v-avatar size="36" class="align-self-center">-->
-<!--                                <v-img :src="item.avatar"></v-img>-->
-<!--                              </v-avatar>-->
-<!--                            </v-badge>-->
-<!--                          </v-btn>-->
-<!--                        </template>-->
-<!--                        {{ item.role === 'ADMIN' ? '群主' : item.role === 'SUB_ADMIN' ? '管理员' : '成员' }}-->
-<!--                      </v-tooltip>-->
-<!--                    </template>-->
-<!--                    <v-card>-->
-<!--                      <v-list-item-content class="justify-center">-->
-<!--                        <div class="mx-auto text-center">-->
-<!--                          <v-avatar size="36" class="align-self-center mb-2">-->
-<!--                            <v-img :src="item.avatar"></v-img>-->
-<!--                          </v-avatar>-->
-<!--                          <h4>{{ item.username }}</h4>-->
-<!--                          <div v-if="canStartChat(item)">-->
-<!--                            <v-divider class="my-3"></v-divider>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                @click="startChat(item)"-->
-<!--                            >-->
-<!--                              开始会话-->
-<!--                            </v-btn>-->
-<!--                          </div>-->
-<!--                          <div v-if="canRemoveRoom(item)">-->
-<!--                            <v-divider class="my-3"></v-divider>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                v-if="!action.removeAction"-->
-<!--                                @click="clickSureButton('removeAction')"-->
-<!--                            >-->
-<!--                              移出群聊-->
-<!--                            </v-btn>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                color="error"-->
-<!--                                v-else-->
-<!--                                @click="removeRoom(item)"-->
-<!--                            >-->
-<!--                              确定移出吗-->
-<!--                            </v-btn>-->
-<!--                          </div>-->
-<!--                          <div v-if="canOutRoom(item)">-->
-<!--                            <v-divider class="my-3"></v-divider>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                v-if="!action.outAction"-->
-<!--                                @click="clickSureButton('outAction')"-->
-<!--                            >-->
-<!--                              退出群聊-->
-<!--                            </v-btn>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                color="error"-->
-<!--                                v-else-->
-<!--                                @click="outRoom(item)"-->
-<!--                            >-->
-<!--                              确定退出吗-->
-<!--                            </v-btn>-->
-<!--                          </div>-->
-<!--                          <div v-if="canHandoverRoom(item)">-->
-<!--                            <v-divider class="my-3"></v-divider>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                v-if="!action.handoverAction"-->
-<!--                                @click="clickSureButton('handoverAction')"-->
-<!--                            >-->
-<!--                              移交群主-->
-<!--                            </v-btn>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                color="error"-->
-<!--                                v-else-->
-<!--                                @click="handoverRoom(item)"-->
-<!--                            >-->
-<!--                              确定移交吗-->
-<!--                            </v-btn>-->
-<!--                          </div>-->
-<!--                          <div v-if="canDisbandRoom(item)">-->
-<!--                            <v-divider class="my-3"></v-divider>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                v-if="!action.disbandAction"-->
-<!--                                @click="clickSureButton('disbandAction')"-->
-<!--                            >-->
-<!--                              解散群聊-->
-<!--                            </v-btn>-->
-<!--                            <v-btn-->
-<!--                                depressed-->
-<!--                                rounded-->
-<!--                                text-->
-<!--                                color="error"-->
-<!--                                v-else-->
-<!--                                @click="disbandRoom()"-->
-<!--                            >-->
-<!--                              确定解散吗-->
-<!--                            </v-btn>-->
-<!--                          </div>-->
-<!--                        </div>-->
-<!--                      </v-list-item-content>-->
-<!--                    </v-card>-->
-<!--                  </v-menu>-->
 
-<!--                  <span class="subtitle-2 align-self-center text&#45;&#45;secondary">-->
-<!--                        {{ item.username.length > 3 ? item.username.substring(0, 3) + '..' : item.username }}-->
-<!--                      </span>-->
-<!--                </div>-->
-<!--              </template>-->
-<!--            </div>-->
-<!--          </v-list-item-content>-->
-<!--        </v-list-item>-->
-<!--      </v-list>-->
-<!--    </v-card>-->
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {onMounted, ref, watch} from "@vue/composition-api";
+import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
 import {editGroupProfile} from "@/net/message";
-import {mdiCamera, mdiDeleteOutline, mdiLockOutline} from "@mdi/js";
-import ImCropper from "@/components/system/ImCropper";
+import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
+import ImUpload from "@/components/system/ImUpload";
 
 export default {
   name: "GroupEdit",
   components: {
+    ImUpload,
     DrawerTop,
-    ImCropper
   },
   props: {
     room: {type: Object}
@@ -267,43 +125,42 @@ export default {
     const roomAvatar = ref('')
     // 图片预览地址
     const picUrl = ref(process.env.VUE_APP_PIC_URL)
-    const file = ref(null)
-    const dialog = ref(false)
+    const upload = ref(null)
     // 头像路径
     const img = ref('')
+    // 是否管理员
     const isAdmin = ref(false)
 
+    // 是否展示确定按钮
+    const showSure = computed(() => {
+      return roomName.value !== props.room.roomName && roomName.value !== ''
+    })
+
     watch(() => props.room, (room) => {
-      console.log(room,'房间发生变化')
+      console.log('数据变化')
       init(room)
     })
 
     const init = (room) => {
-      console.log('数据初始化',room)
       curUser.value = room?.users.find(r => r._id === curUserId.value)
       isAdmin.value = curUser.value?.role === 'ADMIN'
       roomName.value = room?.roomName
     }
 
     const onFileChange = (files) => {
-      dialog.value = true
-
       img.value = URL.createObjectURL(files[0])
     }
 
     const closeDialog = () => {
-      dialog.value = false
       img.value = ''
     }
 
     const openUpload = () => {
-      file.value.click()
+      upload.value.startUpload()
     }
 
     const sure = (url) => {
-      dialog.value = false
       roomAvatar.value = url
-
       editGroupProfile({roomId: props.room.roomId, avatar: picUrl.value + url, roomName: roomName.value})
     }
 
@@ -337,21 +194,21 @@ export default {
     })
 
     const close = (item) => {
-      if (!item){
-        emit('close','GROUP_INFO')
+      if (item) {
+        emit('close', item)
         return
       }
-      emit('close','GROUP_USER_MANAGE')
+      emit('close', 'GROUP_INFO')
     }
 
     return {
       img,
-      file,
+      upload,
       isAdmin,
       roomAvatar,
       picUrl,
-      dialog,
       roomName,
+      showSure,
       roomNameChange,
       canStartChat,
       canRemoveRoom,
@@ -368,6 +225,8 @@ export default {
         mdiCamera,
         mdiLockOutline,
         mdiDeleteOutline,
+        mdiCheck,
+        mdiPoliceBadgeOutline
       }
     }
   }

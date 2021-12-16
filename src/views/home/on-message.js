@@ -261,8 +261,8 @@ const COMMAND_HANDOVER_GROUP_RESP = (data) => {
 
 // 修改群组信息响应
 const COMMAND_EDIT_GROUP_PROFILE_RESP = (data) => {
-    const {roomId, roomName, avatar} = data.data
-    const index = loadedRooms.value.findIndex(r => r.roomId === roomId);
+    const {roomId:changeRoomId, roomName, avatar} = data.data
+    const index = loadedRooms.value.findIndex(r => r.roomId === changeRoomId);
     loadedRooms.value[index].roomName = roomName
     loadedRooms.value[index].avatar = avatar
 

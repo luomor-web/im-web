@@ -73,7 +73,7 @@
 <script>
 import ChatWindow from 'alispig-advanced-chat'
 import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
-import {onUnmounted, onMounted, ref} from "@vue/composition-api";
+import {onUnmounted, onMounted, ref, computed} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/local-store";
@@ -92,7 +92,7 @@ import RoomOptions from "@/components/RoomOptions";
 import MessageViewer from "@/components/message/MessageViewer";
 import {
   changeRoom,
-  currentUserId, curRoom,
+  currentUserId,
   curUser,
   loadedRooms, loadingRooms,
   messageLoaded, messages, number,
@@ -228,6 +228,10 @@ export default {
 
     }
 
+    const curRoom = computed(() => {
+      return loadedRooms.value.find(r => r.roomId === roomId.value)
+    })
+
     // 查找更多消息
     const fetchMessage = ({room}) => {
       if (room.roomId !== roomId.value) {
@@ -260,7 +264,6 @@ export default {
     }
 
     const roomInfo = item => {
-      curRoom.value = item
       console.log(item, 'item')
       openRightDrawer()
     }

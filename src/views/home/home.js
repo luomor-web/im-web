@@ -23,8 +23,6 @@ export const sendPage = ref(-1)
 export const number = ref(20)
 // 当前房间ID
 export const roomId = ref('')
-// 当前房间
-export const curRoom = ref({})
 // 等待发送的消息
 export const waitSendMessage = ref([])
 // 系统全部人员列表
