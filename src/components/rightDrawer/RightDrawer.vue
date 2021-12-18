@@ -20,6 +20,12 @@
         <v-window-item value="GROUP_INVITE_USER">
           <group-invite-user :room="room" @close="goTo"></group-invite-user>
         </v-window-item>
+        <v-window-item value="USER_INFO">
+          <user-info :room="room" @close="goTo"></user-info>
+        </v-window-item>
+        <v-window-item value="MESSAGE_HISTORY">
+          <message-history :room="room" @close="goTo"></message-history>
+        </v-window-item>
       </v-window>
     </div>
   </v-expand-x-transition>
@@ -32,26 +38,40 @@ import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
 import GroupHandoverAdmin from "@/components/rightDrawer/GroupHandoverAdmin";
 import GroupInviteUser from "@/components/rightDrawer/GroupInviteUser";
+import UserInfo from "@/components/rightDrawer/UserInfo";
+import MessageHistory from "@/components/rightDrawer/MessageHistory";
 
 export default {
   name: "RightDrawer",
-  components: {GroupInviteUser, GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
+  components: {MessageHistory, UserInfo, GroupInviteUser, GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
   props: {
-    active: {type: String, default: 'GROUP_INFO'},
+    active: {type: String, default: ''},
     visible: {type: Boolean},
     room: {type: Object},
   },
   setup(props, {emit}) {
 
-    const activeSub = ref('GROUP_INFO')
+    const activeSub = ref('')
+    const startActive = ref('')
+
+    watch(() => props.room, room => {
+      activeSub.value = room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
+      startActive.value = room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
+    })
 
     watch(() => props.active, active => {
       activeSub.value = active
     })
 
     const goTo = (item) => {
-      if (!item) close()
+      if (!item) {
+        close()
+        activeSub.value = startActive.value
+        return
+      }
       activeSub.value = item
+
+      console.log(activeSub.value,'值改变')
     }
 
     const close = () => {

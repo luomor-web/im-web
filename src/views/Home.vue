@@ -265,7 +265,7 @@ export default {
 
     const roomInfo = item => {
       console.log(item, 'item')
-      openRightDrawer()
+      openRightDrawer(item)
     }
 
     const closeLeftDrawer = item => {

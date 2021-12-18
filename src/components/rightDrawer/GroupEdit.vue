@@ -1,9 +1,9 @@
 <template>
   <div>
-    <drawer-top :title="'编辑资料'" :sub="true" @close="close"></drawer-top>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="close('GROUP_INFO')"></drawer-top>
     <div class="pt-2 mx-2">
       <div class="d-table ma-auto">
-        <v-hover v-if="isAdmin">
+        <v-hover>
           <template v-slot:default="{ hover }">
             <v-img
                 aspect-ratio="1"
@@ -32,7 +32,6 @@
 
     <div class="mx-2 mb-2 mt-8">
       <v-text-field
-          v-if="isAdmin"
           v-model="roomName"
           label="群组名称"
           hide-details="auto"
@@ -52,7 +51,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_HANDOVER_ADMIN')">
+        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_HANDOVER_ADMIN')" v-if="isAdmin">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiPoliceBadgeOutline }}</v-icon>
           </v-list-item-icon>
@@ -69,7 +68,16 @@
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item error--text">
+        <v-list-item v-ripple class="im-list-item error--text" v-if="isAdmin" @click="disbandRoom">
+          <v-list-item-icon>
+            <v-icon color="red">{{ icons.mdiDeleteOutline }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>删除并解散群聊</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item v-ripple class="im-list-item error--text" v-if="!isAdmin" @click="outRoom">
           <v-list-item-icon>
             <v-icon color="red">{{ icons.mdiDeleteOutline }}</v-icon>
           </v-list-item-icon>
@@ -101,7 +109,7 @@
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
-import {editGroupProfile} from "@/net/message";
+import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
 import ImUpload from "@/components/system/ImUpload";
 
@@ -168,6 +176,16 @@ export default {
       editGroupProfile({roomId: props.room.roomId, roomName: roomName.value})
     }
 
+    const outRoom = () => {
+      removeUserGroup({roomId: props.room.roomId, userId: curUser.value._id, type: 'OUT'})
+      close()
+    }
+
+    const disbandRoom = () => {
+      disbandGroup({roomId: props.room.roomId})
+      close()
+    }
+
     // 不是当前用户且当前用户不是普通人
     const canRemoveRoom = (item) => {
       return curUserId.value !== item._id && curUser.value?.role !== 'GENERAL'
@@ -198,7 +216,7 @@ export default {
         emit('close', item)
         return
       }
-      emit('close', 'GROUP_INFO')
+      emit('close')
     }
 
     return {
@@ -209,6 +227,8 @@ export default {
       picUrl,
       roomName,
       showSure,
+      disbandRoom,
+      outRoom,
       roomNameChange,
       canStartChat,
       canRemoveRoom,

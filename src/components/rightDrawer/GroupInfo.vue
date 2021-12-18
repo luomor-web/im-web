@@ -76,8 +76,7 @@
 </template>
 
 <script>
-import {ref} from "@vue/composition-api";
-import {disbandGroup, handoverUserGroup, joinUserGroup, removeUserGroup} from "@/net/message";
+import {joinUserGroup} from "@/net/message";
 import {mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
@@ -85,7 +84,6 @@ import ImDriver from "@/components/system/ImDriver";
 export default {
   name: "GroupInfo",
   props: {
-    visible: Boolean,
     room: Object
   },
   components: {
@@ -94,56 +92,8 @@ export default {
   },
   setup(props, context) {
 
-    const action = ref({
-      removeAction: false,
-      outAction: false,
-      handoverAction: false,
-      disbandAction: false
-    })
-
-    const resetActionData = (timeout) => {
-      setTimeout(() => {
-        action.value = {
-          removeAction: false,
-          outAction: false,
-          handoverAction: false,
-          disbandAction: false
-        }
-      }, timeout)
-    }
-
-    const clickSureButton = (item) => {
-      if (action.value.handoverAction || action.value.removeAction || action.value.disbandAction || action.value.outAction) {
-        action.value = {
-          removeAction: false,
-          outAction: false,
-          handoverAction: false,
-          disbandAction: false
-        }
-      }
-      action.value[item] = true
-    }
-
     const closeGroupInfo = () => {
       context.emit('close')
-    }
-
-
-    const outRoom = (item) => {
-      action.value.outAction = false
-      removeUserGroup({roomId: props.room.roomId, userId: item._id, type: 'OUT'})
-      closeGroupInfo()
-    }
-
-    const handoverRoom = (item) => {
-      action.value.handoverAction = false
-      handoverUserGroup({roomId: props.room.roomId, userId: item._id})
-    }
-
-    const disbandRoom = () => {
-      action.value.disbandAction = false
-      disbandGroup({roomId: props.room.roomId})
-      closeGroupInfo()
     }
 
     const startChat = (item) => {
@@ -169,11 +119,6 @@ export default {
     return {
       close,
       joinGroup,
-      clickSureButton,
-      outRoom,
-      resetActionData,
-      handoverRoom,
-      disbandRoom,
       closeGroupInfo,
       startChat,
 
