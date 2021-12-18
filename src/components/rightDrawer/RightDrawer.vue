@@ -5,7 +5,6 @@
         <v-window-item value="GROUP_INFO">
           <group-info
               :room="room"
-              @edit="activeSub = 'GROUP_EDIT'"
               @close="goTo"
           />
         </v-window-item>
@@ -18,6 +17,9 @@
         <v-window-item value="GROUP_HANDOVER_ADMIN">
           <group-handover-admin :room="room" @close="goTo"></group-handover-admin>
         </v-window-item>
+        <v-window-item value="GROUP_INVITE_USER">
+          <group-invite-user :room="room" @close="goTo"></group-invite-user>
+        </v-window-item>
       </v-window>
     </div>
   </v-expand-x-transition>
@@ -29,10 +31,11 @@ import GroupInfo from "@/components/rightDrawer/GroupInfo";
 import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
 import GroupHandoverAdmin from "@/components/rightDrawer/GroupHandoverAdmin";
+import GroupInviteUser from "@/components/rightDrawer/GroupInviteUser";
 
 export default {
   name: "RightDrawer",
-  components: {GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
+  components: {GroupInviteUser, GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
   props: {
     active: {type: String, default: 'GROUP_INFO'},
     visible: {type: Boolean},
@@ -58,7 +61,7 @@ export default {
     return {
       goTo,
       close,
-      activeSub
+      activeSub,
     }
   }
 }

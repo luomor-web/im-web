@@ -8,7 +8,7 @@
         <div v-if="userSelect.length > 0">
           <v-spacer></v-spacer>
           <v-btn icon @click="toGo('GROUP_SETTING')">
-            <v-icon>{{ icons.mdiArrowRight }}</v-icon>
+            <v-icon>{{ icon }}</v-icon>
           </v-btn>
         </div>
       </template>
@@ -23,7 +23,7 @@
         </v-chip>
       </div>
       <im-driver v-if="userSelect.length > 0"></im-driver>
-      <user-select-column @click-content="operationUser">
+      <user-select-column @click-content="operationUser" :filters="room.users" style="height: calc(100vh - 60px)">
         <div slot="userAction" slot-scope="{item}">
           <v-btn @click="operationUser(item)" :color="isInclude(item) ? 'error':'primary'">
             {{ isInclude(item) ? '移除' : '添加' }}
@@ -51,6 +51,15 @@ export default {
     UserSelectColumn,
     DrawerTop
   },
+  props: {
+    icon: String,
+    room: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
+  },
   setup(props, {emit}) {
 
     const userSelect = ref([])
@@ -77,16 +86,21 @@ export default {
       return userSelect.value.findIndex(r => r._id === item._id)
     }
 
+    const clearUserSelect = () => {
+      userSelect.value = []
+    }
+
     const closeAddRoom = () => {
       emit('close')
     }
 
-    const toGo = item => {
-      emit('to-go', item,userSelect.value)
+    const toGo = () => {
+      emit('to-go', userSelect.value)
     }
 
     return {
       userSelect,
+      clearUserSelect,
       toGo,
       isInclude,
       removeUser,

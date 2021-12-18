@@ -1,8 +1,6 @@
 <template>
   <div>
-    <float-menu v-show="!visible" @close="goTo">
-
-    </float-menu>
+    <float-menu v-show="!visible" @close="goTo"></float-menu>
     <v-slide-x-transition>
       <div class="im-left-drawer" v-show="visible">
         <user-profile v-if="activeSub === 'USER_PROFILE'" :user="curUser" @close="goTo"/>

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="height: 100%" class="overflow-y-auto">
     <v-list nav>
-      <v-list-item v-ripple class="im-list-item" v-for="(item,index) of waitSelectUser" :key="index">
+      <v-list-item v-ripple v-for="(item,index) of waitSelectUser" :key="index" :class="isFilter(item) ?'d-none':'im-list-item'">
         <v-list-item-avatar>
           <v-img :src="item.avatar"></v-img>
         </v-list-item-avatar>
@@ -22,12 +22,26 @@ import {waitSelectUser} from "@/views/home/home";
 
 export default {
   name: "UserSelectColumn",
+  props: {
+    filters: {
+      type: Array, default: () => {
+        return []
+      }
+    }
+  },
   setup(props, {emit}) {
     const clickContent = (item) => {
       emit('click-content', item)
     }
 
+    // 是否在拦截元素中
+    const isFilter = (item) => {
+      console.log(props.filters,'props.filters')
+      return props.filters.findIndex(r => r._id === item._id) !== -1;
+    }
+
     return {
+      isFilter,
       clickContent,
       waitSelectUser
     }

@@ -127,7 +127,6 @@ export default {
       fileHistoryVisible.value = true
     }
 
-
     return {
       userInfoVisible,
       groupInfoVisible,

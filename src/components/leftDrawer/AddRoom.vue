@@ -4,8 +4,9 @@
       <v-window-item value="SELECT_USER">
 
         <add-room-select-user
+            :icon="icons.mdiArrowRight"
             @close="closeAddRoom"
-            @to-go="toGo"
+            @to-go="toGo('GROUP_SETTING',$event)"
         />
 
       </v-window-item>
@@ -26,6 +27,7 @@
 import {ref} from "@vue/composition-api";
 import AddRoomSelectUser from "@/components/leftDrawer/AddRoomSelectUser";
 import AddRoomGroupInfo from "@/components/leftDrawer/AddRoomGroupInfo";
+import {mdiArrowRight} from "@mdi/js";
 
 export default {
   name: "AddRoom",
@@ -60,6 +62,7 @@ export default {
       toGo,
       closeAddRoom,
       icons: {
+        mdiArrowRight
       },
 
     }

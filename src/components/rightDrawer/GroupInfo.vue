@@ -5,7 +5,7 @@
         @close="close">
       <template #right>
         <v-spacer></v-spacer>
-        <v-btn class="no-drag" icon @click="edit">
+        <v-btn class="no-drag" icon @click="close('GROUP_EDIT')">
           <v-icon>
             {{ icons.mdiPencilOutline }}
           </v-icon>
@@ -67,6 +67,7 @@
           bottom
           right
           fab
+          @click="close('GROUP_INVITE_USER')"
       >
         <v-icon>{{icons.mdiPlus}}</v-icon>
       </v-btn>
@@ -161,17 +162,12 @@ export default {
       joinUserGroup({group, users})
     }
 
-    const edit = () => {
-      context.emit('edit')
-    }
-
-    const close = () => {
-      context.emit('close')
+    const close = item => {
+      context.emit('close',item)
     }
 
     return {
       close,
-      edit,
       joinGroup,
       clickSureButton,
       outRoom,
