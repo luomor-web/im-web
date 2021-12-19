@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top @close="close">
+    <drawer-top @close="close" :title="'历史消息'">
 
     </drawer-top>
   </div>

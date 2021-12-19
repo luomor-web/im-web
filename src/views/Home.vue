@@ -50,15 +50,15 @@
         <template #right-drawer="{}">
           <right-drawer
               :room="curRoom"
+              :active="rightActive"
               :visible="rightDrawerActive"
-              @close="rightDrawerActive = false"/>
+              @close="closeRightDrawer"/>
         </template>
 
         <template #room-options="{}">
           <room-options
-              :system-users="systemUsers"
               :room-id="roomId"
-              :loaded-rooms="loadedRooms"
+              @open="openRightDrawer"
               @up-room="upRoom"
               @change-room="changeRoom"
           >
@@ -119,6 +119,8 @@ export default {
     ChatWindow,
   },
   setup() {
+
+    const rightActive = ref('')
 
     // 系统用户列表
     const systemUsers = ref([])
@@ -265,7 +267,7 @@ export default {
 
     const roomInfo = item => {
       console.log(item, 'item')
-      openRightDrawer(item)
+      openRightDrawer()
     }
 
     const closeLeftDrawer = item => {
@@ -274,7 +276,12 @@ export default {
 
     const openRightDrawer = (item) => {
       console.log(item)
+      rightActive.value = item
       rightDrawerActive.value = !rightDrawerActive.value
+    }
+
+    const closeRightDrawer = () => {
+      rightDrawerActive.value = false
     }
 
     const styles = ref({
@@ -318,6 +325,7 @@ export default {
       messageActions,
       loadingRooms,
       roomsLoaded,
+      rightActive,
       curRoom,
       leftActive,
       rightDrawerActive,
@@ -327,6 +335,8 @@ export default {
       pageHeight,
       styles,
       systemUsers,
+      closeRightDrawer,
+      openRightDrawer,
       leftGoTo,
       roomInfo,
       closeLeftDrawer,

@@ -52,8 +52,17 @@
             <v-img :src="item.avatar"></v-img>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{ item.username }}</v-list-item-title>
+            <v-badge
+                inline
+                left
+                dot
+            >
+              <v-list-item-title>{{ item.username }}</v-list-item-title>
+            </v-badge>
           </v-list-item-content>
+          <v-list-item-icon>
+
+          </v-list-item-icon>
         </v-list-item>
       </v-list>
     </div>
