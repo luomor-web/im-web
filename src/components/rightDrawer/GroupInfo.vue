@@ -53,6 +53,7 @@
           </v-list-item-avatar>
           <v-list-item-content>
             <v-badge
+                :color="item.status.state === 'online' ? 'green': 'grey'"
                 inline
                 left
                 dot
@@ -60,9 +61,11 @@
               <v-list-item-title>{{ item.username }}</v-list-item-title>
             </v-badge>
           </v-list-item-content>
-          <v-list-item-icon>
-
-          </v-list-item-icon>
+          <v-list-item-action>
+            <v-btn :color="item.role==='ADMIN'?'warning': item.role==='GENERAL' ? 'success': 'primary'" small>
+              {{ item.role === 'ADMIN' ? '群主' : item.role === 'GENERAL' ? '成员' : '管理员' }}
+            </v-btn>
+          </v-list-item-action>
         </v-list-item>
       </v-list>
     </div>
@@ -78,7 +81,7 @@
           fab
           @click="close('GROUP_INVITE_USER')"
       >
-        <v-icon>{{icons.mdiPlus}}</v-icon>
+        <v-icon>{{ icons.mdiPlus }}</v-icon>
       </v-btn>
     </v-fab-transition>
   </div>
@@ -122,7 +125,7 @@ export default {
     }
 
     const close = item => {
-      context.emit('close',item)
+      context.emit('close', item)
     }
 
     return {

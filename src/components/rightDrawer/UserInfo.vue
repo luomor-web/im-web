@@ -120,7 +120,7 @@ export default {
 @import "src/styles/theme";
 
 .header-img {
-  border-radius: 150px;
+  border-radius: 120px;
   background-color: $v-grey-lighten1;
 }
 

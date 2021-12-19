@@ -89,7 +89,7 @@ import {textMessages} from "@/locales/text-message";
 import {messageActions} from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
-import MessageViewer from "@/components/message/MessageViewer";
+import MessageViewer from "@/components/system/ImViewer";
 import {
   changeRoom,
   currentUserId,

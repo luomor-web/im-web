@@ -7,7 +7,7 @@
         top
         left
         offset-y
-        transition="fab-transition"
+        transition="scale-transition"
         origin="right bottom"
     >
       <template v-slot:activator="{ on, attrs }">

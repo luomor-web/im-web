@@ -25,8 +25,8 @@
 
 <script>
 import {ref} from "@vue/composition-api";
-import AddRoomSelectUser from "@/components/leftDrawer/AddRoomSelectUser";
-import AddRoomGroupInfo from "@/components/leftDrawer/AddRoomGroupInfo";
+import AddRoomSelectUser from "@/components/leftDrawer/addRoom/AddRoomSelectUser";
+import AddRoomGroupInfo from "@/components/leftDrawer/addRoom/AddRoomGroupInfo";
 import {mdiArrowRight} from "@mdi/js";
 
 export default {

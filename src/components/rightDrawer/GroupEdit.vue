@@ -17,7 +17,7 @@
                     v-if="hover"
                     absolute
                 >
-                  <v-btn icon @click="openUpload" height="150" width="150">
+                  <v-btn icon @click="openUpload" height="120" width="120">
                     <v-icon>{{ icons.mdiCamera }}</v-icon>
                   </v-btn>
                 </v-overlay>
@@ -42,7 +42,7 @@
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_USER_MANAGE')">
+        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_USER_MANAGE')" v-if="isAdminOrSubAdmin">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiLockOutline }}</v-icon>
           </v-list-item-icon>
@@ -136,8 +136,14 @@ export default {
     const upload = ref(null)
     // 头像路径
     const img = ref('')
-    // 是否管理员
-    const isAdmin = ref(false)
+
+    const isAdmin = computed(()=>{
+      return curUser.value?.role === 'ADMIN'
+    })
+
+    const isAdminOrSubAdmin = computed(() => {
+      return curUser.value?.role === 'ADMIN' || curUser.value?.role === 'SUB_ADMIN'
+    })
 
     // 是否展示确定按钮
     const showSure = computed(() => {
@@ -151,7 +157,7 @@ export default {
 
     const init = (room) => {
       curUser.value = room?.users.find(r => r._id === curUserId.value)
-      isAdmin.value = curUser.value?.role === 'ADMIN'
+      // isAdmin.value = curUser.value?.role === 'ADMIN'
       roomName.value = room?.roomName
     }
 
@@ -227,6 +233,7 @@ export default {
       picUrl,
       roomName,
       showSure,
+      isAdminOrSubAdmin,
       disbandRoom,
       outRoom,
       roomNameChange,

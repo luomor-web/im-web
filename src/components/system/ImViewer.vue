@@ -15,7 +15,7 @@ import {isImageFile} from "@/utils/media-file";
 import {downloadForUrl} from "@/utils/download"
 
 export default {
-  name: "MessageViewer",
+  name: "ImViewer",
   props: {
     message: Object,
     file: Object

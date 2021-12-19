@@ -1,13 +1,21 @@
 <template>
   <div>
-    <drawer-top @close="close" :title="'历史消息'">
-
+    <drawer-top @close="close">
+      <template #default>
+        <v-text-field hide-details rounded dense filled placeholder="搜索">
+        </v-text-field>
+      </template>
+      <template #right>
+        <v-btn icon>
+          <v-icon>{{ icons.mdiCalendarBlankOutline }}</v-icon>
+        </v-btn>
+      </template>
     </drawer-top>
   </div>
 </template>
 
 <script>
-import {mdiDownload} from "@mdi/js";
+import {mdiCalendarBlankOutline} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 
 export default {
@@ -29,7 +37,7 @@ export default {
       close,
 
       icons: {
-        mdiDownload
+        mdiCalendarBlankOutline,
       }
     }
   }
@@ -38,19 +46,4 @@ export default {
 
 <style lang="scss" scoped>
 
-.other-file {
-  width: 110px;
-  height: 110px;
-  border: 1px solid #b7c1ca;
-  border-radius: 4px;
-  text-align: center;
-
-  .file-body {
-    height: 55px;
-  }
-
-  .text-line {
-    line-height: 55px;
-  }
-}
 </style>

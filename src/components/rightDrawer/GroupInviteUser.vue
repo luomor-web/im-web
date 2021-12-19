@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import AddRoomSelectUser from "@/components/leftDrawer/AddRoomSelectUser";
+import AddRoomSelectUser from "@/components/leftDrawer/addRoom/AddRoomSelectUser";
 import {ref} from "@vue/composition-api";
 import {mdiCheck} from "@mdi/js";
 import {joinUserGroup} from "@/net/message";

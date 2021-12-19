@@ -14,7 +14,7 @@
             <v-list-item-title>{{ item.username }}</v-list-item-title>
           </v-list-item-content>
 
-          <v-list-item-icon>
+          <v-list-item-icon v-if="item.role === 'GENERAL'">
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon

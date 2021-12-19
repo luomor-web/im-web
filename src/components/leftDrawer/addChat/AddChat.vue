@@ -13,7 +13,6 @@
       </user-select-column>
     </div>
   </div>
-
 </template>
 
 <script>

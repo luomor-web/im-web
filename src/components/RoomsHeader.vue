@@ -6,6 +6,8 @@
           min-width="260px"
           :rounded="'lg'"
           offset-y
+          transition="scale-transition"
+          origin="left top"
       >
         <template v-slot:activator="{ on }">
           <v-btn
@@ -24,16 +26,16 @@
         <v-card flat
                 class="mt-2">
           <v-list>
-            <v-list-item class="im-list-item" @click="goTo('USER_PROFILE')">
-              <v-list-item-icon>
-                <v-icon>{{ icons.mdiPencilOutline }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                编辑资料
-              </v-list-item-content>
-            </v-list-item>
+<!--            <v-list-item class="im-list-item" @click="goTo('USER_PROFILE')">-->
+<!--              <v-list-item-icon>-->
+<!--                <v-icon>{{ icons.mdiPencilOutline }}</v-icon>-->
+<!--              </v-list-item-icon>-->
+<!--              <v-list-item-content>-->
+<!--                编辑资料-->
+<!--              </v-list-item-content>-->
+<!--            </v-list-item>-->
 
-            <v-list-item class="im-list-item">
+            <v-list-item class="im-list-item" @click="goTo('SETTING')">
               <v-list-item-icon>
                 <v-icon>{{ icons.mdiCog }}</v-icon>
               </v-list-item-icon>
