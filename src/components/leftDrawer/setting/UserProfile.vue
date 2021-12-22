@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <drawer-top :title="'编辑资料'" @close="close"></drawer-top>
+  <div >
+    <drawer-top :title="'编辑资料'" :sub="true" @close="close('SETTING_ITEM')"></drawer-top>
     <div class="mt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -34,7 +34,6 @@
 
     <div class="mx-2 mb-2 mt-8">
       <v-text-field
-          autofocus
           v-model="username"
           label="用户名称"
           hide-details="auto"

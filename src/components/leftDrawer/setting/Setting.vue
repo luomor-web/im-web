@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100vh">
     <v-window v-model="active">
       <v-window-item value="SETTING_ITEM">
         <setting-item :curUser="curUser" @close="close"></setting-item>
@@ -27,10 +27,10 @@ export default {
     curUser: Object
   },
   setup(props, {emit}) {
-    const active = ref('SETTING_ITEM')
+    const active = ref('')
 
     const close = item => {
-      console.log('嫦娥')
+      console.log('嫦娥',item)
       if(item){
         active.value = item
         return

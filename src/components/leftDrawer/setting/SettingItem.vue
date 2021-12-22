@@ -26,20 +26,6 @@
           </v-list-item>
         </v-list>
         <im-driver></im-driver>
-        <v-list nav>
-          <v-list-item v-ripple class="im-list-item">
-            <v-list-item-icon>
-              <v-icon>{{ icons.mdiBellOutline }}</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>通知</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-switch
-              ></v-switch>
-            </v-list-item-action>
-          </v-list-item>
-        </v-list>
       </div>
     </div>
   </div>
