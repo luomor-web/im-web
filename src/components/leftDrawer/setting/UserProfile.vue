@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div style="height: 100vh">
     <drawer-top :title="'编辑资料'" :sub="true" @close="close('SETTING_ITEM')"></drawer-top>
     <div class="mt-2">
       <div class="mx-2">

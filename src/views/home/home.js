@@ -7,7 +7,7 @@ export const currentUserId = ref('')
 // 已加载完成的房间列表
 export const loadedRooms = ref([])
 // 当前用户
-export const curUser = ref({})
+export const curUser = ref({_id: ''})
 // 加载动画
 export const loadingRooms = ref(false)
 // 房间列表是否加载完成

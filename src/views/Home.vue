@@ -21,6 +21,7 @@
           :room-info-enabled="true"
           :show-audio="false"
           :media-preview-enabled="false"
+          :show-footer="curRoomIsSystem"
           @room-info="roomInfo"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
@@ -200,6 +201,7 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
+      console.log('sendMessage..')
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()
@@ -232,6 +234,10 @@ export default {
 
     const curRoom = computed(() => {
       return loadedRooms.value.find(r => r.roomId === roomId.value)
+    })
+
+    const curRoomIsSystem = computed(() => {
+      return curRoom?.system
     })
 
     // 查找更多消息
@@ -325,6 +331,7 @@ export default {
       messageActions,
       loadingRooms,
       roomsLoaded,
+      curRoomIsSystem,
       rightActive,
       curRoom,
       leftActive,

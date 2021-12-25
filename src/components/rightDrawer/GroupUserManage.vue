@@ -6,7 +6,8 @@
     </drawer-top>
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple :class="curUser._id === item._id? 'd-none':'im-list-item'" v-for="(item,index) of users" :key="index">
+        <v-list-item v-ripple :class="curUser._id === item._id || item.role === 'ADMIN' ? 'd-none':'im-list-item'" v-for="(item,index) of room.users"
+                     :key="index">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>
           </v-list-item-avatar>
@@ -19,11 +20,26 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon
                        v-bind="attrs"
-                       v-on="on">
-                  <v-icon>{{ icons.mdiShieldCrownOutline  }}</v-icon>
+                       v-on="on"
+                       @click="startSetRoomAdmin(item)">
+                  <v-icon>{{ icons.mdiShieldLockOutline }}</v-icon>
                 </v-btn>
               </template>
               <span>设为管理员</span>
+            </v-tooltip>
+          </v-list-item-icon>
+
+          <v-list-item-icon v-if="item.role === 'SUB_ADMIN'">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn icon
+                       v-bind="attrs"
+                       v-on="on"
+                       @click="startUnSetRoomAdmin(item)">
+                  <v-icon>{{ icons.mdiShieldLockOpenOutline }}</v-icon>
+                </v-btn>
+              </template>
+              <span>解除管理员</span>
             </v-tooltip>
           </v-list-item-icon>
 
@@ -33,8 +49,8 @@
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"
-                       @click="removeRoom(item)">
-                  <v-icon>{{ icons.mdiExitToApp  }}</v-icon>
+                       @click="startRemoveRoom(item)">
+                  <v-icon>{{ icons.mdiExitToApp }}</v-icon>
                 </v-btn>
               </template>
               <span>移出群聊</span>
@@ -43,19 +59,23 @@
         </v-list-item>
       </v-list>
     </div>
+
+    <im-warn-dialog :action="action"></im-warn-dialog>
   </div>
 </template>
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {onMounted, ref, watch} from "@vue/composition-api";
-import {mdiAccountCogOutline, mdiAccountRemoveOutline, mdiExitToApp, mdiShieldCrownOutline} from "@mdi/js";
-import {removeUserGroup} from "@/net/message";
+import {ref} from "@vue/composition-api";
+import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
+import {removeUserGroup, setAdmin} from "@/net/message";
 import {curUser} from "@/views/home/home";
+import ImWarnDialog from "@/components/system/ImWarnDialog";
 
 export default {
 
   name: "GroupUserManage",
   components: {
+    ImWarnDialog,
     DrawerTop
   },
   props: {
@@ -63,21 +83,74 @@ export default {
   },
   setup(props, {emit}) {
 
-    const users = ref([])
-
-    watch(() => props.room, room => {
-      users.value = room.users
+    // 操作动作
+    const action = ref({
+      model: false,
+      type: '',
+      title: '',
+      content: '',
+      item: null,
+      sure: () => {
+        switch (action.value.type) {
+          case "REMOVE_ROOM":
+            removeRoom(action.value.item)
+            action.value.model = false
+            break
+          case "SET_ROOM_ADMIN":
+            setRoomAdmin(action.value.item)
+            action.value.model = false
+            break
+          case "UN_SET_ROOM_ADMIN":
+            unSetRoomAdmin(action.value.item)
+            action.value.model = false
+            break
+        }
+      },
+      cancel: () => {
+        action.value.model = false
+      }
     })
 
-    onMounted(() => {
-      users.value = props.room.users
-    })
+    // 点击退出群组按钮, 主要强调弹出过程
+    const startRemoveRoom = item => {
+      action.value.model = true
+      action.value.title = '移出群聊'
+      action.value.content = '您确认将该成员移出群组吗?'
+      action.value.type = 'REMOVE_ROOM'
+      action.value.item = item
+    }
 
-
-    const removeRoom = (item) => {
+    const removeRoom = item => {
       removeUserGroup({roomId: props.room.roomId, userId: item._id, type: 'REMOVE'})
     }
 
+    // 点击退出群组按钮, 主要强调弹出过程
+    const startSetRoomAdmin = item => {
+      action.value.model = true
+      action.value.title = '设为管理员'
+      action.value.content = '您确认将该成员设为管理员吗?'
+      action.value.type = 'SET_ROOM_ADMIN'
+      action.value.item = item
+    }
+
+    const setRoomAdmin = (item) => {
+      console.log(item)
+      setAdmin({roomId: props.room.roomId, userId: item._id, type: 'SET'})
+    }
+
+    // 点击退出群组按钮, 主要强调弹出过程
+    const startUnSetRoomAdmin = item => {
+      action.value.model = true
+      action.value.title = '解除管理员'
+      action.value.content = '您确认解除该成员的管理员身份吗?'
+      action.value.type = 'UN_SET_ROOM_ADMIN'
+      action.value.item = item
+    }
+
+    const unSetRoomAdmin = (item) => {
+      console.log(item)
+      setAdmin({roomId: props.room.roomId, userId: item._id, type: 'UN_SET'})
+    }
 
     const close = () => {
       emit('close', 'GROUP_EDIT')
@@ -85,13 +158,18 @@ export default {
 
     return {
       curUser,
-      users,
+      action,
+      startRemoveRoom,
       removeRoom,
+      startSetRoomAdmin,
+      setRoomAdmin,
+      startUnSetRoomAdmin,
+      unSetRoomAdmin,
       close,
 
       icons: {
-        mdiAccountCogOutline,
-        mdiAccountRemoveOutline,
+        mdiShieldLockOutline,
+        mdiShieldLockOpenOutline,
         mdiShieldCrownOutline,
         mdiExitToApp
       }

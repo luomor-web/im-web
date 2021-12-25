@@ -45,7 +45,7 @@
 
     <im-driver></im-driver>
 
-    <div class="mx-2" style="height: calc(100vh - 296px)">
+    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 296px)">
       <v-list nav>
         <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
           <v-list-item-avatar>
@@ -62,7 +62,7 @@
             </v-badge>
           </v-list-item-content>
           <v-list-item-action>
-            <v-btn :color="item.role==='ADMIN'?'warning': item.role==='GENERAL' ? 'success': 'primary'" small>
+            <v-btn :color="item.role ==='ADMIN' ? 'warning': item.role==='GENERAL' ? 'success': 'primary'" small>
               {{ item.role === 'ADMIN' ? '群主' : item.role === 'GENERAL' ? '成员' : '管理员' }}
             </v-btn>
           </v-list-item-action>

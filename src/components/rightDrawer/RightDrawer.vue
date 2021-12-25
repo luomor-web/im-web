@@ -1,7 +1,7 @@
 <template>
   <v-expand-x-transition>
     <div class="im-right-drawer" v-if="visible">
-      <v-window v-model="activeSub" style="height: 100% ">
+      <v-window v-model="activeSub" class="fill-height">
         <v-window-item value="GROUP_INFO">
           <group-info
               :room="room"
@@ -94,7 +94,7 @@ export default {
 .im-right-drawer {
   position: relative;
   width: 400px;
-  height: 100%;
+  height: 100vh;
   background-color: #ffffff;
 }
 

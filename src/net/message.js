@@ -102,6 +102,17 @@ const removeUserGroup = ({roomId, userId, type}) => {
     sendMsg(param)
 }
 
+// 移出群聊 和 退出群聊
+const setAdmin = ({roomId, userId, type}) => {
+    const param = {
+        cmd: 46,
+        roomId,
+        userId,
+        type
+    }
+    sendMsg(param)
+}
+
 
 // 移交群主
 const handoverUserGroup = ({roomId, userId}) => {
@@ -207,6 +218,7 @@ const buildLastMessageTime = (lastMessage) => {
 }
 
 export {
+    setAdmin,
     handoverUserGroup,
     disbandGroup,
     getUserInfo,

@@ -68,7 +68,7 @@
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item error--text" v-if="isAdmin" @click="disbandRoom">
+        <v-list-item v-ripple class="im-list-item error--text" v-if="isAdmin" @click="startDisbandRoom">
           <v-list-item-icon>
             <v-icon color="red">{{ icons.mdiDeleteOutline }}</v-icon>
           </v-list-item-icon>
@@ -77,7 +77,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-ripple class="im-list-item error--text" v-if="!isAdmin" @click="outRoom">
+        <v-list-item v-ripple class="im-list-item error--text" v-if="!isAdmin" @click="startOutRoom">
           <v-list-item-icon>
             <v-icon color="red">{{ icons.mdiDeleteOutline }}</v-icon>
           </v-list-item-icon>
@@ -102,6 +102,8 @@
         <v-icon>{{ icons.mdiCheck }}</v-icon>
       </v-btn>
     </v-fab-transition>
+
+    <im-warn-dialog :action="action"></im-warn-dialog>
   </div>
 </template>
 
@@ -112,10 +114,12 @@ import localStoreUtil from "@/utils/local-store";
 import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
 import ImUpload from "@/components/system/ImUpload";
+import ImWarnDialog from "@/components/system/ImWarnDialog";
 
 export default {
   name: "GroupEdit",
   components: {
+    ImWarnDialog,
     ImUpload,
     DrawerTop,
   },
@@ -137,7 +141,30 @@ export default {
     // 头像路径
     const img = ref('')
 
-    const isAdmin = computed(()=>{
+    // 操作动作
+    const action = ref({
+      model: false,
+      type: '',
+      title: '',
+      content: '',
+      sure: () => {
+        switch (action.value.type) {
+          case "OUT_ROOM":
+            outRoom()
+            action.value.model = false
+            break
+          case "DISBAND_ROOM":
+            disbandRoom()
+            action.value.model = false
+            break
+        }
+      },
+      cancel: () => {
+        action.value.model = false
+      }
+    })
+
+    const isAdmin = computed(() => {
       return curUser.value?.role === 'ADMIN'
     })
 
@@ -151,7 +178,6 @@ export default {
     })
 
     watch(() => props.room, (room) => {
-      console.log('数据变化')
       init(room)
     })
 
@@ -159,14 +185,6 @@ export default {
       curUser.value = room?.users.find(r => r._id === curUserId.value)
       // isAdmin.value = curUser.value?.role === 'ADMIN'
       roomName.value = room?.roomName
-    }
-
-    const onFileChange = (files) => {
-      img.value = URL.createObjectURL(files[0])
-    }
-
-    const closeDialog = () => {
-      img.value = ''
     }
 
     const openUpload = () => {
@@ -182,35 +200,30 @@ export default {
       editGroupProfile({roomId: props.room.roomId, roomName: roomName.value})
     }
 
+    // 点击退出群组按钮, 主要强调弹出过程
+    const startOutRoom = () => {
+      action.value.model = true
+      action.value.title = '退出群聊'
+      action.value.content = '您确认离开群组吗?'
+      action.value.type = 'OUT_ROOM'
+    }
+
     const outRoom = () => {
       removeUserGroup({roomId: props.room.roomId, userId: curUser.value._id, type: 'OUT'})
       close()
     }
 
+    // 点击退出群组按钮, 主要强调弹出过程
+    const startDisbandRoom = () => {
+      action.value.model = true
+      action.value.title = '解散群聊'
+      action.value.content = '您确认解散群组吗?'
+      action.value.type = 'DISBAND_ROOM'
+    }
+
     const disbandRoom = () => {
       disbandGroup({roomId: props.room.roomId})
       close()
-    }
-
-    // 不是当前用户且当前用户不是普通人
-    const canRemoveRoom = (item) => {
-      return curUserId.value !== item._id && curUser.value?.role !== 'GENERAL'
-    }
-
-    const canOutRoom = (item) => {
-      return curUserId.value === item._id && curUser.value?.role !== 'ADMIN'
-    }
-
-    const canHandoverRoom = (item) => {
-      return curUserId.value !== item._id && curUser.value?.role === 'ADMIN'
-    }
-
-    const canDisbandRoom = (item) => {
-      return curUserId.value === item._id && curUser.value?.role === 'ADMIN'
-    }
-
-    const canStartChat = (item) => {
-      return item._id !== curUserId.value
     }
 
     onMounted(() => {
@@ -227,6 +240,7 @@ export default {
 
     return {
       img,
+      action,
       upload,
       isAdmin,
       roomAvatar,
@@ -234,16 +248,11 @@ export default {
       roomName,
       showSure,
       isAdminOrSubAdmin,
+      startDisbandRoom,
+      startOutRoom,
       disbandRoom,
       outRoom,
       roomNameChange,
-      canStartChat,
-      canRemoveRoom,
-      canOutRoom,
-      canDisbandRoom,
-      canHandoverRoom,
-      onFileChange,
-      closeDialog,
       openUpload,
       sure,
       close,
