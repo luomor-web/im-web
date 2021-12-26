@@ -1,12 +1,12 @@
 <template>
   <div style="height: 100vh">
     <drawer-top :sub="true" @close="close">
-      <v-text-field hide-details rounded dense filled placeholder="搜索">
+      <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName">
       </v-text-field>
     </drawer-top>
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple :class="curUser._id === item._id || item.role === 'ADMIN' ? 'd-none':'im-list-item'" v-for="(item,index) of room.users"
+        <v-list-item v-ripple :class="curUser._id === item._id || item.role === 'ADMIN' ? 'd-none':'im-list-item'" v-for="(item,index) of filteredItems"
                      :key="index">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>
@@ -65,7 +65,7 @@
 </template>
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
 import {removeUserGroup, setAdmin} from "@/net/message";
 import {curUser} from "@/views/home/home";
@@ -82,6 +82,8 @@ export default {
     room: {type: Object}
   },
   setup(props, {emit}) {
+
+    const searchName = ref('')
 
     // 操作动作
     const action = ref({
@@ -111,6 +113,10 @@ export default {
       }
     })
 
+    const filteredItems = computed(() => {
+      return props.room.users.filter(x => curUser.value._id !== x._id && x.role !== 'ADMIN' && x.username.indexOf(searchName.value) !== -1)
+    })
+
     // 点击退出群组按钮, 主要强调弹出过程
     const startRemoveRoom = item => {
       action.value.model = true
@@ -134,7 +140,6 @@ export default {
     }
 
     const setRoomAdmin = (item) => {
-      console.log(item)
       setAdmin({roomId: props.room.roomId, userId: item._id, type: 'SET'})
     }
 
@@ -148,7 +153,6 @@ export default {
     }
 
     const unSetRoomAdmin = (item) => {
-      console.log(item)
       setAdmin({roomId: props.room.roomId, userId: item._id, type: 'UN_SET'})
     }
 
@@ -159,6 +163,8 @@ export default {
     return {
       curUser,
       action,
+      searchName,
+      filteredItems,
       startRemoveRoom,
       removeRoom,
       startSetRoomAdmin,

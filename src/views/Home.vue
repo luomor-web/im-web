@@ -186,8 +186,6 @@ export default {
           return
         }
 
-        console.log('回调', file.progress, isOver)
-
         sendFileMessage({
           id: file.id,
           name: file.name + '.' + file.extension,
@@ -201,7 +199,7 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
-      console.log('sendMessage..')
+      console.log('send Message')
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()
@@ -271,8 +269,7 @@ export default {
       clickFile.value = null
     }
 
-    const roomInfo = item => {
-      console.log(item, 'item')
+    const roomInfo = () => {
       openRightDrawer()
     }
 
@@ -281,7 +278,6 @@ export default {
     }
 
     const openRightDrawer = (item) => {
-      console.log(item)
       rightActive.value = item
       rightDrawerActive.value = !rightDrawerActive.value
     }

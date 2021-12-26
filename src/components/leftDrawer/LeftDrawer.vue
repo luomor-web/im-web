@@ -39,18 +39,14 @@ export default {
     const visible = ref(false)
 
     watch(() => props.active, active => {
-      console.log(active, 'leftActive')
       activeSub.value = active
       visible.value = !!activeSub.value
     })
 
     const goTo = item => {
-      console.log('left', item)
       activeSub.value = item
       visible.value = !!item
-      console.log(activeSub.value, !activeSub.value)
       if(!visible.value) {
-        console.log('关闭')
         emit('close')
       }
     }

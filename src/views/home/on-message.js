@@ -116,7 +116,6 @@ const COMMAND_CHAT_RESP = (data) => {
             if (waitIndex !== -1) {
                 waitSendMessage.value.splice(waitIndex, 1)
             }
-            console.log(waitSendMessage.value, 'waitSendMessage')
         } else {
             messages.value.push(message)
         }

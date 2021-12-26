@@ -131,7 +131,7 @@ const initWebSocket = () => {
             try {
                 socket.close()
             } catch (e) {
-                console.log('Socket 关闭异常')
+                console.error(e)
             }
         }
         localStoreUtil.clear()

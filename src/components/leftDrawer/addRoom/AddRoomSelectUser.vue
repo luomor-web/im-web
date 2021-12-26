@@ -2,7 +2,7 @@
   <div>
     <drawer-top @close="closeAddRoom">
       <template #default>
-        <user-search></user-search>
+        <user-search :filters="room.users" @click-content="operationUser"></user-search>
       </template>
       <template #right>
         <div v-if="userSelect.length > 0">

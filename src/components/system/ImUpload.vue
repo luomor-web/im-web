@@ -36,7 +36,6 @@ export default {
 
     // 文件选择完毕后执行的动作
     const onFileChange = (files) => {
-      console.log(files,'文件选中完毕')
       dialog.value = true
 
       img.value = URL.createObjectURL(files[0])
@@ -59,7 +58,6 @@ export default {
 
 
     const onFileCancel = () => {
-        console.log('cancel...')
     }
 
     return {

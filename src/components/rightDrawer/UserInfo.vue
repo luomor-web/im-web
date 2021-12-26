@@ -3,16 +3,7 @@
     <drawer-top
         :title="'资料'"
         @close="close">
-<!--      <template #right>-->
-<!--        <v-spacer></v-spacer>-->
-<!--        <v-btn class="no-drag" icon @click="close('GROUP_EDIT')">-->
-<!--          <v-icon>-->
-<!--            {{ icons.mdiPencilOutline }}-->
-<!--          </v-icon>-->
-<!--        </v-btn>-->
-<!--      </template>-->
     </drawer-top>
-
 
     <div class="pt-2">
       <div class="mx-2">
@@ -45,33 +36,7 @@
     </div>
 
     <im-driver></im-driver>
-<!--    <v-card flat>-->
-<!--      <div class="d-table ma-auto">-->
-<!--        <v-img-->
-<!--            aspect-ratio="1"-->
-<!--            height="150"-->
-<!--            width="150"-->
-<!--            class="header-img"-->
-<!--            :src="room.avatar"-->
-<!--        >-->
-<!--        </v-img>-->
-<!--      </div>-->
-<!--      <v-card-title class="d-table ma-auto text-h5">{{ room.roomName }}</v-card-title>-->
-<!--    </v-card>-->
-    <!--        <div class="d-flex align-center py-2">-->
-    <!--          <v-text-field v-model="room.roomName"-->
-    <!--                        small-->
-    <!--                        light-->
-    <!--                        label="修改备注"-->
-    <!--                        single-line>-->
-    <!--          </v-text-field>-->
-    <!--          <v-spacer></v-spacer>-->
-    <!--          <v-btn color="primary"-->
-    <!--                 @click="changeUserProfile(null)"-->
-    <!--          >-->
-    <!--            确认-->
-    <!--          </v-btn>-->
-    <!--        </div>-->
+
   </div>
 </template>
 

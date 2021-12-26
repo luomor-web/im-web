@@ -30,7 +30,6 @@ export default {
     const active = ref('')
 
     const close = item => {
-      console.log('嫦娥',item)
       if(item){
         active.value = item
         return

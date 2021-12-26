@@ -1,7 +1,7 @@
 <template>
   <div>
     <drawer-top @close="closeAddChat">
-      <user-search></user-search>
+      <user-search @click-item="startChat"></user-search>
     </drawer-top>
     <div>
       <user-select-column>
@@ -35,12 +35,10 @@ export default {
     const waitSelect = ref([])
 
     const closeAddChat = () => {
-      console.log('close chat')
       context.emit('close')
     }
 
     const startChat = item => {
-      console.log(loadedRooms.value, item)
       const room = loadedRooms.value.find(r => item._id === r.friendId)
       if (!room) {
         createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})

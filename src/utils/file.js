@@ -106,7 +106,7 @@ const countSpeed = (data) => {
     data.percentage = uploaded <= 0 ? 0 : Math.round((uploaded / data.fileSizeByte) * 10000) / 100.0
     data.uploaded = formatSize(uploaded)
     data.speed = formatSize(speed)
-    console.log('总大小:', data.fileSize, ' 上传速度:', data.speed, ' 上传百分比:', data.percentage, ' 已上传:', data.uploaded)
+    // console.log('总大小:', data.fileSize, ' 上传速度:', data.speed, ' 上传百分比:', data.percentage, ' 已上传:', data.uploaded)
 }
 
 const inputChange = async (file, cb) => {

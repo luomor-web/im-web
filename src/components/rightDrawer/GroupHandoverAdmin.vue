@@ -2,13 +2,13 @@
   <div class="fill-height">
 
     <drawer-top :sub="true" @close="close">
-      <v-text-field hide-details rounded dense filled placeholder="搜索">
+      <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索">
       </v-text-field>
     </drawer-top>
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple :class="curUser._id === item._id? 'd-none':'im-list-item'" v-for="(item,index) of room.users" :key="index" @click="startHandoverRoom(item)">
+        <v-list-item v-ripple  v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>
           </v-list-item-avatar>
@@ -26,7 +26,7 @@
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {handoverUserGroup} from "@/net/message";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
 import {curUser} from "@/views/home/home";
@@ -41,6 +41,8 @@ export default {
     room: {type: Object}
   },
   setup(props, {emit}) {
+
+    const searchName = ref('')
 
     // 操作动作
     const action = ref({
@@ -62,6 +64,10 @@ export default {
       }
     })
 
+    const filteredItems = computed(() => {
+      return props.room.users.filter(x => curUser.value._id !== x._id && x.role !== 'ADMIN' && x.username.indexOf(searchName.value) !== -1)
+    })
+
     const startHandoverRoom = item => {
       action.value.model = true
       action.value.title = '移交群聊'
@@ -81,6 +87,8 @@ export default {
 
     return {
       curUser,
+      filteredItems,
+      searchName,
       action,
       startHandoverRoom,
       handoverRoom,

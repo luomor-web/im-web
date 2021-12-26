@@ -71,7 +71,6 @@ export default {
       }
       activeSub.value = item
 
-      console.log(activeSub.value,'值改变')
     }
 
     const close = () => {

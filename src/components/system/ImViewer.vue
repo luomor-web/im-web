@@ -29,7 +29,6 @@ export default {
     const urlList = ref([])
 
     watch(() => props.file, file => {
-      console.log(file,'    file')
       if (!file) return
 
       if (file.action === 'download') {
@@ -38,7 +37,6 @@ export default {
       }
 
       if (isImageFile(file.file)) {
-        console.log('卧槽')
         urlList.value.push(file.file.url)
         imageViewVisible.value = true
       }

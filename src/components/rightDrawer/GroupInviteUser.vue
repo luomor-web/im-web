@@ -26,7 +26,6 @@ export default {
     const selectUser = ref(null)
 
     const inviteUser = (item, userSelect) => {
-      console.log(item, userSelect)
 
       const users = userSelect.map(x => {
         return {
@@ -37,7 +36,6 @@ export default {
         roomId: props.room.roomId
       }
 
-      console.log(users,'usersIds')
       joinUserGroup({group, users})
 
       close(item)

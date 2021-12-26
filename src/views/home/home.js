@@ -68,10 +68,12 @@ export const ding = () => {
 
 export const sortedUser = (users) => {
     return users.sort((x, y) => {
-        // 如果是群主，优先在最前面
+        // 群主位于第一位, 无视状态
         if (x.role === 'ADMIN' || y.role === 'ADMIN') {
             return x.role === 'ADMIN' ? -1 : 1
             // 如果两个角色相等 判断在线状态
+        } else if (x.role === 'SUB_ADMIN' || y.role === 'SUB_ADMIN') {
+            return x.role === 'SUB_ADMIN' ? -1 : 1
         } else if (x.role === y.role) {
             // 在线的优先于不在线的
             if (x.status.state !== y.status.state) {
