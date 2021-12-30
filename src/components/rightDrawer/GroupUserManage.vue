@@ -6,7 +6,7 @@
     </drawer-top>
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple :class="curUser._id === item._id || item.role === 'ADMIN' ? 'd-none':'im-list-item'" v-for="(item,index) of filteredItems"
+        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of filteredItems"
                      :key="index">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>

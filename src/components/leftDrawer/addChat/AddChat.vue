@@ -1,7 +1,7 @@
 <template>
   <div>
     <drawer-top @close="closeAddChat">
-      <user-search @click-item="startChat"></user-search>
+      <user-search @click-content="startChat"></user-search>
     </drawer-top>
     <div>
       <user-select-column>

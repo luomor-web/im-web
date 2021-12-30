@@ -93,6 +93,10 @@ const webSocket = (username, password) => {
             case 45:
                 msg.$emit("COMMAND_MESSAGE_DELETE_RESP", data)
                 break;
+            // 删除信息响应
+            case 49:
+                msg.$emit("COMMAND_SEARCH_MESSAGE_RESP", data)
+                break;
             default:
                 break
         }

@@ -1,5 +1,5 @@
 import {close, sendMsg} from "@/net/socket";
-import moment from "moment";
+import {buildDisplayTime} from "@/utils/DateUtil";
 
 const getUserInfo = (data) => {
     // 发送获取用户信息
@@ -174,6 +174,15 @@ const messageDelete = ({messageId}) => {
     sendMsg(param)
 }
 
+const searchMessage = ({content,roomId}) => {
+    const param = {
+        cmd: 48,
+        content,
+        roomId
+    }
+    sendMsg(param)
+}
+
 const quitSystem = () => {
     close()
 }
@@ -202,22 +211,14 @@ const buildLastMessage = (data) => {
 // 构建最后一条消息时间
 const buildLastMessageTime = (lastMessage) => {
     if (lastMessage?.date) {
-        const diffDay = moment().diff(moment(lastMessage.date), 'days');
-        let charset = lastMessage.date + ' ,   '
-        if (diffDay === 0) {
-            charset = ''
-        } else if (diffDay === 1) {
-            charset = '昨天 ,   '
-        } else if (diffDay > 1 && diffDay < 365) {
-            charset = moment(lastMessage.date).format("MM-DD") + ' ,   '
-        }
-        lastMessage.timestamp = charset + lastMessage.timestamp
+        lastMessage.timestamp = buildDisplayTime(lastMessage.date,lastMessage.timestamp)
     }
 
     return lastMessage
 }
 
 export {
+    searchMessage,
     setAdmin,
     handoverUserGroup,
     disbandGroup,
