@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100vh">
+  <div class="message-history">
     <drawer-top @close="close">
       <template #default>
         <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search">
@@ -45,7 +45,7 @@
       </template>
     </drawer-top>
 
-    <div class="overflow-y-auto" style="height: 100%">
+    <div class="overflow-y-auto message-history-content">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messages"
                      :key="index" two-line @click="scroll(item)">
@@ -78,7 +78,7 @@
 <script>
 import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {onMounted, ref} from "@vue/composition-api";
+import {onMounted, onUnmounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/message";
 import {buildDisplayTime} from "@/utils/DateUtil";
@@ -107,36 +107,47 @@ export default {
     }
 
     const search = item => {
+
       console.log('change', item)
-      if (!item) return
+      if (!item) {
+        messages.value = []
+        return
+      }
 
       searchMessage({content: item, roomId: props.room.roomId})
     }
 
     const scroll = item => {
       const element = document.getElementById(item._id);
-      console.log(element,'element')
+      console.log(element, 'element')
       if (!element) return
       scrollToView(element)
 
       element.style = "transition: background-color .5s ease-in-out;background-color:#dfe1e5;border-radius: 8px;"
-      setTimeout(()=>{
-        element.style="transition: background-color .5s ease-in-out;border-radius: 8px;"
-      },500)
+      setTimeout(() => {
+        element.style = "transition: background-color .5s ease-in-out;border-radius: 8px;"
+      }, 500)
 
     }
 
     onMounted(() => {
+
+      console.log('挂在')
       msg.$on('COMMAND_SEARCH_MESSAGE_RESP', data => {
         console.log("消息响应", data.data)
         messages.value = [...data.data]
       })
     })
 
+    onUnmounted(() => {
+      msg.$off('COMMAND_SEARCH_MESSAGE_RESP')
+    })
+
     const close = () => {
       picker.value = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
       emit('close')
     }
+
 
     return {
       modal,
@@ -160,5 +171,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.message-history {
+  height: 100vh;
 
+  .message-history-content {
+    height: calc(100vh - 64px);
+  }
+
+}
 </style>

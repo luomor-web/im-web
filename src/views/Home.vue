@@ -283,6 +283,7 @@ export default {
     }
 
     const closeRightDrawer = () => {
+      rightActive.value = ''
       rightDrawerActive.value = false
     }
 

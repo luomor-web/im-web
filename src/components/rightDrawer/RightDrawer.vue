@@ -52,25 +52,23 @@ export default {
   setup(props, {emit}) {
 
     const activeSub = ref('')
-    const startActive = ref('')
 
     watch(() => props.room, room => {
       activeSub.value = room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
-      startActive.value = room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
     })
 
     watch(() => props.active, active => {
+      console.log(props.active,'chan')
       activeSub.value = active
     })
 
     const goTo = (item) => {
       if (!item) {
         close()
-        activeSub.value = startActive.value
+        activeSub.value = props.room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
         return
       }
       activeSub.value = item
-
     }
 
     const close = () => {
