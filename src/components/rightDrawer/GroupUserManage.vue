@@ -1,10 +1,10 @@
 <template>
-  <div style="height: 100vh">
+  <div  class="fill-height">
     <drawer-top :sub="true" @close="close">
       <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName">
       </v-text-field>
     </drawer-top>
-    <div class="mx-2">
+    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 64px)">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of filteredItems"
                      :key="index">

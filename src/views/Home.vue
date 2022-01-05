@@ -21,7 +21,6 @@
           :room-info-enabled="true"
           :show-audio="false"
           :media-preview-enabled="false"
-          :show-footer="curRoomIsSystem"
           @room-info="roomInfo"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
@@ -235,7 +234,8 @@ export default {
     })
 
     const curRoomIsSystem = computed(() => {
-      return curRoom?.system
+      console.log(curRoom.value,'isSystem')
+      return !curRoom.value?.isSystem
     })
 
     // 查找更多消息
@@ -313,6 +313,8 @@ export default {
       msg.$off('COMMAND_HANDOVER_GROUP_RESP')
       msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')
       msg.$off('COMMAND_MESSAGE_DELETE_RESP')
+      msg.$off('COMMAND_SYSTEM_MESSAGE_RESP')
+      msg.$off('COMMAND_USER_GROUP_CONFIG_RESP')
     })
 
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'

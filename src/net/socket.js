@@ -97,6 +97,14 @@ const webSocket = (username, password) => {
             case 49:
                 msg.$emit("COMMAND_SEARCH_MESSAGE_RESP", data)
                 break;
+            // 系统消息会话消息
+            case 51:
+                msg.$emit("COMMAND_SYSTEM_MESSAGE_RESP",data)
+                break;
+            // 群组配置修改
+            case 53:
+                msg.$emit("COMMAND_USER_GROUP_CONFIG_RESP",data)
+                break;
             default:
                 break
         }

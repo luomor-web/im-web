@@ -29,13 +29,13 @@
         <v-list nav>
           <v-list-item v-ripple class="im-list-item">
             <v-list-item-icon>
-              <v-icon>{{ icons.mdiBellOutline }}</v-icon>
+              <v-icon>{{ room.notice ? icons.mdiBellOutline : icons.mdiBellOffOutline }}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>通知</v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-switch
+              <v-switch v-model="notice" @change="noticeChange"
               ></v-switch>
             </v-list-item-action>
           </v-list-item>
@@ -88,10 +88,11 @@
 </template>
 
 <script>
-import {joinUserGroup} from "@/net/message";
-import {mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
+import {joinUserGroup, userGroupConfig} from "@/net/message";
+import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
+import {onMounted, ref, watch} from "@vue/composition-api";
 
 export default {
   name: "GroupInfo",
@@ -103,6 +104,26 @@ export default {
     DrawerTop,
   },
   setup(props, context) {
+
+    const notice = ref(true)
+
+    watch(props.room , room => {
+      notice.value = room.notice
+    })
+
+    onMounted(()=>{
+      notice.value = props.room.notice
+    })
+
+    const noticeChange = item => {
+      console.log(item)
+      const param = {
+        roomId: props.room.roomId,
+        notice: item,
+        type: 'NOTICE'
+      }
+      userGroupConfig(param)
+    }
 
     const closeGroupInfo = () => {
       context.emit('close')
@@ -129,6 +150,8 @@ export default {
     }
 
     return {
+      notice,
+      noticeChange,
       close,
       joinGroup,
       closeGroupInfo,
@@ -136,6 +159,7 @@ export default {
 
       icons: {
         mdiBellOutline,
+        mdiBellOffOutline,
         mdiPencilOutline,
         mdiPlus,
       }

@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="d-flex">
-      <div class="mr-2">
+      <div class="mr-2" v-show="!room.isSystem">
         <v-btn icon @click="openRightDrawer('MESSAGE_HISTORY')">
           <v-icon>{{ icons.mdiMagnify }}</v-icon>
         </v-btn>
       </div>
       <div class="mr-2">
         <v-btn icon @click="roomInfo">
-          <v-icon>{{ icons.mdiDotsVertical  }}</v-icon>
+          <v-icon>{{ icons.mdiDotsVertical }}</v-icon>
         </v-btn>
       </div>
     </div>
@@ -17,20 +17,24 @@
 
 <script>
 import {mdiDotsVertical, mdiMagnify,} from "@mdi/js";
-import {ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {getUserList} from "@/net/message";
+import {loadedRooms} from "@/views/home/home";
 
 export default {
   name: "RoomOptions",
   props: {
     roomId: String,
   },
-  components: {
-  },
+  components: {},
   setup(props, {emit}) {
 
     // 当前点击的用户,有可能时房间,有可能时用户
     const clickRoom = ref({})
+
+    const room = computed(() => {
+      return loadedRooms.value.find(r => r.roomId === props.roomId);
+    })
 
     const roomInfo = () => {
       if (clickRoom.value.isFriend) {
@@ -38,36 +42,27 @@ export default {
       }
     }
 
-    // const createChat = item => {
-      // const roomIndex = props.loadedRooms.findIndex(r => item._id === r.friendId)
-      // if (roomIndex === -1) {
-      //   createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
-      //   return
-      // }
-      // emit('up-room', props.loadedRooms[roomIndex].roomId)
-      // emit('change-room', props.loadedRooms[roomIndex].roomId)
-    // }
-
     const inviteUser = () => {
       getUserList()
     }
 
     const openRightDrawer = item => {
-      emit('open',item)
+      emit('open', item)
     }
 
     const openFileHistory = () => {
     }
 
     return {
+      room,
       clickRoom,
       roomInfo,
       inviteUser,
       openRightDrawer,
       openFileHistory,
       icons: {
-        mdiMagnify ,
-        mdiDotsVertical ,
+        mdiMagnify,
+        mdiDotsVertical,
       }
     }
   }

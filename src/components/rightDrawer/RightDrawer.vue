@@ -54,7 +54,7 @@ export default {
     const activeSub = ref('')
 
     watch(() => props.room, room => {
-      activeSub.value = room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
+      activeSub.value = room.isFriend || room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
     })
 
     watch(() => props.active, active => {
@@ -65,7 +65,7 @@ export default {
     const goTo = (item) => {
       if (!item) {
         close()
-        activeSub.value = props.room.isFriend ? 'USER_INFO' : 'GROUP_INFO'
+        activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
         return
       }
       activeSub.value = item

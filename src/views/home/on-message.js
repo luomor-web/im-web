@@ -40,7 +40,11 @@ export const init = () => {
     // 已读消息响应
     msg.$on("COMMAND_MESSAGE_READ_RESP", COMMAND_MESSAGE_READ_RESP)
     // 全部人员列表
-    msg.$on("COMMAND_USER_LIST_RESP",COMMAND_USER_LIST_RESP)
+    msg.$on("COMMAND_USER_LIST_RESP", COMMAND_USER_LIST_RESP)
+    // 系统消息会话
+    msg.$on("COMMAND_SYSTEM_MESSAGE_RESP", COMMAND_JOIN_GROUP_NOTIFY_RESP)
+    // 用户配置响应
+    msg.$on("COMMAND_USER_GROUP_CONFIG_RESP", COMMAND_USER_GROUP_CONFIG_RESP)
 }
 
 // 获取用户信息响应
@@ -82,12 +86,14 @@ const COMMAND_GET_MESSAGE_RESP = (data) => {
 // 聊天请求
 const COMMAND_CHAT_RESP = (data) => {
     const message = data.data
-    if (message.senderId !== curUser.value._id) {
-        ding()
-    }
+
     const roomIndex = loadedRooms.value.findIndex(
         r => message.roomId === r.roomId
     )
+
+    if (loadedRooms.value[roomIndex].notice && message.senderId !== curUser.value._id) {
+        ding()
+    }
 
     const lastMessage = buildLastMessage(message)
 
@@ -260,7 +266,7 @@ const COMMAND_HANDOVER_GROUP_RESP = (data) => {
 
 // 修改群组信息响应
 const COMMAND_EDIT_GROUP_PROFILE_RESP = (data) => {
-    const {roomId:changeRoomId, roomName, avatar} = data.data
+    const {roomId: changeRoomId, roomName, avatar} = data.data
     const index = loadedRooms.value.findIndex(r => r.roomId === changeRoomId);
     loadedRooms.value[index].roomName = roomName
     loadedRooms.value[index].avatar = avatar
@@ -310,5 +316,24 @@ const COMMAND_MESSAGE_READ_RESP = (data) => {
 // 全部人员列表
 const COMMAND_USER_LIST_RESP = (data) => {
     waitSelectUser.value = data.data
+}
+
+// 用户配置响应
+const COMMAND_USER_GROUP_CONFIG_RESP = (data) => {
+    const {data: config} = data
+    console.log(config)
+
+    const index = loadedRooms.value.findIndex(r => r.roomId === config.roomId);
+    if(index === -1){
+         return
+    }
+    switch (config.type){
+        case 'NOTICE':
+            loadedRooms.value[index].notice = config.notice
+            break;
+    }
+
+    loadedRooms.value = [...loadedRooms.value]
+
 }
 

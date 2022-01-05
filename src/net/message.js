@@ -174,11 +174,21 @@ const messageDelete = ({messageId}) => {
     sendMsg(param)
 }
 
+// 搜索聊天记录
 const searchMessage = ({content,roomId}) => {
     const param = {
         cmd: 48,
         content,
         roomId
+    }
+    sendMsg(param)
+}
+
+// 群组配置
+const userGroupConfig = (data) => {
+    const param = {
+        cmd: 52,
+        ...data
     }
     sendMsg(param)
 }
@@ -238,5 +248,6 @@ export {
     messageHistory,
     editGroupProfile,
     messageDelete,
-    buildLastMessageTime
+    buildLastMessageTime,
+    userGroupConfig
 }

@@ -6,7 +6,7 @@
       </v-text-field>
     </drawer-top>
 
-    <div class="mx-2">
+    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 64px)">
       <v-list nav>
         <v-list-item v-ripple  v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
           <v-list-item-avatar>
