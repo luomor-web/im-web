@@ -22,7 +22,7 @@
               ></v-img>
 
               <h2 class="text-2xl font-weight-semibold">
-                Materio
+                Courier
               </h2>
             </router-link>
           </v-card-title>
@@ -30,7 +30,7 @@
           <!-- title -->
           <v-card-text>
             <p class="text-2xl font-weight-semibold text--primary mb-2">
-              Welcome to Materio! 👋🏻
+              欢迎来到信使 Welcome to Courier! 👋🏻
             </p>
           </v-card-text>
 
@@ -41,7 +41,7 @@
                   v-model="username"
                   outlined
                   label="用户名"
-                  placeholder="a"
+                  placeholder="用户名"
                   hide-details
                   class="mb-3"
               ></v-text-field>
@@ -59,7 +59,8 @@
 
               <div class="d-flex align-center justify-space-between flex-wrap">
                 <v-checkbox
-                    label="Remember Me"
+                    v-model="remember"
+                    label="记住密码"
                     hide-details
                     class="me-3 mt-1"
                 >
@@ -70,7 +71,7 @@
                     href="javascript:void(0)"
                     class="mt-1"
                 >
-                  Forgot Password?
+                  忘记密码
                 </a>
               </div>
 
@@ -88,10 +89,10 @@
           <!-- create new account  -->
           <v-card-text class="d-flex align-center justify-center flex-wrap mt-2">
           <span class="me-2">
-            New on our platform?
+            体验新功能?
           </span>
             <router-link :to="{name:'Home'}">
-              Create an account
+              创建账号
             </router-link>
           </v-card-text>
         </v-card>
@@ -125,7 +126,7 @@
 
 <script>
 import TopBar from "../components/system/TopBar";
-import { mdiFacebook, mdiTwitter, mdiGithub, mdiGoogle, mdiEyeOutline, mdiEyeOffOutline } from '@mdi/js'
+import {mdiFacebook, mdiTwitter, mdiGithub, mdiGoogle, mdiEyeOutline, mdiEyeOffOutline} from '@mdi/js'
 import {onMounted, ref} from '@vue/composition-api'
 import {webSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
@@ -135,16 +136,17 @@ import localStoreUtil from "@/utils/local-store";
 export default {
 
   name: "Login",
-  components:{
+  components: {
     TopBar
   },
-  setup(){
+  setup() {
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
     const isPasswordVisible = ref(false)
     const username = ref('')
     const password = ref('')
+    const remember = ref(false)
     const socialLink = [
       {
         icon: mdiFacebook,
@@ -172,28 +174,37 @@ export default {
       webSocket(username.value, password.value)
     }
 
-    onMounted(()=>{
+    onMounted(() => {
       const value = localStoreUtil.getValue('username');
-      if(value){
+      if (value) {
         username.value = value
       }
-      msg.$on("COMMAND_LOGIN_RESP",(data) => {
-        if(data.success) {
-          localStoreUtil.setValue('token','123456')
-          localStoreUtil.setValue('username',username.value)
-          localStoreUtil.setValue('userId',data.data._id)
+      const pwd = localStoreUtil.getValue('password');
+      if(pwd){
+        remember.value = true
+        password.value = pwd
+      }
+      msg.$on("COMMAND_LOGIN_RESP", (data) => {
+        if (data.success) {
+          localStoreUtil.setValue('token', '123456')
+          localStoreUtil.setValue('username', username.value)
+          localStoreUtil.setValue('userId', data.data._id)
+          if (remember.value) {
+            localStoreUtil.setValue('password', password.value)
+          }
           router.push('/')
         }
       })
     })
 
-    const pageHeight = isElectron ?  'calc(100vh - 48px)' : '100vh'
+    const pageHeight = isElectron ? 'calc(100vh - 48px)' : '100vh'
 
     return {
       isPasswordVisible,
       username,
       password,
       socialLink,
+      remember,
 
       login,
 

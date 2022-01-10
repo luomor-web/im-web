@@ -3,7 +3,7 @@
     <drawer-top @close="closeAddChat">
       <user-search @click-content="startChat"></user-search>
     </drawer-top>
-    <div>
+    <div class="overflow-y-auto" style="height: calc(100vh - 64px)">
       <user-select-column>
         <div slot="userAction" slot-scope="{item}">
           <v-btn icon @click="startChat(item)">
