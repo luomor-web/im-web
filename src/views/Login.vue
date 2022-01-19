@@ -121,6 +121,23 @@
           src="@/assets/images/misc/tree-3.png"
       ></v-img>
     </div>
+
+    <v-snackbar
+        v-model="snackbar.display"
+    >
+      {{ snackbar.text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="snackbar.display = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -128,7 +145,7 @@
 import TopBar from "../components/system/TopBar";
 import {mdiEyeOffOutline, mdiEyeOutline} from '@mdi/js'
 import {onMounted, ref} from '@vue/composition-api'
-import {startWebSocket} from "@/net/socket";
+import {close, startWebSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
 import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
@@ -147,6 +164,11 @@ export default {
     const username = ref('')
     const password = ref('')
     const remember = ref(false)
+
+    const snackbar = ref({
+      display: false,
+      text: ''
+    })
 
     const login = () => {
       startWebSocket(username.value, password.value)
@@ -171,6 +193,10 @@ export default {
             localStoreUtil.setValue('password', password.value)
           }
           router.push('/')
+        }else {
+          snackbar.value.display = true
+          snackbar.value.text = data.msg
+          close()
         }
       })
     })
@@ -186,6 +212,7 @@ export default {
       username,
       password,
       remember,
+      snackbar,
 
       login,
       forgotPassword,

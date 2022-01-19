@@ -160,13 +160,7 @@ const initWebSocket = () => {
 
 const startWebSocket = (username, password) => {
     if (socket) {
-        const param = {
-            cmd: 5,
-            account: username,
-            password
-        }
-        sendMsg(param)
-        return
+        close()
     }
     webSocket(username, password)
 }

@@ -54,15 +54,17 @@ export default {
     const activeSub = ref('')
 
     watch(() => props.room, room => {
+      console.log('change', room)
       activeSub.value = room.isFriend || room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
     })
 
     watch(() => props.active, active => {
-      console.log(props.active,'chan')
-      activeSub.value = active
+      console.log(active, 'chan')
+      activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
     })
 
     const goTo = (item) => {
+      console.log('rightClose')
       if (!item) {
         close()
         activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
