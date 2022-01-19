@@ -68,7 +68,7 @@
 
                 <!-- forgot link -->
                 <a
-                    href="javascript:void(0)"
+                    @click="forgotPassword"
                     class="mt-1"
                 >
                   忘记密码
@@ -91,7 +91,7 @@
           <span class="me-2">
             体验新功能?
           </span>
-            <router-link :to="{name:'Home'}">
+            <router-link :to="{name:'Register'}">
               创建账号
             </router-link>
           </v-card-text>
@@ -126,9 +126,9 @@
 
 <script>
 import TopBar from "../components/system/TopBar";
-import {mdiFacebook, mdiTwitter, mdiGithub, mdiGoogle, mdiEyeOutline, mdiEyeOffOutline} from '@mdi/js'
+import {mdiEyeOffOutline, mdiEyeOutline} from '@mdi/js'
 import {onMounted, ref} from '@vue/composition-api'
-import {webSocket} from "@/net/socket";
+import {startWebSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
 import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
@@ -147,31 +147,9 @@ export default {
     const username = ref('')
     const password = ref('')
     const remember = ref(false)
-    const socialLink = [
-      {
-        icon: mdiFacebook,
-        color: '#4267b2',
-        colorInDark: '#4267b2',
-      },
-      {
-        icon: mdiTwitter,
-        color: '#1da1f2',
-        colorInDark: '#1da1f2',
-      },
-      {
-        icon: mdiGithub,
-        color: '#272727',
-        colorInDark: '#fff',
-      },
-      {
-        icon: mdiGoogle,
-        color: '#db4437',
-        colorInDark: '#db4437',
-      },
-    ]
 
     const login = () => {
-      webSocket(username.value, password.value)
+      startWebSocket(username.value, password.value)
     }
 
     onMounted(() => {
@@ -180,7 +158,7 @@ export default {
         username.value = value
       }
       const pwd = localStoreUtil.getValue('password');
-      if(pwd){
+      if (pwd) {
         remember.value = true
         password.value = pwd
       }
@@ -197,16 +175,20 @@ export default {
       })
     })
 
+    const forgotPassword = () => {
+
+    }
+
     const pageHeight = isElectron ? 'calc(100vh - 48px)' : '100vh'
 
     return {
       isPasswordVisible,
       username,
       password,
-      socialLink,
       remember,
 
       login,
+      forgotPassword,
 
       icons: {
         mdiEyeOutline,

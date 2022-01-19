@@ -99,11 +99,11 @@ const webSocket = (username, password) => {
                 break;
             // 系统消息会话消息
             case 51:
-                msg.$emit("COMMAND_SYSTEM_MESSAGE_RESP",data)
+                msg.$emit("COMMAND_SYSTEM_MESSAGE_RESP", data)
                 break;
             // 群组配置修改
             case 53:
-                msg.$emit("COMMAND_USER_GROUP_CONFIG_RESP",data)
+                msg.$emit("COMMAND_USER_GROUP_CONFIG_RESP", data)
                 break;
             default:
                 break
@@ -158,4 +158,17 @@ const initWebSocket = () => {
     }
 }
 
-export {webSocket, close, sendMsg, initWebSocket, socket}
+const startWebSocket = (username, password) => {
+    if (socket) {
+        const param = {
+            cmd: 5,
+            account: username,
+            password
+        }
+        sendMsg(param)
+        return
+    }
+    webSocket(username, password)
+}
+
+export {webSocket, close, sendMsg, initWebSocket, startWebSocket, socket}

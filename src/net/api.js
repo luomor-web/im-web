@@ -29,3 +29,21 @@ export function mergeMultipartUpload(data) {
     data: data
   })
 }
+
+export function registerUser(data) {
+  return request({
+    url: '/register',
+    method: 'put',
+    data: data
+  })
+}
+
+export function checkAccountAuth(data) {
+  return request({
+    url: '/check/account',
+    method: 'get',
+    params: data
+  })
+}
+
+

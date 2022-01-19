@@ -99,7 +99,7 @@ export default {
     }
 
     const changeUserProfile = (url) => {
-      editProfile({roomId: curUser.value._id, isGroup: false, avatar: url, name: username.value})
+      editProfile({userId: curUser.value._id,  avatar: url, name: username.value})
     }
 
     const sure = (url) => {

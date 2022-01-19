@@ -70,13 +70,12 @@ const messageReaction = ({reaction, remove, messageId, roomId}) => {
 }
 
 // 修改用户资料
-const editProfile = ({roomId, isGroup, avatar, name}) => {
+const editProfile = ({userId, avatar, name}) => {
     const param = {
         cmd: 30,
-        isGroup,
         avatar,
         name,
-        roomId
+        userId
     }
     sendMsg(param)
 }
