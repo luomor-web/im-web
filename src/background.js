@@ -4,7 +4,7 @@ import {app, ipcMain, protocol, BrowserWindow, Menu, Tray, dialog} from 'electro
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 // import { autoUpdater } from 'electron-updater'
 // import config from '../public/config'
-import path from 'path'
+const path = require('path')
 
 const versionInfo = require("../package.json")
 
@@ -132,7 +132,7 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
 
 // 绑定托盘
 const bindTray = () => {
-    const iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.png' : './icons/tray.png')
+    const iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.ico' : './icons/tray.ico')
     appIcon = new Tray(iconPath)
     appIcon.setContextMenu(Menu.buildFromTemplate([
         {
@@ -148,7 +148,7 @@ const bindTray = () => {
             }
         }
     ]))
-    appIcon.setToolTip('ins-im')
+    appIcon.setToolTip('信使')
     appIcon.on('click', () => {
         showWindow()
     })

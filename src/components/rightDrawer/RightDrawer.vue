@@ -60,7 +60,11 @@ export default {
 
     watch(() => props.active, active => {
       console.log(active, 'chan')
-      activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
+      if(active){
+        activeSub.value = active
+      }else{
+        activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
+      }
     })
 
     const goTo = (item) => {

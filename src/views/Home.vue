@@ -61,12 +61,14 @@
               @open="openRightDrawer"
               @up-room="upRoom"
               @change-room="changeRoom"
+              @start-video="videoVisible=true"
           >
           </room-options>
         </template>
       </chat-window>
     </div>
     <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
+    <im-video-dialog :visible="videoVisible"></im-video-dialog>
   </div>
 </template>
 
@@ -106,6 +108,7 @@ import {uuid} from "@/utils/id-util";
 import moment from "moment";
 import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
+import ImVideoDialog from "@/components/system/ImVideoDialog";
 
 export default {
   name: 'Home',
@@ -117,6 +120,7 @@ export default {
     RoomsHeader,
     TopBar,
     ChatWindow,
+    ImVideoDialog,
   },
   setup() {
 
@@ -133,6 +137,9 @@ export default {
     const rightDrawerActive = ref(false)
 
     let isElectron = ref(process.env.IS_ELECTRON);
+
+
+    const videoVisible = ref(false)
 
     onMounted(() => {
       currentUserId.value = localStoreUtil.getValue('userId')
@@ -234,7 +241,7 @@ export default {
     })
 
     const curRoomIsSystem = computed(() => {
-      console.log(curRoom.value,'isSystem')
+      console.log(curRoom.value, 'isSystem')
       return !curRoom.value?.isSystem
     })
 
@@ -320,6 +327,7 @@ export default {
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
+      videoVisible,
       messages,
       messageLoaded,
       curUser,
