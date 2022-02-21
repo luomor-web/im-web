@@ -45,6 +45,7 @@ export const init = () => {
     msg.$on("COMMAND_SYSTEM_MESSAGE_RESP", COMMAND_JOIN_GROUP_NOTIFY_RESP)
     // 用户配置响应
     msg.$on("COMMAND_USER_GROUP_CONFIG_RESP", COMMAND_USER_GROUP_CONFIG_RESP)
+
 }
 
 // 获取用户信息响应

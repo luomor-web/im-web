@@ -192,6 +192,15 @@ const userGroupConfig = (data) => {
     sendMsg(param)
 }
 
+// 发起视频
+const callVideo = (data) =>{
+    const param = {
+        cmd:55,
+        ...data
+    }
+    sendMsg(param)
+}
+
 const quitSystem = () => {
     close()
 }
@@ -227,6 +236,7 @@ const buildLastMessageTime = (lastMessage) => {
 }
 
 export {
+    callVideo,
     searchMessage,
     setAdmin,
     handoverUserGroup,

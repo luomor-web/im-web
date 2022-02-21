@@ -19,7 +19,6 @@
           :text-messages="textMessages"
           :message-actions="messageActions"
           :room-info-enabled="true"
-          :show-audio="false"
           :media-preview-enabled="false"
           @room-info="roomInfo"
           @send-message="sendMessage"
@@ -61,14 +60,14 @@
               @open="openRightDrawer"
               @up-room="upRoom"
               @change-room="changeRoom"
-              @start-video="videoVisible=true"
+              @start-video="startVideo"
           >
           </room-options>
         </template>
       </chat-window>
     </div>
     <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
-    <im-video-dialog :visible="videoVisible"></im-video-dialog>
+    <im-video-dialog ref="videoDialog"  :room="curRoom"></im-video-dialog>
   </div>
 </template>
 
@@ -135,11 +134,11 @@ export default {
 
     const leftActive = ref('')
     const rightDrawerActive = ref(false)
+    const videoDialog = ref(null)
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
 
-    const videoVisible = ref(false)
 
     onMounted(() => {
       currentUserId.value = localStoreUtil.getValue('userId')
@@ -294,6 +293,10 @@ export default {
       rightDrawerActive.value = false
     }
 
+    const startVideo = () => {
+      videoDialog.value.call()
+    }
+
     const styles = ref({
       container: {
         boxShadow: ''
@@ -322,12 +325,13 @@ export default {
       msg.$off('COMMAND_MESSAGE_DELETE_RESP')
       msg.$off('COMMAND_SYSTEM_MESSAGE_RESP')
       msg.$off('COMMAND_USER_GROUP_CONFIG_RESP')
+      msg.$off('COMMAND_VIDEO_RESP')
     })
 
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
-      videoVisible,
+      videoDialog,
       messages,
       messageLoaded,
       curUser,
@@ -349,6 +353,7 @@ export default {
       pageHeight,
       styles,
       systemUsers,
+      startVideo,
       closeRightDrawer,
       openRightDrawer,
       leftGoTo,

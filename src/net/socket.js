@@ -105,6 +105,10 @@ const webSocket = (username, password) => {
             case 53:
                 msg.$emit("COMMAND_USER_GROUP_CONFIG_RESP", data)
                 break;
+            // 音视频通话消息
+            case 56:
+                msg.$emit("COMMAND_VIDEO_RESP", data)
+                break;
             default:
                 break
         }
@@ -138,6 +142,7 @@ const sendMsg = (data) => {
 
 const initWebSocket = () => {
     const username = getValue('username')
+    const password = getValue('password')
     if (username === '' || username === undefined || username === null) {
         if (socket) {
             try {
@@ -154,7 +159,7 @@ const initWebSocket = () => {
         return
     }
     if (socket == null && username) {
-        webSocket(username, 'a')
+        webSocket(username, password)
     }
 }
 
