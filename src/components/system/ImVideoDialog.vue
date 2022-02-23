@@ -24,10 +24,10 @@
       </v-app-bar>
       <div style="height: 300px;position: relative">
         <div>
-          <video style="object-fit:fill" ref="video" width="400" height="300" autoplay muted></video>
+          <video style="object-fit:fill" ref="video" width="400" height="300" autoplay ></video>
         </div>
         <div style="width: 160px;height: 120px;position: absolute;right: 0;bottom: 0;z-index: 1">
-          <video style="object-fit:fill" ref="video2" width="160" height="120" autoplay muted></video>
+          <video style="object-fit:fill" ref="video2" width="160" height="120" autoplay ></video>
         </div>
       </div>
       <v-toolbar class="px-16" v-if="role === 'HOST' || videoed" elevation="0">
