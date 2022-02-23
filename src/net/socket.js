@@ -11,7 +11,7 @@ const webSocket = (username, password) => {
     const protocol = location.protocol
     const port = location.port
     const host = location.host
-    const socketUrl = protocol + "//" + host + (port === '' ? '' : ':') + port + "/ws"
+    const socketUrl = (protocol === 'https:' ? 'wss:' : 'ws:') + "//" + host + (port === '' ? '' : ':') + port + "/ws"
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?account=' + username + '&password=' + password,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
