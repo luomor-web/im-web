@@ -9,9 +9,9 @@ const webSocket = (username, password) => {
     // const socketUrl = process.env.VUE_APP_SOCKET_URL
 
     const protocol = location.protocol
-    const port = location.port
+    // const port = location.port
     const host = location.host
-    const socketUrl = (protocol === 'https:' ? 'wss:' : 'ws:') + "//" + host + (port === '' ? '' : ':') + port + "/ws"
+    const socketUrl = (protocol === 'https:' ? 'wss:' : 'ws:') + "//" + host + "/ws"
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?account=' + username + '&password=' + password,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000

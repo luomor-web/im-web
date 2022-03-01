@@ -62,4 +62,37 @@ export function pullVideoStream(data, userId) {
     })
 }
 
+export function createSession( sessionId) {
+
+    return request({
+        url: `https://localhost:4443/openvidu/api/sessions`,
+        method: 'post',
+        data: {
+            customSessionId: sessionId
+        },
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: 'MY_SECRET',
+        },
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+export function createToken(sessionId) {
+    return request({
+        url: `https://localhost:4443/openvidu/api/sessions/${sessionId}/connection`,
+        method: 'post',
+        data: {},
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: 'MY_SECRET',
+        },
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+        }
+    })
+}
+
 
