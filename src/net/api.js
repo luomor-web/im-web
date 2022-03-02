@@ -65,7 +65,7 @@ export function pullVideoStream(data, userId) {
 export function createSession( sessionId) {
 
     return request({
-        url: `https://localhost:4443/openvidu/api/sessions`,
+        url: `/openvidu/api/sessions`,
         method: 'post',
         data: {
             customSessionId: sessionId
@@ -82,7 +82,7 @@ export function createSession( sessionId) {
 
 export function createToken(sessionId) {
     return request({
-        url: `https://localhost:4443/openvidu/api/sessions/${sessionId}/connection`,
+        url: `/openvidu/api/sessions/${sessionId}/connection`,
         method: 'post',
         data: {},
         auth: {

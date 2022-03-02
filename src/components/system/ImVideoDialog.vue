@@ -2,32 +2,36 @@
   <v-expand-transition>
     <v-card v-drag class="video-content" v-show="display">
       <v-app-bar dense class="px-3" elevation="0">
-        <v-toolbar-title>Title</v-toolbar-title>
+        <v-avatar color="#b7c1ca" size="30">
+          <img
+              :src="callUser.avatar"
+          >
+        </v-avatar>
+        <v-toolbar-title class="ml-1">{{callUser.username}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <!--        <v-btn icon>-->
-        <!--          <v-icon>mdi-fullscreen</v-icon>-->
-        <!--        </v-btn>-->
-        <v-btn icon @click="close">
-          <v-icon>mdi-window-close</v-icon>
+        <v-btn icon @click="changeAudio" v-if="videoed || role === 'HOST'">
+          <v-icon>{{ audioEnabled ? icons.mdiMicrophone : icons.mdiMicrophoneOff }}</v-icon>
+        </v-btn>
+        <v-btn icon @click="changeVideo" v-if="videoed || role === 'HOST'">
+          <v-icon>{{ videoEnabled ? icons.mdiCamera : icons.mdiCameraOff }}</v-icon>
+        </v-btn>
+        <v-btn icon color="red" @click="refuse" elevation="0">
+          <v-icon>{{ icons.mdiPhoneHangup }}</v-icon>
+        </v-btn>
+        <v-btn icon color="green" @click="agree" elevation="0" v-if="!videoed && role === 'PARTNER'">
+          <v-icon>{{ icons.mdiVideo }}</v-icon>
         </v-btn>
       </v-app-bar>
 
       <div class="content-center" v-if="session">
-        <user-video :stream-manager="subStreamManager" :class="isMainStream ? 'other-video': ''"
-                    @click.native="updateMainVideoStreamManager(subStreamManager)"/>
-        <user-video :stream-manager="mainStreamManager" :class="!isMainStream ? 'other-video': ''" @click.native="updateMainVideoStreamManager(subStreamManager)"/>
-
-        <div class="px-16 align-center tool-bar justify-space-between">
-          <v-btn small fab dark color="grey" elevation="0" @click="changeAudio">
-            <v-icon dark>{{ audioEnabled ? icons.mdiMicrophone : icons.mdiMicrophoneOff }}</v-icon>
-          </v-btn>
-          <v-btn fab dark color="red" @click="stop" elevation="0">
-            <v-icon dark>{{ icons.mdiPhoneOff }}</v-icon>
-          </v-btn>
-          <v-btn small fab dark color="grey" elevation="0" @click="changeVideo">
-            <v-icon dark>{{ videoEnabled ? icons.mdiCamera : icons.mdiCameraOff }}</v-icon>
-          </v-btn>
-        </div>
+        <user-video
+            :stream-manager="subStreamManager"
+            :class=" {'other-video': isMainStream}"
+            @click.native="updateMainVideoStreamManager(subStreamManager)"/>
+        <user-video
+            :stream-manager="mainStreamManager"
+            :class=" {'other-video':!isMainStream }"
+            @click.native="updateMainVideoStreamManager(subStreamManager)"/>
       </div>
 
       <v-snackbar
@@ -54,13 +58,12 @@
 <script>
 
 import {onMounted, ref} from "@vue/composition-api";
-import {currentUserId} from "@/views/home/home";
+import {currentUserId, loadedRooms} from "@/views/home/home";
 import msg from "@/plugins/msg";
 import {callVideo} from "@/net/message";
-import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhone, mdiPhoneOff} from "@mdi/js";
+import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo} from "@mdi/js";
 import UserVideo from "@/components/system/UserVideo";
 import {OpenVidu} from "openvidu-browser";
-// import {createSession, createToken} from "@/net/api";
 import {createSession, createToken} from "@/net/api";
 
 export default {
@@ -68,7 +71,6 @@ export default {
   components: {UserVideo},
   props: {
     room: {type: Object}
-    // callUserId: {type: String},
   },
   // 自定义指令 实现可拖动
   directives: {
@@ -93,45 +95,59 @@ export default {
 
   setup(props, {emit}) {
 
+    // 推送者视频流
     const publisher = ref(undefined)
     const OV = ref(undefined)
     const session = ref(undefined)
+    // 主界面视频流
     const mainStreamManager = ref(undefined)
+    // 接听者视频流
     const subStreamManager = ref(undefined)
+    // 所有的子, 本界面不存在
     const subscribers = ref([])
+    // 开启音频
     const audioEnabled = ref(true)
+    // 开启视频
     const videoEnabled = ref(true)
+    // 放大的视频是不是自己
     const isMainStream = ref(true)
 
-
+    // 当前
     const role = ref('')
+    // 提示框
     const snackbar = ref({
       display: false,
       text: ''
     })
+    // 是否显示弹窗
     const display = ref(false)
+    // 是否正在视频中
     const videoed = ref(false)
+    // 呼叫配置
     const calledConfig = ref(null)
+    // 定时器
     const selfTimer = ref(null)
-
+    // 呼叫/被呼叫 用户
+    const callUser = ref({})
 
     // 接听或挂断视频
-    const stop = () => {
+    const refuse = () => {
       const param = {
         ...calledConfig.value,
-        command: 'REFUSE'
+        command: role.value === 'HOST' ? 'CALLED_REFUSE' : 'BE_CALLED_REFUSE'
       }
       callVideo(param)
+      overVideo('通话结束')
     }
 
-    const start = async () => {
+    const agree = () => {
       const param = {
         ...calledConfig.value,
         command: 'AGREE'
       }
       callVideo(param)
-      console.log('start')
       videoed.value = true
+      joinSession()
       clearTimeout(selfTimer.value)
     }
 
@@ -140,11 +156,10 @@ export default {
       role.value = 'HOST'
       if (props.room.isFriend) {
         const find = props.room.users.find(x => x._id !== currentUserId.value);
-        console.log(find, 'find')
+        callUser.value = find
         calledConfig.value = {userId: find._id, fromId: currentUserId.value, roomId: props.room.roomId, command: 'CALL'}
-        // callVideo(calledConfig.value)
+        callVideo(calledConfig.value)
       }
-      joinSession()
     }
 
     const joinSession = () => {
@@ -197,6 +212,10 @@ export default {
               mainStreamManager.value = publisherCamera;
               publisher.value = publisherCamera;
 
+              publisher.value.on('streamAudioVolumeChange', (event) => {
+                console.log('Publisher audio volume change from ' + event.value.oldValue + ' to' + event.value.newValue);
+              });
+
               // --- Publish your stream ---
 
               session.value.publish(publisher.value);
@@ -242,7 +261,6 @@ export default {
 
     const changeAudio = () => {
       audioEnabled.value = !audioEnabled.value
-      console.log(publisher.value, 'publih')
       publisher.value.publishAudio(audioEnabled.value)
     }
 
@@ -258,6 +276,28 @@ export default {
     const COMMAND_VIDEO_RESP = async (data) => {
       console.log(data)
       switch (data.data.command) {
+          // 接听者指令
+        case 'CALL': {
+          display.value = true
+          role.value = 'PARTNER'
+          calledConfig.value = data.data;
+          const room = loadedRooms.value.find(x => x.roomId === calledConfig.value.roomId);
+          callUser.value = room.users.find(x => x._id === calledConfig.value.fromId)
+          selfTimer.value = setTimeout(() => {
+            overVideo('已超时')
+          }, 20000)
+          break;
+        }
+        case 'AGREE':
+          clearTimeout(selfTimer.value)
+          snackbar.value.display = true
+          snackbar.value.text = '已接通'
+          break;
+        case 'BE_CALLED_REFUSE':
+          overVideo('接听者对方已挂断')
+          break;
+
+          // 发起者接收指令
         case 'NOT_ONLINE':
           snackbar.value.display = true
           snackbar.value.text = '对方不在线'
@@ -267,29 +307,12 @@ export default {
           break;
         case 'REQ_SUCCESS':
           selfTimer.value = setTimeout(() => {
-            console.log('对方无响应')
             overVideo('对方无响应')
           }, 20000)
+          joinSession()
           break;
-        case 'CALL':
-          display.value = true
-          role.value = 'PARTNER'
-          calledConfig.value = data.data
-          selfTimer.value = setTimeout(() => {
-            console.log('自己无响应')
-            overVideo('已超时')
-          }, 20000)
-          break;
-        case 'AGREE':
-          clearTimeout(selfTimer.value)
-          snackbar.value.display = true
-          snackbar.value.text = '等待流就绪'
-          break;
-        case 'STREAM_OK':
-          snackbar.value.display = true
-          snackbar.value.text = '流已就绪'
-          break;
-        case 'REFUSE':
+        case 'CALLED_REFUSE':
+          overVideo('发起者已挂断')
           break;
         default:
           break;
@@ -297,28 +320,20 @@ export default {
     }
 
     const updateMainVideoStreamManager = () => {
-      // if (mainStreamManager.value === stream) return;
-      // mainStreamManager.value = stream;
       isMainStream.value = !isMainStream.value
-      // subStreamManager.value = mainStreamManager.value
-      // mainStreamManager.value = stream
     }
 
     const overVideo = (text) => {
-      if (!videoed.value) {
-        snackbar.value.display = true
-        snackbar.value.text = text
-        setTimeout(() => {
-          display.value = false
-        }, 1000)
-      }
+      console.log(videoed.value, text)
+      snackbar.value.display = true
+      snackbar.value.text = text
+      setTimeout(() => {
+        display.value = false
+      }, 1000)
+      leaveSession()
+      emit('close')
     }
 
-    const close = () => {
-      display.value = false
-      emit('close')
-      leaveSession()
-    }
 
     const leaveSession = () => {
       // --- Leave the session by calling 'disconnect' method over the Session object ---
@@ -330,6 +345,9 @@ export default {
       publisher.value = undefined;
       subscribers.value = [];
       OV.value = undefined;
+      videoed.value = false
+      role.value = ''
+      clearTimeout(selfTimer)
 
       window.removeEventListener('beforeunload', leaveSession);
     }
@@ -347,22 +365,23 @@ export default {
       subStreamManager,
       audioEnabled,
       videoEnabled,
+      callUser,
 
       updateMainVideoStreamManager,
-      stop,
-      start,
+      refuse,
+      agree,
       call,
-      close,
+      overVideo,
       changeAudio,
       changeVideo,
 
       icons: {
-        mdiPhoneOff,
-        mdiPhone,
+        mdiPhoneHangup,
         mdiMicrophone,
         mdiMicrophoneOff,
         mdiCamera,
-        mdiCameraOff
+        mdiCameraOff,
+        mdiVideo
       }
     }
   }
@@ -390,35 +409,9 @@ export default {
       z-index: 1
     }
 
-    .tool-bar {
-      display: none;
-      height: 60px;
-      width: 100%;
-      position: absolute;
-      bottom: 0;
-      z-index: 1;
-      animation: anim 0.5s;
-    }
-
-
   }
 
-  .content-center:hover {
-
-    .tool-bar {
-      animation: anim 0.5s;
-      display: flex;
-    }
-  }
 }
 
-@keyframes anim {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 
 </style>
