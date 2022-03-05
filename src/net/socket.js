@@ -6,7 +6,6 @@ import router from "@/router";
 let socket
 
 const webSocket = (username, password) => {
-    // const socketUrl = process.env.VUE_APP_SOCKET_URL
 
     const protocol = location.protocol
     // const port = location.port
