@@ -60,7 +60,7 @@
               @open="openRightDrawer"
               @up-room="upRoom"
               @change-room="changeRoom"
-              @start-video="startVideo"
+              @call="call"
           >
           </room-options>
         </template>
@@ -293,8 +293,8 @@ export default {
       rightDrawerActive.value = false
     }
 
-    const startVideo = () => {
-      videoDialog.value.call()
+    const call = (roomId,type) => {
+      videoDialog.value.call(type)
     }
 
     const styles = ref({
@@ -353,7 +353,7 @@ export default {
       pageHeight,
       styles,
       systemUsers,
-      startVideo,
+      call,
       closeRightDrawer,
       openRightDrawer,
       leftGoTo,

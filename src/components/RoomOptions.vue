@@ -2,12 +2,12 @@
   <div>
     <div class="d-flex">
       <div class="mr-2">
-        <v-btn icon @click="phone">
+        <v-btn icon @click="call('AUDIO')">
           <v-icon>{{ icons.mdiPhone }}</v-icon>
         </v-btn>
       </div>
       <div class="mr-2">
-        <v-btn icon @click="video">
+        <v-btn icon @click="call('VIDEO')">
           <v-icon>{{ icons.mdiVideoOutline }}</v-icon>
         </v-btn>
       </div>
@@ -62,13 +62,10 @@ export default {
       emit('open', item)
     }
 
-    const video = () => {
-      emit('start-video', room.value.roomId)
+    const call = (type) => {
+      emit('call', room.value.roomId,type)
     }
 
-    const phone = () => {
-
-    }
 
     return {
       room,
@@ -77,8 +74,7 @@ export default {
       roomInfo,
       inviteUser,
       openRightDrawer,
-      video,
-      phone,
+      call,
 
       icons: {
         mdiMagnify,
