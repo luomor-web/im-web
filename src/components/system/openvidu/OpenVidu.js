@@ -15,7 +15,7 @@ export const subStreamManager = ref(undefined)
 const subscribers = ref([])
 export const audioVolume = ref(0)
 
-const joinSession = (sessionId,enableVideo) => {
+const joinSession = (roomId,sessionId,enableVideo) => {
     console.log(enableVideo,'enableVideo')
 
     OV.value = new OpenVidu();
@@ -26,7 +26,7 @@ const joinSession = (sessionId,enableVideo) => {
     session.value.on('streamCreated', ({stream}) => {
         console.log(subscribers, 'subscribers')
         const subscriber = session.value.subscribe(stream);
-        console.log(subscriber)
+        console.log(subscriber,'=========================================================================================================')
         console.log(stream)
         subscribers.value.push(subscriber);
         subStreamManager.value = subscriber
@@ -45,7 +45,7 @@ const joinSession = (sessionId,enableVideo) => {
         console.warn(exception);
     });
 
-    getToken(sessionId).then(token => {
+    getToken(roomId).then(token => {
         console.log(token, 'token', session.value)
         session.value.connect(token, {clientData: currentUserId.value})
             .then(() => {

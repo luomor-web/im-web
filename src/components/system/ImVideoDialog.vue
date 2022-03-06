@@ -35,11 +35,11 @@
         <user-video
             :stream-manager="subStreamManager"
             :class=" {'other-video': isMainStream}"
-            @click.native="updateMainVideoStreamManager(subStreamManager)"/>
+            @click.native="updateMainVideoStreamManager"/>
         <user-video
             :stream-manager="mainStreamManager"
             :class=" {'other-video':!isMainStream }"
-            @click.native="updateMainVideoStreamManager(subStreamManager)"/>
+            @click.native="updateMainVideoStreamManager"/>
       </div>
 
       <v-snackbar
@@ -144,7 +144,7 @@ export default {
       }
       callVideo(param)
       videoed.value = true
-      du.joinSession(currentUserId.value,calledConfig.value.type === 'VIDEO')
+      du.joinSession(props.room.roomId,currentUserId.value,calledConfig.value.type === 'VIDEO')
       clearTimeout(selfTimer.value)
     }
 
@@ -209,7 +209,7 @@ export default {
           selfTimer.value = setTimeout(() => {
             overVideo('对方无响应')
           }, 20000)
-          du.joinSession(currentUserId.value, calledConfig.value.type === 'VIDEO')
+          du.joinSession(props.room.roomId,currentUserId.value, calledConfig.value.type === 'VIDEO')
           break;
         case 'CALLED_REFUSE':
           overVideo('发起者已挂断')
