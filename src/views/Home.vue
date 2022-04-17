@@ -204,7 +204,6 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
-      console.log('send Message')
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()

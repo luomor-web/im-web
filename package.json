@@ -20,7 +20,7 @@
     "@mdi/js": "^6.5.95",
     "@vue/composition-api": "^1.4.0",
     "@vuetify/cli-plugin-utils": "^0.0.10",
-    "alispig-advanced-chat": "1.5.1-bate.0",
+    "alispig-advanced-chat": "1.5.4-beta.0",
     "axios": "^0.23.0",
     "core-js": "^3.19.1",
     "lamejs": "^1.2.0",
