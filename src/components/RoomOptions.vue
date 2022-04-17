@@ -58,7 +58,6 @@ export default {
     }
 
     const openRightDrawer = item => {
-      console.log('打开搜索记录')
       emit('open', item)
     }
 
