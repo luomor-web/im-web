@@ -81,7 +81,7 @@ import DrawerTop from "@/components/drawer/DrawerTop";
 import {onMounted, onUnmounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/message";
-import {buildDisplayTime} from "@/utils/DateUtil";
+import {buildDisplayTime} from "@/utils/date-util";
 import {scrollToView} from "@/utils/dom";
 
 export default {

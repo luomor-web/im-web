@@ -1,5 +1,5 @@
 import {close, sendMsg} from "@/net/socket";
-import {buildDisplayTime} from "@/utils/DateUtil";
+import {buildDisplayTime} from "@/utils/date-util";
 
 const getUserInfo = (data) => {
     // 发送获取用户信息
