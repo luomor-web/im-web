@@ -6,12 +6,11 @@ import router from "@/router";
 let socket
 
 const webSocket = (username, password) => {
-    // const socketUrl = process.env.VUE_APP_SOCKET_URL
+    const socketUrl = process.env.VUE_APP_SOCKET_URL + "/ws"
 
-    const protocol = location.protocol
+    // const protocol = location.protocol
     // const port = location.port
-    const host = location.host
-    const socketUrl = (protocol === 'https:' ? 'wss:' : 'ws:') + "//" + host + "/ws"
+    // const host = location.host
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?account=' + username + '&password=' + password,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000

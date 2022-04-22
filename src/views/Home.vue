@@ -138,8 +138,6 @@ export default {
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
-
-
     onMounted(() => {
       currentUserId.value = localStoreUtil.getValue('userId')
       getUserInfo(currentUserId.value)
@@ -204,6 +202,7 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
+      console.log(files)
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()

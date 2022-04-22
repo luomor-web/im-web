@@ -175,6 +175,7 @@ export default {
     }
 
     onMounted(() => {
+      console.log(process.env)
       const value = localStoreUtil.getValue('username');
       if (value) {
         username.value = value

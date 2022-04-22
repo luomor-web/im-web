@@ -20,7 +20,7 @@
           重启更新
         </v-btn>
         <v-btn
-            v-if="!force"
+            v-if="!forceUpdate"
             color="error"
             text
             v-bind="attrs"
@@ -35,7 +35,6 @@
 
 <script>
 
-import {ipcRenderer} from 'electron'
 import {onMounted, ref} from "@vue/composition-api";
 import config from '../../../package.json'
 import log from "electron-log";
@@ -55,9 +54,9 @@ export default {
     onMounted(() => {
       if (isElectron) {
         // 发送版本信息, 防止主线程版本错误
-        ipcRenderer.invoke('win-version', config.version)
+        window.require('electron').ipcRenderer.invoke('win-version', config.version)
         // 有可用更新
-        ipcRenderer.on('update-available', (event, info) => {
+        window.require('electron').ipcRenderer.on('update-available', (event, info) => {
           const parse = JSON.parse(info.releaseNotes);
 
           // 是否全量更新
@@ -67,33 +66,33 @@ export default {
             incrementUpdate.value = false
             const bigForce = compareVersion(info.version, parse.wholeVersion);
             if (bigForce > 0) {
-              text.value = `新版本: v${version.value}.您已经很久没有更新了,无法进行增量升级.本次更新为安装更新`
-            }else {
-              text.value = `新版本: v${version.value}.为了您更好的体验,本次更新为安装更新.`
+              text.value = `新版本: v${info.version}.您已经很久没有更新了,无法进行增量升级.本次更新为安装更新`
+            } else {
+              text.value = `新版本: v${info.version}.为了您更好的体验,本次更新为安装更新.`
             }
           }
           // 是否强制更新
-          const force = compareVersion(config.version, parse.wholeVersion);
-          if(force < 0){
+          const force = compareVersion(config.version, parse.forceVersion);
+          if (force < 0) {
             forceUpdate.value = true
           }
 
           version.value = info.version
           downloadUpdate()
         })
-        ipcRenderer.on('update-not-available', (event, info) => {
+        window.require('electron').ipcRenderer.on('update-not-available', (event, info) => {
           log.info('未发现可用更新', info)
         })
         // 全量更新下载成功
-        ipcRenderer.on('update-downloaded', () => {
+        window.require('electron').ipcRenderer.on('update-downloaded', () => {
+          snackbar.value = true
+        })
+        // 增量更新下载成功
+        window.require('electron').ipcRenderer.on('increment-update-downloaded', () => {
           snackbar.value = true
           text.value = `新版本: v${version.value},本次更新为增量更新,点击重启即可更新`
         })
-        // 增量更新下载成功
-        ipcRenderer.on('increment-update-downloaded', () => {
-          snackbar.value = true
-        })
-        ipcRenderer.on('increment-update-fail', () => {
+        window.require('electron').ipcRenderer.on('increment-update-fail', () => {
           console.log('增量信息处理失败')
           incrementUpdate.value = false
           downloadUpdate()
@@ -105,14 +104,14 @@ export default {
 
     const startUpdate = () => {
       if (incrementUpdate.value) {
-        ipcRenderer.send('increment-install')
+        window.require('electron').ipcRenderer.send('increment-install')
         return
       }
-      ipcRenderer.send('quit-and-install')
+      window.require('electron').ipcRenderer.send('quit-and-install')
     }
 
     const checkUpdate = () => {
-      ipcRenderer.send('check-update')
+      window.require('electron').ipcRenderer.send('check-update')
     }
 
     const downloadUpdate = () => {
@@ -120,10 +119,10 @@ export default {
       if (config.version !== version.value) {
         if (incrementUpdate.value) {
           log.info('即将下载增量更新')
-          ipcRenderer.send('download-increment-update', version.value)
+          window.require('electron').ipcRenderer.send('download-increment-update', version.value)
         } else {
           log.info('即将下载全量更新')
-          ipcRenderer.send('download-update', version.value)
+          window.require('electron').ipcRenderer.send('download-update', version.value)
         }
       }
     }

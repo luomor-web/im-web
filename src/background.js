@@ -1,7 +1,6 @@
 'use strict'
 
 import {app, BrowserWindow, dialog, ipcMain, Menu, protocol, Tray} from 'electron'
-// import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 import createProtocol from './service/createProtocol'
 import {autoUpdater} from 'electron-updater'
 import update from "@/utils/update";
@@ -150,6 +149,7 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
 // 绑定托盘
 const bindTray = () => {
     const iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.ico' : './icons/tray.ico')
+    log.info('图标路径', iconPath)
     appIcon = new Tray(iconPath)
     appIcon.setContextMenu(Menu.buildFromTemplate([
         {
@@ -191,13 +191,13 @@ const hideWindow = () => {
 const updateHandle = () => {
     log.transports.file.level = "debug"
     autoUpdater.logger = log
-    log.info('process.env.APP_UPDATE_URL22', process.env.VUE_APP_UPDATE_URL)
     // autoUpdater.setFeedURL(updateUrl)
 
     autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = false
 
-    autoUpdater.checkForUpdates().then(() => {})
+    autoUpdater.checkForUpdates().then(() => {
+    })
     autoUpdater.on('error', (info) => {
         console.log('更新失败', info)
     })
@@ -235,7 +235,6 @@ const updateHandle = () => {
         ipcMain.on('quit-and-install', () => {
             autoUpdater.quitAndInstall();
         });
-        win.webContents.send('quitAndInstall')
     })
     // 监听消息检查更新
     ipcMain.on('check-update', () => {

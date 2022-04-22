@@ -31,8 +31,9 @@ export default (scheme, serverPath = __dirname) => {
                     mimeType = 'application/json'
                 } else if (extension === '.wasm') {
                     mimeType = 'application/wasm'
+                } else if (extension === ".ico") {
+                    mimeType = "image/x-icon";
                 }
-
                 respond({ mimeType, data })
             })
         },

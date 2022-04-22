@@ -107,8 +107,6 @@ export default {
     }
 
     const search = item => {
-
-      console.log('change', item)
       if (!item) {
         messages.value = []
         return
@@ -131,10 +129,7 @@ export default {
     }
 
     onMounted(() => {
-
-      console.log('挂在')
       msg.$on('COMMAND_SEARCH_MESSAGE_RESP', data => {
-        console.log("消息响应", data.data)
         messages.value = [...data.data]
       })
     })
