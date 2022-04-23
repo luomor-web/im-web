@@ -38,25 +38,42 @@
               @change-room="changeRoom"
           />
         </template>
-
         <template #left-drawer="{}">
           <left-drawer
               :active="leftActive"
               @close="closeLeftDrawer"
           />
         </template>
-        <room-options-control />
+
+        <template #right-drawer="{}">
+          <right-drawer
+              ref="rightDrawer"
+              :room="curRoom"
+              :active="rightActive"
+              :visible="rightDrawerActive"/>
+        </template>
+
+        <template #room-options="{}">
+          <room-options
+              :room-id="roomId"
+              @open="openRightDrawer"
+              @up-room="upRoom"
+              @change-room="changeRoom"
+              @call="call"
+          >
+          </room-options>
+        </template>
       </chat-window>
     </div>
     <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
-    <im-video-dialog ref="videoDialog" :room="curRoom"></im-video-dialog>
+    <im-video-dialog ref="videoDialog"  :room="curRoom"></im-video-dialog>
   </div>
 </template>
 
 <script>
 import ChatWindow from 'alispig-advanced-chat'
 import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
-import {computed, onMounted, onUnmounted, ref} from "@vue/composition-api";
+import {computed, onMounted, onUnmounted, provide, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import localStoreUtil from "@/utils/local-store";
 import {
@@ -72,6 +89,7 @@ import {addFiles} from "@/utils/file";
 import {textMessages} from "@/locales/text-message";
 import {messageActions} from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
+import RoomOptions from "@/components/RoomOptions";
 import MessageViewer from "@/components/system/ImViewer";
 import {
   changeRoom,
@@ -89,25 +107,30 @@ import {
   upRoom,
   waitSendMessage
 } from "@/views/home/home";
-import {destroy, init} from "@/views/home/on-message";
+import {init, msgDestroy} from "@/views/home/on-message";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
+import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 import ImVideoDialog from "@/components/system/ImVideoDialog";
-import RoomOptionsControl from "@/components/roomOptions/RoomOptionsControl";
 
 export default {
   name: 'Home',
   components: {
-    RoomOptionsControl,
     LeftDrawer,
+    RightDrawer,
     MessageViewer,
+    RoomOptions,
     RoomsHeader,
     TopBar,
     ChatWindow,
     ImVideoDialog,
   },
   setup() {
+
+    const rightDrawer = ref(null)
+
+    const rightActive = ref('')
 
     // 系统用户列表
     const systemUsers = ref([])
@@ -116,9 +139,8 @@ export default {
     // 点击的文件
     const clickFile = ref(null)
 
-    const rightDrawer = ref(null)
-
     const leftActive = ref('')
+    const rightDrawerActive = ref(false)
     const videoDialog = ref(null)
 
     let isElectron = ref(process.env.IS_ELECTRON);
@@ -187,6 +209,7 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
+      console.log(files)
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()
@@ -257,8 +280,8 @@ export default {
       clickFile.value = null
     }
 
-    const roomInfo = () => {
-      console.log('roomsInfo')
+    const roomInfo = (item) => {
+      console.log('roomInfo', item)
       rightDrawer.value.roomInfo()
     }
 
@@ -266,7 +289,12 @@ export default {
       leftActive.value = item
     }
 
-    const call = (roomId, type) => {
+    const openRightDrawer = (item) => {
+      rightDrawer.value.open(item)
+    }
+    provide('openRightDrawer', openRightDrawer)
+
+    const call = (roomId,type) => {
       videoDialog.value.call(type)
     }
 
@@ -277,13 +305,12 @@ export default {
     })
 
     onUnmounted(() => {
-      destroy()
+      msgDestroy()
     })
 
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
-      rightDrawer,
       videoDialog,
       messages,
       messageLoaded,
@@ -296,8 +323,10 @@ export default {
       loadingRooms,
       roomsLoaded,
       curRoomIsSystem,
+      rightActive,
       curRoom,
       leftActive,
+      rightDrawerActive,
       clickMessage,
       clickFile,
       isElectron,
@@ -305,6 +334,7 @@ export default {
       styles,
       systemUsers,
       call,
+      openRightDrawer,
       leftGoTo,
       roomInfo,
       closeLeftDrawer,
@@ -316,6 +346,7 @@ export default {
       fetchMessage,
       upRoom,
       changeRoom,
+      rightDrawer,
 
       icons: {
         mdiWindowClose,

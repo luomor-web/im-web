@@ -4,14 +4,14 @@
       :icon="icons.mdiCheck"
       :room="room"
       @to-go="inviteUser('GROUP_INFO',$event)"
-      @close="close('GROUP_INFO')"/>
+      @close="resetAndOpen('GROUP_INFO')"/>
 </template>
 
 <script>
 import AddRoomSelectUser from "@/components/leftDrawer/addRoom/AddRoomSelectUser";
-import {ref} from "@vue/composition-api";
-import {mdiCheck} from "@mdi/js";
-import {joinUserGroup} from "@/net/message";
+import { inject, ref } from "@vue/composition-api";
+import { mdiCheck } from "@mdi/js";
+import { joinUserGroup } from "@/net/message";
 
 export default {
   name: "GroupInviteUser",
@@ -21,8 +21,9 @@ export default {
   components: {
     AddRoomSelectUser
   },
-  setup(props, {emit}) {
+  setup(props) {
 
+    const open = inject('open', () => {})
     const selectUser = ref(null)
 
     const inviteUser = (item, userSelect) => {
@@ -38,15 +39,16 @@ export default {
 
       joinUserGroup({group, users})
 
-      close(item)
+      resetAndOpen(item)
     }
 
-    const close = (item) => {
+    const resetAndOpen = (item) => {
       selectUser.value.clearUserSelect()
-      emit('close', item)
+      open(item)
     }
 
     return {
+      resetAndOpen,
       selectUser,
       close,
       inviteUser,

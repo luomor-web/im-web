@@ -1,5 +1,4 @@
 <template>
-  <div>
     <div class="room-header-container">
       <v-menu
           bottom
@@ -62,7 +61,6 @@
       </h3>
       <v-spacer></v-spacer>
     </div>
-  </div>
 </template>
 
 <script>

@@ -78,7 +78,7 @@
 <script>
 import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {onMounted, onUnmounted, ref} from "@vue/composition-api";
+import {onMounted, onUnmounted, ref,inject} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/message";
 import {buildDisplayTime} from "@/utils/date-util";
@@ -94,13 +94,15 @@ export default {
   },
 
   filters: {},
-  setup(props, {emit}) {
+  setup(props) {
 
     const modal = ref(false)
     const picker = ref(null)
     const searchName = ref('')
 
     const messages = ref([])
+
+    const close = inject('close',()=>{})
 
     const open = () => {
 
@@ -138,11 +140,10 @@ export default {
       msg.$off('COMMAND_SEARCH_MESSAGE_RESP')
     })
 
-    const close = () => {
+    const resetAndClose = () => {
       picker.value = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
-      emit('close')
+      close()
     }
-
 
     return {
       modal,
@@ -154,6 +155,7 @@ export default {
       search,
       open,
       close,
+      resetAndClose,
 
       icons: {
         mdiCalendarBlankOutline,

@@ -5,7 +5,7 @@
         @close="close">
       <template #right>
         <v-spacer></v-spacer>
-        <v-btn class="no-drag" icon @click="close('GROUP_EDIT')">
+        <v-btn class="no-drag" icon @click="open('GROUP_EDIT')">
           <v-icon>
             {{ icons.mdiPencilOutline }}
           </v-icon>
@@ -79,7 +79,7 @@
           bottom
           right
           fab
-          @click="close('GROUP_INVITE_USER')"
+          @click="open('GROUP_INVITE_USER')"
       >
         <v-icon>{{ icons.mdiPlus }}</v-icon>
       </v-btn>
@@ -92,7 +92,7 @@ import {joinUserGroup, userGroupConfig} from "@/net/message";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
-import {onMounted, ref, watch} from "@vue/composition-api";
+import {inject, onMounted, ref, watch} from "@vue/composition-api";
 
 export default {
   name: "GroupInfo",
@@ -104,6 +104,9 @@ export default {
     DrawerTop,
   },
   setup(props, context) {
+
+    const close = inject('close', ()=>{})
+    const open = inject('open', ()=>{})
 
     const notice = ref(true)
 
@@ -125,10 +128,6 @@ export default {
       userGroupConfig(param)
     }
 
-    const closeGroupInfo = () => {
-      context.emit('close')
-    }
-
     const startChat = (item) => {
       context.emit('chat', item)
     }
@@ -145,16 +144,14 @@ export default {
       joinUserGroup({group, users})
     }
 
-    const close = item => {
-      context.emit('close', item)
-    }
+
 
     return {
       notice,
       noticeChange,
+      open,
       close,
       joinGroup,
-      closeGroupInfo,
       startChat,
 
       icons: {

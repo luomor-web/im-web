@@ -27,7 +27,7 @@
 
 <script>
 import {mdiDotsVertical, mdiMagnify, mdiPhone, mdiVideoOutline,} from "@mdi/js";
-import {computed, ref} from "@vue/composition-api";
+import {computed, inject, ref,onMounted} from "@vue/composition-api";
 import {getUserList} from "@/net/message";
 import {loadedRooms} from "@/views/home/home";
 
@@ -42,9 +42,14 @@ export default {
     // 当前点击的用户,有可能时房间,有可能时用户
     const clickRoom = ref({})
 
+    const openRightDrawer = inject('openRightDrawer', () => {})
 
     const room = computed(() => {
       return loadedRooms.value.find(r => r.roomId === props.roomId);
+    })
+
+    onMounted(() => {
+      openRightDrawer('你好')
     })
 
     const roomInfo = () => {
@@ -57,9 +62,6 @@ export default {
       getUserList()
     }
 
-    const openRightDrawer = item => {
-      emit('open', item)
-    }
 
     const call = (type) => {
       emit('call', room.value.roomId,type)

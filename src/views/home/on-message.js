@@ -338,7 +338,7 @@ const COMMAND_USER_GROUP_CONFIG_RESP = (data) => {
 
 }
 
-export const destroy = () => {
+export const msgDestroy = () => {
     msg.$off('COMMAND_LOGIN_RESP')
     msg.$off('COMMAND_JOIN_GROUP_NOTIFY_RESP')
     msg.$off('COMMAND_CHAT_RESP')

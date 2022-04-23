@@ -3,28 +3,25 @@
     <div class="im-right-drawer" v-if="visible">
       <v-window v-model="active" class="fill-height">
         <v-window-item value="GROUP_INFO">
-          <group-info
-              :room="room"
-              @close="goTo"
-          />
+          <group-info :room="room"/>
         </v-window-item>
         <v-window-item value="GROUP_EDIT">
-          <group-edit :room="room" @close="goTo"/>
+          <group-edit :room="room"/>
         </v-window-item>
         <v-window-item value="GROUP_USER_MANAGE">
-          <group-user-manage :room="room" @close="goTo"></group-user-manage>
+          <group-user-manage :room="room"></group-user-manage>
         </v-window-item>
         <v-window-item value="GROUP_HANDOVER_ADMIN">
-          <group-handover-admin :room="room" @close="goTo"></group-handover-admin>
+          <group-handover-admin :room="room"></group-handover-admin>
         </v-window-item>
         <v-window-item value="GROUP_INVITE_USER">
-          <group-invite-user :room="room" @close="goTo"></group-invite-user>
+          <group-invite-user :room="room"></group-invite-user>
         </v-window-item>
         <v-window-item value="USER_INFO">
-          <user-info :room="room" @close="goTo"></user-info>
+          <user-info :room="room"></user-info>
         </v-window-item>
         <v-window-item value="MESSAGE_HISTORY">
-          <message-history :room="room" @close="goTo"></message-history>
+          <message-history :room="room" />
         </v-window-item>
       </v-window>
     </div>
@@ -32,7 +29,7 @@
 </template>
 
 <script>
-import  {ref, watch, provide} from "@vue/composition-api";
+import {ref, watch, provide} from "@vue/composition-api";
 import GroupInfo from "@/components/rightDrawer/GroupInfo";
 import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
@@ -51,51 +48,40 @@ export default {
     const visible = ref(false)
     const active = ref('')
 
-    provide('visible', visible)
-
-    const activeSub = ref('')
-
-    watch(() => props.room, room => {
-      console.log('change', room)
-      open(props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+    watch(() => props.room, (room,old) => {
+      if (old === undefined) return
+      console.log('change', room,old)
+      active.value = room.isFriend || room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
     })
 
-    const goTo = (item) => {
-      console.log('rightClose')
-      if (!item) {
-        close()
-        activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
-        return
-      }
-      activeSub.value = item
-    }
-
     const roomInfo = () => {
-      if (visible.value) {
+      if(visible.value) {
         close()
         return
       }
       open(props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO')
     }
 
-    const open = (item) => {
+    const open = item => {
       active.value = item
       visible.value = true
     }
+
+    provide('open', open)
 
     const close = () => {
       active.value = ''
       visible.value = false
     }
 
+    provide('close', close)
+
     return {
       open,
-      goTo,
       close,
       roomInfo,
-      activeSub,
+      active,
       visible,
-      active
     }
   }
 }
