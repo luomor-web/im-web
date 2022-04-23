@@ -338,3 +338,27 @@ const COMMAND_USER_GROUP_CONFIG_RESP = (data) => {
 
 }
 
+export const destroy = () => {
+    msg.$off('COMMAND_LOGIN_RESP')
+    msg.$off('COMMAND_JOIN_GROUP_NOTIFY_RESP')
+    msg.$off('COMMAND_CHAT_RESP')
+    msg.$off('COMMAND_HEARTBEAT_RESP')
+    msg.$off('COMMAND_GET_USER_RESP')
+    msg.$off('COMMAND_GET_MESSAGE_RESP')
+    msg.$off('COMMAND_USER_STATUS_RESP')
+    msg.$off('COMMAND_CREATE_GROUP_RESP')
+    msg.$off('COMMAND_MESSAGE_READ_RESP')
+    msg.$off('COMMAND_USER_LIST_RESP')
+    msg.$off('COMMAND_SEND_MESSAGE_REACTION_RESP')
+    msg.$off('COMMAND_EDIT_PROFILE_REST')
+    msg.$off('COMMAND_REMOVE_GROUP_USER_RESP')
+    msg.$off('COMMAND_MESSAGE_FILE_HISTORY_RESP')
+    msg.$off('COMMAND_MESSAGE_HISTORY_RESP')
+    msg.$off('COMMAND_DISBAND_GROUP_RESP')
+    msg.$off('COMMAND_HANDOVER_GROUP_RESP')
+    msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')
+    msg.$off('COMMAND_MESSAGE_DELETE_RESP')
+    msg.$off('COMMAND_SYSTEM_MESSAGE_RESP')
+    msg.$off('COMMAND_USER_GROUP_CONFIG_RESP')
+    msg.$off('COMMAND_VIDEO_RESP')
+}

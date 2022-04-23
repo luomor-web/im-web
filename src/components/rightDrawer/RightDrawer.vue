@@ -1,7 +1,7 @@
 <template>
   <v-expand-x-transition>
     <div class="im-right-drawer" v-if="visible">
-      <v-window v-model="activeSub" class="fill-height">
+      <v-window v-model="active" class="fill-height">
         <v-window-item value="GROUP_INFO">
           <group-info
               :room="room"
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import {ref, watch} from "@vue/composition-api";
+import  {ref, watch, provide} from "@vue/composition-api";
 import GroupInfo from "@/components/rightDrawer/GroupInfo";
 import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
@@ -45,26 +45,19 @@ export default {
   name: "RightDrawer",
   components: {MessageHistory, UserInfo, GroupInviteUser, GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
   props: {
-    active: {type: String, default: ''},
-    visible: {type: Boolean},
     room: {type: Object},
   },
-  setup(props, {emit}) {
+  setup(props) {
+    const visible = ref(false)
+    const active = ref('')
+
+    provide('visible', visible)
 
     const activeSub = ref('')
 
     watch(() => props.room, room => {
       console.log('change', room)
-      activeSub.value = room.isFriend || room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
-    })
-
-    watch(() => props.active, active => {
-      console.log(active, 'chan')
-      if(active){
-        activeSub.value = active
-      }else{
-        activeSub.value = props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
-      }
+      open(props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO')
     })
 
     const goTo = (item) => {
@@ -77,14 +70,32 @@ export default {
       activeSub.value = item
     }
 
+    const roomInfo = () => {
+      if (visible.value) {
+        close()
+        return
+      }
+      open(props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+    }
+
+    const open = (item) => {
+      active.value = item
+      visible.value = true
+    }
+
     const close = () => {
-      emit('close')
+      active.value = ''
+      visible.value = false
     }
 
     return {
+      open,
       goTo,
       close,
+      roomInfo,
       activeSub,
+      visible,
+      active
     }
   }
 }

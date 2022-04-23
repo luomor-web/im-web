@@ -45,42 +45,25 @@
               @close="closeLeftDrawer"
           />
         </template>
-
-        <template #right-drawer="{}">
-          <right-drawer
-              :room="curRoom"
-              :active="rightActive"
-              :visible="rightDrawerActive"
-              @close="closeRightDrawer"/>
-        </template>
-
-        <template #room-options="{}">
-          <room-options
-              :room-id="roomId"
-              @open="openRightDrawer"
-              @up-room="upRoom"
-              @change-room="changeRoom"
-              @call="call"
-          >
-          </room-options>
-        </template>
+        <room-options-control />
       </chat-window>
     </div>
     <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
-    <im-video-dialog ref="videoDialog"  :room="curRoom"></im-video-dialog>
+    <im-video-dialog ref="videoDialog" :room="curRoom"></im-video-dialog>
   </div>
 </template>
 
 <script>
 import ChatWindow from 'alispig-advanced-chat'
 import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
-import {onUnmounted, onMounted, ref, computed} from "@vue/composition-api";
+import {computed, onMounted, onUnmounted, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
-import msg from "@/plugins/msg";
 import localStoreUtil from "@/utils/local-store";
 import {
   getHistoryMessage,
-  getUserInfo, getUserList, messageDelete,
+  getUserInfo,
+  getUserList,
+  messageDelete,
   messageReaction,
   sendChatMessage
 } from "@/net/message";
@@ -89,41 +72,42 @@ import {addFiles} from "@/utils/file";
 import {textMessages} from "@/locales/text-message";
 import {messageActions} from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
-import RoomOptions from "@/components/RoomOptions";
 import MessageViewer from "@/components/system/ImViewer";
 import {
   changeRoom,
   currentUserId,
   curUser,
-  loadedRooms, loadingRooms,
-  messageLoaded, messages, number,
+  loadedRooms,
+  loadingRooms,
+  messageLoaded,
+  messages,
+  number,
   page,
-  roomId, roomsLoaded,
+  roomId,
+  roomsLoaded,
   sendPage,
-  upRoom, waitSendMessage
+  upRoom,
+  waitSendMessage
 } from "@/views/home/home";
-import {init} from "@/views/home/on-message";
+import {destroy, init} from "@/views/home/on-message";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
-import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 import ImVideoDialog from "@/components/system/ImVideoDialog";
+import RoomOptionsControl from "@/components/roomOptions/RoomOptionsControl";
 
 export default {
   name: 'Home',
   components: {
+    RoomOptionsControl,
     LeftDrawer,
-    RightDrawer,
     MessageViewer,
-    RoomOptions,
     RoomsHeader,
     TopBar,
     ChatWindow,
     ImVideoDialog,
   },
   setup() {
-
-    const rightActive = ref('')
 
     // 系统用户列表
     const systemUsers = ref([])
@@ -132,8 +116,9 @@ export default {
     // 点击的文件
     const clickFile = ref(null)
 
+    const rightDrawer = ref(null)
+
     const leftActive = ref('')
-    const rightDrawerActive = ref(false)
     const videoDialog = ref(null)
 
     let isElectron = ref(process.env.IS_ELECTRON);
@@ -202,7 +187,6 @@ export default {
     }
 
     const sendMessage = async ({content, roomId, files, replyMessage}) => {
-      console.log(files)
       // 如果发送了文件, 那么给每一个文件生成一个ID
       files?.forEach(x => {
         x.id = uuid()
@@ -274,24 +258,15 @@ export default {
     }
 
     const roomInfo = () => {
-      openRightDrawer()
+      console.log('roomsInfo')
+      rightDrawer.value.roomInfo()
     }
 
     const closeLeftDrawer = item => {
       leftActive.value = item
     }
 
-    const openRightDrawer = (item) => {
-      rightActive.value = item
-      rightDrawerActive.value = !rightDrawerActive.value
-    }
-
-    const closeRightDrawer = () => {
-      rightActive.value = ''
-      rightDrawerActive.value = false
-    }
-
-    const call = (roomId,type) => {
+    const call = (roomId, type) => {
       videoDialog.value.call(type)
     }
 
@@ -302,33 +277,13 @@ export default {
     })
 
     onUnmounted(() => {
-      msg.$off('COMMAND_LOGIN_RESP')
-      msg.$off('COMMAND_JOIN_GROUP_NOTIFY_RESP')
-      msg.$off('COMMAND_CHAT_RESP')
-      msg.$off('COMMAND_HEARTBEAT_RESP')
-      msg.$off('COMMAND_GET_USER_RESP')
-      msg.$off('COMMAND_GET_MESSAGE_RESP')
-      msg.$off('COMMAND_USER_STATUS_RESP')
-      msg.$off('COMMAND_CREATE_GROUP_RESP')
-      msg.$off('COMMAND_MESSAGE_READ_RESP')
-      msg.$off('COMMAND_USER_LIST_RESP')
-      msg.$off('COMMAND_SEND_MESSAGE_REACTION_RESP')
-      msg.$off('COMMAND_EDIT_PROFILE_REST')
-      msg.$off('COMMAND_REMOVE_GROUP_USER_RESP')
-      msg.$off('COMMAND_MESSAGE_FILE_HISTORY_RESP')
-      msg.$off('COMMAND_MESSAGE_HISTORY_RESP')
-      msg.$off('COMMAND_DISBAND_GROUP_RESP')
-      msg.$off('COMMAND_HANDOVER_GROUP_RESP')
-      msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')
-      msg.$off('COMMAND_MESSAGE_DELETE_RESP')
-      msg.$off('COMMAND_SYSTEM_MESSAGE_RESP')
-      msg.$off('COMMAND_USER_GROUP_CONFIG_RESP')
-      msg.$off('COMMAND_VIDEO_RESP')
+      destroy()
     })
 
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
+      rightDrawer,
       videoDialog,
       messages,
       messageLoaded,
@@ -341,10 +296,8 @@ export default {
       loadingRooms,
       roomsLoaded,
       curRoomIsSystem,
-      rightActive,
       curRoom,
       leftActive,
-      rightDrawerActive,
       clickMessage,
       clickFile,
       isElectron,
@@ -352,8 +305,6 @@ export default {
       styles,
       systemUsers,
       call,
-      closeRightDrawer,
-      openRightDrawer,
       leftGoTo,
       roomInfo,
       closeLeftDrawer,
