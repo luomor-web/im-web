@@ -1,5 +1,5 @@
 <template>
-  <div class="message-history">
+  <div class="message-history" :style="{height: pageHeight}">
     <drawer-top @close="close">
       <template #default>
         <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search">
@@ -45,7 +45,7 @@
       </template>
     </drawer-top>
 
-    <div class="overflow-y-auto message-history-content">
+    <div class="overflow-y-auto message-history-content" :style="{height: `calc(${pageHeight} - 64px`}">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messages"
                      :key="index" two-line @click="scroll(item)">
@@ -95,7 +95,7 @@ export default {
 
   filters: {},
   setup(props) {
-
+    const pageHeight = process.env.isElectron ? "calc(100vh  - 32px)" : "100vh"
     const modal = ref(false)
     const picker = ref(null)
     const searchName = ref('')
@@ -146,6 +146,7 @@ export default {
     }
 
     return {
+      pageHeight,
       modal,
       searchName,
       picker,
@@ -169,10 +170,8 @@ export default {
 
 <style lang="scss" scoped>
 .message-history {
-  height: 100vh;
 
   .message-history-content {
-    height: calc(100vh - 64px);
   }
 
 }

@@ -3,7 +3,7 @@
     <drawer-top @close="closeAddChat">
       <user-search @click-content="startChat"></user-search>
     </drawer-top>
-    <div class="overflow-y-auto" style="height: calc(100vh - 64px)">
+    <div class="overflow-y-auto" :style="{height: pageHeight}">
       <user-select-column>
         <div slot="userAction" slot-scope="{item}">
           <v-btn icon @click="startChat(item)">
@@ -17,7 +17,7 @@
 
 <script>
 import {mdiChatOutline, mdiMagnify} from "@mdi/js";
-import {onMounted, ref} from "@vue/composition-api";
+import {ref} from "@vue/composition-api";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {createGroup} from "@/net/message";
 import {changeRoom, loadedRooms, upRoom} from "@/views/home/home";
@@ -29,7 +29,7 @@ export default {
   components: {UserSearch, UserSelectColumn, DrawerTop},
   props: {},
   setup(props, context) {
-
+    const pageHeight = process.env.isElectron ? "calc(100vh - 64px - 32px)" : "calc(100vh - 64px)"
     const userSelectModel = ref(false)
 
     const waitSelect = ref([])
@@ -50,15 +50,12 @@ export default {
       closeAddChat()
     }
 
-    onMounted(() => {
-
-    })
-
     return {
       userSelectModel,
       waitSelect,
       startChat,
       closeAddChat,
+      pageHeight,
 
       icons: {
         mdiMagnify,

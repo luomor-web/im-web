@@ -232,7 +232,6 @@ export default {
       })
     }
 
-    const pageHeight = isElectron ? 'calc(100vh - 48px)' : '100vh'
 
     return {
       from,
@@ -250,7 +249,6 @@ export default {
         mdiCloseCircleOutline,
       },
 
-      pageHeight,
       isElectron
     }
   }

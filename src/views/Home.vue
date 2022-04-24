@@ -29,35 +29,19 @@
       >
 
         <template #rooms-header="{}">
-          <rooms-header
-              :cur-user="curUser"
-              :system-users="systemUsers"
-              :loaded-rooms="loadedRooms"
-              @goto="leftGoTo"
-              @up-room="upRoom"
-              @change-room="changeRoom"
-          />
+          <rooms-header :cur-user="curUser"/>
         </template>
         <template #left-drawer="{}">
-          <left-drawer
-              :active="leftActive"
-              @close="closeLeftDrawer"
-          />
+          <left-drawer ref="leftDrawer"/>
         </template>
-
         <template #right-drawer="{}">
-          <right-drawer
-              ref="rightDrawer"
-              :room="curRoom"
-              :active="rightActive"
-              :visible="rightDrawerActive"/>
+          <right-drawer ref="rightDrawer" :room="curRoom"/>
         </template>
 
         <template #room-options="{}">
           <room-options
               :room-id="roomId"
               @open="openRightDrawer"
-              @up-room="upRoom"
               @change-room="changeRoom"
               @call="call"
           >
@@ -66,7 +50,7 @@
       </chat-window>
     </div>
     <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
-    <im-video-dialog ref="videoDialog"  :room="curRoom"></im-video-dialog>
+    <im-video-dialog ref="videoDialog" :room="curRoom"></im-video-dialog>
   </div>
 </template>
 
@@ -129,18 +113,13 @@ export default {
   setup() {
 
     const rightDrawer = ref(null)
+    const leftDrawer = ref(null)
 
-    const rightActive = ref('')
-
-    // 系统用户列表
-    const systemUsers = ref([])
     // 点击文件时的消息
     const clickMessage = ref(null)
     // 点击的文件
     const clickFile = ref(null)
 
-    const leftActive = ref('')
-    const rightDrawerActive = ref(false)
     const videoDialog = ref(null)
 
     let isElectron = ref(process.env.IS_ELECTRON);
@@ -165,10 +144,6 @@ export default {
       sendChatMessage(waitSendMessage.value[index])
 
       // waitSendMessage.value.splice(index, 1)
-    }
-
-    const leftGoTo = item => {
-      leftActive.value = item
     }
 
     const updateProgress = (file, messageId) => {
@@ -245,7 +220,6 @@ export default {
     })
 
     const curRoomIsSystem = computed(() => {
-      console.log(curRoom.value, 'isSystem')
       return !curRoom.value?.isSystem
     })
 
@@ -280,13 +254,8 @@ export default {
       clickFile.value = null
     }
 
-    const roomInfo = (item) => {
-      console.log('roomInfo', item)
+    const roomInfo = () => {
       rightDrawer.value.roomInfo()
-    }
-
-    const closeLeftDrawer = item => {
-      leftActive.value = item
     }
 
     const openRightDrawer = (item) => {
@@ -294,7 +263,12 @@ export default {
     }
     provide('openRightDrawer', openRightDrawer)
 
-    const call = (roomId,type) => {
+    const openLeftDrawer = (item) => {
+      leftDrawer.value.open(item)
+    }
+    provide('openLeftDrawer', openLeftDrawer)
+
+    const call = (roomId, type) => {
       videoDialog.value.call(type)
     }
 
@@ -323,21 +297,16 @@ export default {
       loadingRooms,
       roomsLoaded,
       curRoomIsSystem,
-      rightActive,
       curRoom,
-      leftActive,
-      rightDrawerActive,
       clickMessage,
       clickFile,
       isElectron,
       pageHeight,
       styles,
-      systemUsers,
+      leftDrawer,
       call,
       openRightDrawer,
-      leftGoTo,
       roomInfo,
-      closeLeftDrawer,
       closeMessageViewer,
       openFile,
       deleteMessage,

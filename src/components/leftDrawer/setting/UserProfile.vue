@@ -1,6 +1,6 @@
 <template>
-  <div style="height: 100vh">
-    <drawer-top :title="'编辑资料'" :sub="true" @close="close('SETTING_ITEM')"></drawer-top>
+  <div :style="{height: pageHeight}">
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')"></drawer-top>
     <div class="mt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -77,7 +77,7 @@ export default {
     user: Object
   },
   setup(props, context) {
-
+    const pageHeight = process.env.isElectron ? "calc(100vh  - 32px)" : "100vh"
     watch(() => props.user, () => {
       initData()
     })
@@ -110,16 +110,17 @@ export default {
       upload.value.startUpload()
     }
 
-    const close = item => {
+    const open = (item) => {
       initData()
-      context.emit('close', item)
+      context.emit('open', item)
     }
 
     return {
       upload,
       username,
       showSure,
-      close,
+      pageHeight,
+      open,
       sure,
       changeUserProfile,
       openUpload,

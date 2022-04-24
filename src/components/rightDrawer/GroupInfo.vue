@@ -45,7 +45,7 @@
 
     <im-driver></im-driver>
 
-    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 296px)">
+    <div class="mx-2 overflow-y-auto" :style="{height: pageHeight}">
       <v-list nav>
         <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
           <v-list-item-avatar>
@@ -104,7 +104,7 @@ export default {
     DrawerTop,
   },
   setup(props, context) {
-
+    const pageHeight = process.env.isElectron ? "calc(100vh - 296px - 32px)" : "calc(100vh - 296px)"
     const close = inject('close', ()=>{})
     const open = inject('open', ()=>{})
 
@@ -153,6 +153,7 @@ export default {
       close,
       joinGroup,
       startChat,
+      pageHeight,
 
       icons: {
         mdiBellOutline,

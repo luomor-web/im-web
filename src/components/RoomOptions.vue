@@ -27,7 +27,7 @@
 
 <script>
 import {mdiDotsVertical, mdiMagnify, mdiPhone, mdiVideoOutline,} from "@mdi/js";
-import {computed, inject, ref,onMounted} from "@vue/composition-api";
+import {computed, inject, ref} from "@vue/composition-api";
 import {getUserList} from "@/net/message";
 import {loadedRooms} from "@/views/home/home";
 
@@ -46,10 +46,6 @@ export default {
 
     const room = computed(() => {
       return loadedRooms.value.find(r => r.roomId === props.roomId);
-    })
-
-    onMounted(() => {
-      openRightDrawer('你好')
     })
 
     const roomInfo = () => {

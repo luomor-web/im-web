@@ -206,8 +206,6 @@ export default {
 
     }
 
-    const pageHeight = isElectron ? 'calc(100vh - 48px)' : '100vh'
-
     return {
       isPasswordVisible,
       username,
@@ -223,7 +221,6 @@ export default {
         mdiEyeOffOutline,
       },
 
-      pageHeight,
       isElectron
     }
   }

@@ -1,11 +1,11 @@
 <template>
-  <div style="height: 100vh">
+  <div :style="{height: pageHeight}">
     <v-window v-model="active">
       <v-window-item value="SETTING_ITEM">
-        <setting-item :curUser="curUser" @close="close"></setting-item>
+        <setting-item :curUser="curUser" @open="open"></setting-item>
       </v-window-item>
       <v-window-item value="USER_PROFILE">
-        <user-profile :user="curUser" @close="close"></user-profile>
+        <user-profile :user="curUser" @open="open"></user-profile>
       </v-window-item>
     </v-window>
   </div>
@@ -26,18 +26,17 @@ export default {
   props:{
     curUser: Object
   },
-  setup(props, {emit}) {
+  setup() {
+    const pageHeight = process.env.isElectron ? "calc(100vh  - 32px)" : "100vh"
     const active = ref('')
 
-    const close = item => {
-      if(item){
-        active.value = item
-        return
-      }
-      emit('close')
+    const open = item => {
+      active.value = item
     }
 
     return {
+      pageHeight,
+      open,
       close,
       active
     }

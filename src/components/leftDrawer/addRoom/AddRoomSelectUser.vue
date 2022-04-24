@@ -23,7 +23,7 @@
         </v-chip>
       </div>
       <im-driver v-if="userSelect.length > 0"></im-driver>
-      <user-select-column @click-content="operationUser" :filters="room.users" style="height: calc(100vh - 60px)">
+      <user-select-column @click-content="operationUser" :filters="room.users" :style="{height: pageHeight}">
         <div slot="userAction" slot-scope="{item}">
           <v-btn @click="operationUser(item)" :color="isInclude(item) ? 'error':'primary'">
             {{ isInclude(item) ? '移除' : '添加' }}
@@ -61,7 +61,7 @@ export default {
     }
   },
   setup(props, {emit}) {
-
+    const pageHeight = process.env.isElectron ? "calc(100vh  - 64px - 32px)" : "calc(100vh - 64px)"
     const userSelect = ref([])
 
     const removeUser = (item) => {
@@ -99,6 +99,7 @@ export default {
     }
 
     return {
+      pageHeight,
       userSelect,
       clearUserSelect,
       toGo,

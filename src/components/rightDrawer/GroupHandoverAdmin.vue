@@ -6,7 +6,7 @@
       </v-text-field>
     </drawer-top>
 
-    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 64px)">
+    <div class="mx-2 overflow-y-auto" :style="{height: pageHeight}">
       <v-list nav>
         <v-list-item v-ripple  v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
           <v-list-item-avatar>
@@ -41,7 +41,7 @@ export default {
     room: {type: Object}
   },
   setup(props) {
-
+    const pageHeight = process.env.isElectron ? "calc(100vh  - 64px - 32px)" : "calc(100vh - 64px)"
     const searchName = ref('')
 
     // 操作动作
@@ -84,6 +84,7 @@ export default {
     const open = inject('open', () => {})
 
     return {
+      pageHeight,
       curUser,
       open,
       filteredItems,

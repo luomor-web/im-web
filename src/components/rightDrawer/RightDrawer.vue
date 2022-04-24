@@ -1,6 +1,6 @@
 <template>
   <v-expand-x-transition>
-    <div class="im-right-drawer" v-if="visible">
+    <div class="im-right-drawer" v-if="visible" :style="{height: pageHeight}">
       <v-window v-model="active" class="fill-height">
         <v-window-item value="GROUP_INFO">
           <group-info :room="room"/>
@@ -47,14 +47,17 @@ export default {
   setup(props) {
     const visible = ref(false)
     const active = ref('')
+    const pageHeight = process.env.isElectron ? "calc(100vh  - 32px)" : "100vh"
 
     watch(() => props.room, (room,old) => {
-      if (old === undefined) return
       console.log('change', room,old)
+      // if (old === undefined) return
+      // console.log('change', room,old)
       active.value = room.isFriend || room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
     })
 
     const roomInfo = () => {
+      console.log('roomInfo')
       if(visible.value) {
         close()
         return
@@ -63,6 +66,7 @@ export default {
     }
 
     const open = item => {
+      console.log('open',item)
       active.value = item
       visible.value = true
     }
@@ -82,6 +86,7 @@ export default {
       roomInfo,
       active,
       visible,
+      pageHeight,
     }
   }
 }
@@ -94,7 +99,6 @@ export default {
 .im-right-drawer {
   position: relative;
   width: 400px;
-  height: 100vh;
   background-color: #ffffff;
 }
 

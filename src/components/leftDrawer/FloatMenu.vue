@@ -33,7 +33,7 @@
 
       <v-card width="200" rounded="lg">
         <v-list>
-          <v-list-item class="im-list-item" @click="goTo('ADD_CHAT')">
+          <v-list-item class="im-list-item" @click="open('ADD_CHAT')">
             <v-list-item-icon>
               <v-icon>
                 {{ icons.mdiAccountOutline }}
@@ -43,7 +43,7 @@
               添加会话
             </v-list-item-content>
           </v-list-item>
-          <v-list-item class="im-list-item" @click="goTo('CREATE_GROUP')">
+          <v-list-item class="im-list-item" @click="open('CREATE_GROUP')">
             <v-list-item-icon>
               <v-icon>
                 {{ icons.mdiAccountSupervisorOutline }}
@@ -61,23 +61,21 @@
 </template>
 
 <script>
-import {ref} from "@vue/composition-api";
+import {inject, ref} from "@vue/composition-api";
 import {mdiAccountOutline, mdiAccountSupervisorOutline, mdiClose, mdiPencil} from "@mdi/js";
 
 export default {
   name: "FloatMenu",
   props: {},
-  setup(props, {emit}) {
+  setup() {
 
     const fab = ref(false)
 
-    const goTo = item => {
-      emit('close', item)
-    }
+    const open = inject('open', () => {})
 
     return {
       fab,
-      goTo,
+      open,
 
       icons: {
         mdiAccountSupervisorOutline,
