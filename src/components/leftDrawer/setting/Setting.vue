@@ -1,6 +1,5 @@
 <template>
-  <div :style="{height: pageHeight}">
-    <v-window v-model="active">
+    <v-window v-model="active" class="setting-window">
       <v-window-item value="SETTING_ITEM">
         <setting-item :curUser="curUser" @open="open"></setting-item>
       </v-window-item>
@@ -8,7 +7,6 @@
         <user-profile :user="curUser" @open="open"></user-profile>
       </v-window-item>
     </v-window>
-  </div>
 </template>
 
 <script>
@@ -27,7 +25,6 @@ export default {
     curUser: Object
   },
   setup() {
-    const pageHeight = process.env.isElectron ? "calc(100vh  - 32px)" : "100vh"
     const active = ref('')
 
     const open = item => {
@@ -35,7 +32,6 @@ export default {
     }
 
     return {
-      pageHeight,
       open,
       close,
       active
@@ -45,5 +41,7 @@ export default {
 </script>
 
 <style scoped>
-
+.setting-window {
+  height: 100%;
+}
 </style>

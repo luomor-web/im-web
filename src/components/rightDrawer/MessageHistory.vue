@@ -1,5 +1,5 @@
 <template>
-  <div class="message-history" :style="{height: pageHeight}">
+  <div class="message-history" >
     <drawer-top @close="close">
       <template #default>
         <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search">
@@ -45,7 +45,7 @@
       </template>
     </drawer-top>
 
-    <div class="overflow-y-auto message-history-content" :style="{height: `calc(${pageHeight} - 64px`}">
+    <div class="overflow-y-auto message-history-content" >
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messages"
                      :key="index" two-line @click="scroll(item)">
@@ -95,7 +95,6 @@ export default {
 
   filters: {},
   setup(props) {
-    const pageHeight = process.env.isElectron ? "calc(100vh  - 32px)" : "100vh"
     const modal = ref(false)
     const picker = ref(null)
     const searchName = ref('')
@@ -119,13 +118,22 @@ export default {
 
     const scroll = item => {
       const element = document.getElementById(item._id);
-      console.log(element, 'element')
       if (!element) return
+
+      // element.parentNode.scrollTop = element.offsetTop
+      element.parentNode.scrollTop = element.offsetTop - 30;
+      // element.scroll({top: element.offsetTop, behavior: 'smooth'})
+
+      element.style.transition = "background-color .5s ease-in-out"
+      element.style.backgroundColor = "#dfe1e5"
+      element.style.borderRadius = "8px"
+
       scrollToView(element)
 
-      element.style = "transition: background-color .5s ease-in-out;background-color:#dfe1e5;border-radius: 8px;"
       setTimeout(() => {
-        element.style = "transition: background-color .5s ease-in-out;border-radius: 8px;"
+        element.style.transition = "background-color .5s ease-in-out"
+        element.style.borderRadius = "8px"
+        element.style.backgroundColor = ""
       }, 500)
 
     }
@@ -146,7 +154,6 @@ export default {
     }
 
     return {
-      pageHeight,
       modal,
       searchName,
       picker,
@@ -170,8 +177,12 @@ export default {
 
 <style lang="scss" scoped>
 .message-history {
+  height: 100%;
+  width: 100%;
+  position: absolute;
 
   .message-history-content {
+    height: 100%;
   }
 
 }

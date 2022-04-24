@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fill-height">
     <drawer-top
         :title="'资料'"
         @close="close">
@@ -45,7 +45,7 @@
 
     <im-driver></im-driver>
 
-    <div class="mx-2 overflow-y-auto" :style="{height: pageHeight}">
+    <div class="mx-2 overflow-y-auto fill-height">
       <v-list nav>
         <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
           <v-list-item-avatar>
@@ -70,8 +70,8 @@
       </v-list>
     </div>
 
-    <v-fab-transition>
       <v-btn
+          transition="scroll-x-reverse-transition"
           class="mr-8 mb-16"
           color="primary"
           dark
@@ -83,7 +83,6 @@
       >
         <v-icon>{{ icons.mdiPlus }}</v-icon>
       </v-btn>
-    </v-fab-transition>
   </div>
 </template>
 
@@ -104,7 +103,6 @@ export default {
     DrawerTop,
   },
   setup(props, context) {
-    const pageHeight = process.env.isElectron ? "calc(100vh - 296px - 32px)" : "calc(100vh - 296px)"
     const close = inject('close', ()=>{})
     const open = inject('open', ()=>{})
 
@@ -153,7 +151,6 @@ export default {
       close,
       joinGroup,
       startChat,
-      pageHeight,
 
       icons: {
         mdiBellOutline,
