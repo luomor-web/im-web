@@ -2,7 +2,7 @@
   <v-expand-x-transition>
     <div class="im-right-drawer" v-if="visible">
       <v-window v-model="active" class="fill-height">
-        <v-window-item value="GROUP_INFO">
+        <v-window-item value="GROUP_INFO" class="fill-height">
           <group-info :room="room"/>
         </v-window-item>
         <v-window-item value="GROUP_EDIT">
@@ -65,7 +65,6 @@ export default {
     }
 
     const open = item => {
-      console.log('open',item)
       active.value = item
       visible.value = true
     }

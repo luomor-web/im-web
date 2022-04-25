@@ -69,20 +69,22 @@
         </v-list-item>
       </v-list>
     </div>
+<div>
+  <v-btn
+      transition="scroll-x-reverse-transition"
+      class="mr-8 mb-16"
+      color="primary"
+      dark
+      absolute
+      bottom
+      right
+      fab
+      @click="open('GROUP_INVITE_USER')"
+  >
+    <v-icon>{{ icons.mdiPlus }}</v-icon>
+  </v-btn>
+</div>
 
-      <v-btn
-          transition="scroll-x-reverse-transition"
-          class="mr-8 mb-16"
-          color="primary"
-          dark
-          absolute
-          bottom
-          right
-          fab
-          @click="open('GROUP_INVITE_USER')"
-      >
-        <v-icon>{{ icons.mdiPlus }}</v-icon>
-      </v-btn>
   </div>
 </template>
 
