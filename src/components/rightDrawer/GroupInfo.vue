@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import {joinUserGroup, userGroupConfig} from "@/net/message";
+import {joinUserGroup, userGroupConfig} from "@/net/send-message";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";

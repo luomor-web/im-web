@@ -47,7 +47,7 @@ import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
 import {inject, onMounted, ref, watch} from "@vue/composition-api";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline} from "@mdi/js";
-import {userGroupConfig} from "@/net/message";
+import {userGroupConfig} from "@/net/send-message";
 
 export default {
   name: "UserInfo",

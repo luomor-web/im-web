@@ -68,7 +68,7 @@
 import {onMounted, ref} from "@vue/composition-api";
 import {currentUserId, loadedRooms} from "@/views/home/home";
 import msg from "@/plugins/msg";
-import {callVideo} from "@/net/message";
+import {callVideo} from "@/net/send-message";
 import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo} from "@mdi/js";
 import UserVideo from "@/components/system/openvidu/UserVideo";
 import {du, mainStreamManager, session, subStreamManager,audioVolume} from "@/components/system/openvidu/OpenVidu";

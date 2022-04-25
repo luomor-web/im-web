@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import {createGroup} from "@/net/message";
+import {createGroup} from "@/net/send-message";
 import {ref} from "@vue/composition-api";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {mdiCamera, mdiCheck} from "@mdi/js";

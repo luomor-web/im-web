@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div v-if="isElectron">
-      <top-bar></top-bar>
-    </div>
+    <top-bar v-if="isElectron"></top-bar>
     <div>
       <audio class="d-none" id="audio" controls="controls" :src="require('@/assets/music/tip.wav')"></audio>
       <chat-window
@@ -37,20 +35,14 @@
         <template #right-drawer="{}">
           <right-drawer ref="rightDrawer" :room="curRoom"/>
         </template>
-
         <template #room-options="{}">
-          <room-options
-              :room-id="roomId"
-              @open="openRightDrawer"
-              @change-room="changeRoom"
-              @call="call"
-          >
-          </room-options>
+          <room-options :room-id="roomId" />
         </template>
+
       </chat-window>
     </div>
     <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
-    <im-video-dialog ref="videoDialog" :room="curRoom"></im-video-dialog>
+
   </div>
 </template>
 
@@ -60,16 +52,8 @@ import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
 import {computed, onMounted, onUnmounted, provide, ref} from "@vue/composition-api";
 import TopBar from "../components/system/TopBar";
 import localStoreUtil from "@/utils/local-store";
-import {
-  getHistoryMessage,
-  getUserInfo,
-  getUserList,
-  messageDelete,
-  messageReaction,
-  sendChatMessage
-} from "@/net/message";
+import {getUserInfo, getUserList, messageDelete} from "@/net/send-message";
 import {mdiAccount, mdiWindowClose} from "@mdi/js";
-import {addFiles} from "@/utils/file";
 import {textMessages} from "@/locales/text-message";
 import {messageActions} from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
@@ -83,20 +67,14 @@ import {
   loadingRooms,
   messageLoaded,
   messages,
-  number,
-  page,
   roomId,
   roomsLoaded,
-  sendPage,
-  upRoom,
-  waitSendMessage
+  upRoom
 } from "@/views/home/home";
 import {init, msgDestroy} from "@/views/home/on-message";
-import {uuid} from "@/utils/id-util";
-import moment from "moment";
 import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
-import ImVideoDialog from "@/components/system/ImVideoDialog";
+import {fetchMessage, sendMessage, sendMessageReaction} from "@/views/home/message";
 
 export default {
   name: 'Home',
@@ -108,7 +86,6 @@ export default {
     RoomsHeader,
     TopBar,
     ChatWindow,
-    ImVideoDialog,
   },
   setup() {
 
@@ -120,8 +97,6 @@ export default {
     // 点击的文件
     const clickFile = ref(null)
 
-    const videoDialog = ref(null)
-
     let isElectron = ref(process.env.IS_ELECTRON);
 
     onMounted(() => {
@@ -131,114 +106,11 @@ export default {
       init()
     })
 
-    const sendFileMessage = (file, roomId, isLast) => {
-      const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
-      if (index === -1) return
-
-      const fileIndex = waitSendMessage.value[index].files.findIndex(f => f.id === file.id);
-      if (fileIndex === -1) return
-
-      waitSendMessage.value[index].files[fileIndex] = file
-      if (!isLast) return
-
-      sendChatMessage(waitSendMessage.value[index])
-
-      // waitSendMessage.value.splice(index, 1)
-    }
-
-    const updateProgress = (file, messageId) => {
-      const message = messages.value.find(r => r._id === messageId);
-      if (!message || !message.files) return
-
-      message.files.find(r => r.id === file.id).progress = file.progress
-      messages.value = [...messages.value]
-    }
-
-    const operationMessage = async message => {
-
-      messages.value.push(message)
-      waitSendMessage.value.push(message)
-
-      if (!message.files) {
-        sendChatMessage(message)
-        return
-      }
-
-      await addFiles(message.files, (file, isOver) => {
-
-        if (file.progress) {
-          updateProgress(file, message._id)
-          return
-        }
-
-        sendFileMessage({
-          id: file.id,
-          name: file.name + '.' + file.extension,
-          size: file.size,
-          type: file.type,
-          url: file.url,
-          progress: file.progress
-        }, message.roomId, isOver)
-
-      })
-    }
-
-    const sendMessage = async ({content, roomId, files, replyMessage}) => {
-      console.log(files)
-      // 如果发送了文件, 那么给每一个文件生成一个ID
-      files?.forEach(x => {
-        x.id = uuid()
-        x.url = x.localUrl
-      })
-
-      const message = {
-        senderId: currentUserId.value,
-        content,
-        roomId,
-        replyMessage: replyMessage,
-        files: files
-      }
-
-      // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
-
-      // 构建消息, 添加到消息列表中
-      message._id = uuid()
-      message.system = false
-      message.date = moment().format("YYYY-MM-DD")
-      message.username = curUser.value.username
-      message.avatar = curUser.value.avatar
-      message.timestamp = '...'
-
-      upRoom(roomId)
-
-      await operationMessage(message)
-
-    }
-
     const curRoom = computed(() => {
       return loadedRooms.value.find(r => r.roomId === roomId.value)
     })
 
-    const curRoomIsSystem = computed(() => {
-      return !curRoom.value?.isSystem
-    })
 
-    // 查找更多消息
-    const fetchMessage = ({room}) => {
-      if (room.roomId !== roomId.value) {
-        changeRoom(room.roomId)
-        return
-      }
-      if (page.value === sendPage.value) {
-        return
-      }
-      sendPage.value = page.value
-      getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
-    }
-
-    const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
-      messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
-    }
 
     const deleteMessage = ({message}) => {
       messageDelete({messageId: message._id});
@@ -268,10 +140,6 @@ export default {
     }
     provide('openLeftDrawer', openLeftDrawer)
 
-    const call = (roomId, type) => {
-      videoDialog.value.call(type)
-    }
-
     const styles = ref({
       container: {
         boxShadow: ''
@@ -285,7 +153,6 @@ export default {
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
 
     return {
-      videoDialog,
       messages,
       messageLoaded,
       curUser,
@@ -296,26 +163,27 @@ export default {
       messageActions,
       loadingRooms,
       roomsLoaded,
-      curRoomIsSystem,
+
+      styles,
       curRoom,
-      clickMessage,
       clickFile,
+      leftDrawer,
       isElectron,
       pageHeight,
-      styles,
-      leftDrawer,
-      call,
-      openRightDrawer,
-      roomInfo,
-      closeMessageViewer,
-      openFile,
-      deleteMessage,
-      sendMessage,
-      sendMessageReaction,
-      fetchMessage,
-      upRoom,
-      changeRoom,
       rightDrawer,
+      clickMessage,
+
+      upRoom,
+      roomInfo,
+      openFile,
+      changeRoom,
+      sendMessage,
+      fetchMessage,
+      deleteMessage,
+      openRightDrawer,
+      closeMessageViewer,
+      sendMessageReaction,
+
 
       icons: {
         mdiWindowClose,

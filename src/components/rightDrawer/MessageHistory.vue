@@ -80,7 +80,7 @@ import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js"
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {onMounted, onUnmounted, ref,inject} from "@vue/composition-api";
 import msg from "@/plugins/msg";
-import {searchMessage} from "@/net/message";
+import {searchMessage} from "@/net/send-message";
 import {buildDisplayTime} from "@/utils/date-util";
 import {scrollToView} from "@/utils/dom";
 

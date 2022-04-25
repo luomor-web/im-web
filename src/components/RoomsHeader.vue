@@ -56,7 +56,7 @@
 
 <script>
 import {mdiAccountOutline, mdiChevronDown, mdiCog, mdiExitToApp, mdiPencilOutline} from "@mdi/js";
-import {quitSystem} from "@/net/message";
+import {quitSystem} from "@/net/send-message";
 import {inject} from "@vue/composition-api";
 
 export default {

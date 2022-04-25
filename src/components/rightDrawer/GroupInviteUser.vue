@@ -11,7 +11,7 @@
 import AddRoomSelectUser from "@/components/leftDrawer/addRoom/AddRoomSelectUser";
 import { inject, ref } from "@vue/composition-api";
 import { mdiCheck } from "@mdi/js";
-import { joinUserGroup } from "@/net/message";
+import { joinUserGroup } from "@/net/send-message";
 
 export default {
   name: "GroupInviteUser",

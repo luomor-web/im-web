@@ -1,6 +1,6 @@
 import {nextTick} from "@vue/composition-api";
 import msg from "@/plugins/msg";
-import {buildLastMessage, buildLastMessageTime, clearUnReadMessage} from "@/net/message";
+import {buildLastMessage, buildLastMessageTime, clearUnReadMessage} from "@/net/send-message";
 import {
     changeRoom, currentUserId,
     curUser, ding,
@@ -9,7 +9,7 @@ import {
     messageLoaded,
     messages,
     page, roomId,
-    roomsLoaded, sortedUser, upRoom, waitSelectUser, waitSendMessage
+    roomsLoaded, setCurUser, sortedUser, upRoom, waitSelectUser, waitSendMessage
 } from "@/views/home/home";
 
 export const init = () => {
@@ -211,7 +211,7 @@ const COMMAND_SEND_MESSAGE_REACTION_RESP = (data) => {
 // 编辑用户信息返回
 const COMMAND_EDIT_PROFILE_REST = (data) => {
     const {user} = data.data
-    curUser.value = {...user}
+    setCurUser(user)
 }
 
 // 群组用户移除返回

@@ -62,7 +62,7 @@
 <script>
 import {mdiCamera, mdiCheck} from "@mdi/js";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import {editProfile} from "@/net/message";
+import {editProfile} from "@/net/send-message";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {curUser} from "@/views/home/home";
 import ImUpload from "@/components/system/ImUpload";

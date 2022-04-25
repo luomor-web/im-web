@@ -3,7 +3,7 @@
     <drawer-top @close="closeAddChat">
       <user-search @click-content="startChat"></user-search>
     </drawer-top>
-    <div class="overflow-y-auto" :style="{height: pageHeight}">
+    <div class="overflow-y-auto fill-height">
       <user-select-column>
         <div slot="userAction" slot-scope="{item}">
           <v-btn icon @click="startChat(item)">
@@ -19,7 +19,7 @@
 import {mdiChatOutline, mdiMagnify} from "@mdi/js";
 import {ref} from "@vue/composition-api";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {createGroup} from "@/net/message";
+import {createGroup} from "@/net/send-message";
 import {changeRoom, loadedRooms, upRoom} from "@/views/home/home";
 import UserSelectColumn from "@/components/user/UserSelectColumn";
 import UserSearch from "@/components/user/UserSearch";
@@ -29,7 +29,6 @@ export default {
   components: {UserSearch, UserSelectColumn, DrawerTop},
   props: {},
   setup(props, context) {
-    const pageHeight = process.env.isElectron ? "calc(100vh - 64px - 32px)" : "calc(100vh - 64px)"
     const userSelectModel = ref(false)
 
     const waitSelect = ref([])
@@ -55,7 +54,6 @@ export default {
       waitSelect,
       startChat,
       closeAddChat,
-      pageHeight,
 
       icons: {
         mdiMagnify,
@@ -67,6 +65,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .no-drag {
   -webkit-app-region: no-drag;
 }

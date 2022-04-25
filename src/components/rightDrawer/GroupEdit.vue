@@ -111,7 +111,7 @@
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {computed, inject, onMounted, ref, watch} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
-import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/message";
+import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/send-message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
 import ImUpload from "@/components/system/ImUpload";
 import ImWarnDialog from "@/components/system/ImWarnDialog";

@@ -4,7 +4,7 @@
       <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName">
       </v-text-field>
     </drawer-top>
-    <div class="mx-2 overflow-y-auto" :style="{height: pageHeight}">
+    <div class="mx-2 overflow-y-auto fill-height">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of filteredItems"
                      :key="index">
@@ -67,7 +67,7 @@
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {computed, inject, ref} from "@vue/composition-api";
 import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
-import {removeUserGroup, setAdmin} from "@/net/message";
+import {removeUserGroup, setAdmin} from "@/net/send-message";
 import {curUser} from "@/views/home/home";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
 
@@ -82,7 +82,6 @@ export default {
     room: {type: Object}
   },
   setup(props) {
-    const pageHeight = process.env.isElectron ? "calc(100vh - 64px - 32px)" : "calc(100vh - 64px)"
     const searchName = ref('')
 
     // 操作动作
@@ -165,7 +164,6 @@ export default {
       action,
       searchName,
       filteredItems,
-      pageHeight,
       startRemoveRoom,
       removeRoom,
       startSetRoomAdmin,

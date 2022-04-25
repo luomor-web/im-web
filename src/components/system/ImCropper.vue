@@ -37,6 +37,7 @@ import {Cropper} from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css';
 import 'vue-advanced-cropper/dist/theme.compact.css';
 import {addFiles} from "@/utils/file";
+import SparkMD5 from "spark-md5"
 
 export default {
   name: "ImCropper",
@@ -57,19 +58,30 @@ export default {
     const sure = () => {
       const {canvas} = cropper.value.getResult();
       if (canvas) {
+        const spark = new SparkMD5.ArrayBuffer();
+        const fileReader = new FileReader();
         canvas.toBlob(blob => {
-          const file = {
-            blob: blob,
-            name: 'header',
-            size: blob.size,
-            type: 'image/jpeg',
-            extension: 'jpeg',
-          }
-          addFiles([file], (file, over) => {
-            if (over) {
-              context.emit("sure", picUrl.value + file.url)
+          let md5 = ""
+          fileReader.onload = e => {
+            spark.append(e.target.result);
+            md5 = spark.end()
+
+            const file = {
+              blob: blob,
+              name: 'header',
+              size: blob.size,
+              type: 'image/jpeg',
+              extension: 'jpeg',
+              md5: md5
             }
-          })
+            addFiles([file], (file, over) => {
+              if (over) {
+                context.emit("sure", picUrl.value + file.url)
+              }
+            })
+          }
+          fileReader.readAsArrayBuffer(blob)
+
         }, 'image/jpeg')
       }
     }

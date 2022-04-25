@@ -22,27 +22,34 @@
         </v-btn>
       </div>
     </div>
+
+    <im-video-dialog ref="videoDialog" :room="room"></im-video-dialog>
+
   </div>
 </template>
 
 <script>
 import {mdiDotsVertical, mdiMagnify, mdiPhone, mdiVideoOutline,} from "@mdi/js";
 import {computed, inject, ref} from "@vue/composition-api";
-import {getUserList} from "@/net/message";
+import {getUserList} from "@/net/send-message";
 import {loadedRooms} from "@/views/home/home";
+import ImVideoDialog from "@/components/system/ImVideoDialog";
 
 export default {
   name: "RoomOptions",
   props: {
     roomId: String,
   },
-  components: {},
-  setup(props, {emit}) {
+  components: {ImVideoDialog},
+  setup(props) {
 
     // 当前点击的用户,有可能时房间,有可能时用户
     const clickRoom = ref({})
 
-    const openRightDrawer = inject('openRightDrawer', () => {})
+    const videoDialog = ref(null)
+
+    const openRightDrawer = inject('openRightDrawer', () => {
+    })
 
     const room = computed(() => {
       return loadedRooms.value.find(r => r.roomId === props.roomId);
@@ -58,20 +65,19 @@ export default {
       getUserList()
     }
 
-
     const call = (type) => {
-      emit('call', room.value.roomId,type)
+      videoDialog.value.call(type)
     }
-
 
     return {
       room,
       clickRoom,
+      videoDialog,
+      openRightDrawer,
 
+      call,
       roomInfo,
       inviteUser,
-      openRightDrawer,
-      call,
 
       icons: {
         mdiMagnify,
