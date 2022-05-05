@@ -207,10 +207,5 @@ export const isInContainer = (el, container) => {
 };
 
 export const scrollToView = (el) => {
-    // el.scrollIntoView({
-    //     behavior: "smooth",
-    //     block: 'center',
-    //     inline: 'nearest'
-    // });
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 }

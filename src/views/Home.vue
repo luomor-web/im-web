@@ -17,13 +17,11 @@
           :text-messages="textMessages"
           :message-actions="messageActions"
           :room-info-enabled="true"
-          :media-preview-enabled="false"
           @room-info="roomInfo"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
           @send-message-reaction="sendMessageReaction"
           @delete-message="deleteMessage"
-          @open-file="openFile"
       >
 
         <template #rooms-header="{}">
@@ -36,13 +34,11 @@
           <right-drawer ref="rightDrawer" :room="curRoom"/>
         </template>
         <template #room-options="{}">
-          <room-options :room-id="roomId" />
+          <room-options :room-id="roomId"/>
         </template>
 
       </chat-window>
     </div>
-    <message-viewer :message="clickMessage" :file="clickFile" @close="closeMessageViewer"></message-viewer>
-
   </div>
 </template>
 
@@ -58,7 +54,6 @@ import {textMessages} from "@/locales/text-message";
 import {messageActions} from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
-import MessageViewer from "@/components/system/ImViewer";
 import {
   changeRoom,
   currentUserId,
@@ -81,7 +76,6 @@ export default {
   components: {
     LeftDrawer,
     RightDrawer,
-    MessageViewer,
     RoomOptions,
     RoomsHeader,
     TopBar,
@@ -91,11 +85,6 @@ export default {
 
     const rightDrawer = ref(null)
     const leftDrawer = ref(null)
-
-    // 点击文件时的消息
-    const clickMessage = ref(null)
-    // 点击的文件
-    const clickFile = ref(null)
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
@@ -110,20 +99,8 @@ export default {
       return loadedRooms.value.find(r => r.roomId === roomId.value)
     })
 
-
-
     const deleteMessage = ({message}) => {
       messageDelete({messageId: message._id});
-    }
-
-    const openFile = ({message, file}) => {
-      clickMessage.value = message
-      clickFile.value = file
-    }
-
-    const closeMessageViewer = () => {
-      clickMessage.value = null
-      clickFile.value = null
     }
 
     const roomInfo = () => {
@@ -166,22 +143,18 @@ export default {
 
       styles,
       curRoom,
-      clickFile,
       leftDrawer,
       isElectron,
       pageHeight,
       rightDrawer,
-      clickMessage,
 
       upRoom,
       roomInfo,
-      openFile,
       changeRoom,
       sendMessage,
       fetchMessage,
       deleteMessage,
       openRightDrawer,
-      closeMessageViewer,
       sendMessageReaction,
 
 

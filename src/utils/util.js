@@ -240,6 +240,7 @@ export function objToArray(obj) {
   return isEmpty(obj) ? [] : [obj];
 }
 
+
 // 这是微信小程序官方给出的比较方法
 export function compareVersion(v1, v2) {
   v1 = v1.split('.')

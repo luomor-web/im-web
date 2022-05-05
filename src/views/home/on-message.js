@@ -82,6 +82,7 @@ const COMMAND_GET_MESSAGE_RESP = (data) => {
             messages.value.unshift(x)
         }
     })
+    console.log(messages.value)
 }
 
 // 聊天请求
