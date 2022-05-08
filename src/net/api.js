@@ -97,7 +97,7 @@ export function createToken(sessionId) {
 
 export function userLogin(data) {
     return request({
-        url: '/account/login',
+        url: '/user/login',
         method: 'post',
         data: data
     })
