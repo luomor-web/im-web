@@ -1,5 +1,4 @@
 import {init, mergeMultipartUpload, upload} from "@/net/api";
-import SparkMD5 from 'spark-md5'
 
 const CHUNK_SIZE = 5 * 1024 * 1024
 
@@ -13,7 +12,7 @@ const addFiles = async (f, cb) => {
             // 文件类型
             type: file.type,
             // 文件md5
-            md5: '',
+            md5: file.md5,
             // 切片列表
             chunks: [],
             // 上传进度
@@ -41,12 +40,15 @@ const addFiles = async (f, cb) => {
             data.chunkedProgress = listLen <= 0 ? 0 : Math.round((listLen / len) * 10000) / 100.0
         })
 
+        console.log(file)
+
         const response = await init({
             filename: file.name + '.' + file.extension,
             partCount: data.chunks.length,
-            md5: data.md5,
+            md5: file.md5,
             contentType: file.type,
         })
+
         data.url = response.objectName
 
         if (!response.quick) {
@@ -75,7 +77,7 @@ const addFiles = async (f, cb) => {
                 mergeMultipartUpload({
                     uploadId: response.uploadId,
                     objectName: response.objectName,
-                    md5: data.md5
+                    md5: file.md5
                 })
                 checkOver(data, f, cb)
             })
@@ -84,7 +86,6 @@ const addFiles = async (f, cb) => {
             checkOver(data, f, cb)
         }
     }
-
 }
 
 const checkOver = (data, target, cb) => {
@@ -110,13 +111,10 @@ const countSpeed = (data) => {
 }
 
 const inputChange = async (file, cb) => {
-    if (file) {
-        const fileChunkList = await createFileChunk(file.file, (data, size) => {
-            cb(data, size)
-        })
-        file.md5 = await getFileChunkMd5(fileChunkList)
-        file.chunks = fileChunkList
-    }
+    if (!file) return
+    file.chunks = await createFileChunk(file.file, (data, size) => {
+        cb(data, size)
+    })
 }
 
 const createFileChunk = async (file, cb) => {
@@ -136,41 +134,6 @@ const createFileChunk = async (file, cb) => {
         cb(list, len)
     }
     return list;
-}
-
-const getFileChunkMd5 = (fileChunkList) => {
-    return new Promise((resolve) => {
-        // 总切片数
-        const chunkSize = fileChunkList.length
-        // 当前处理位置
-        let currentChunk = 0
-        // SparkMD5实例的ArrayBuffer
-        const spark = new SparkMD5.ArrayBuffer()
-
-        const fileReader = new FileReader()
-        fileReader.onload = (e) => {
-            try {
-                spark.append(e.target.result)
-            } catch (error) {
-                // console.log('获取Md5错误，错误位置：' + currentChunk)
-            }
-            currentChunk++
-
-            if (currentChunk < chunkSize) {
-                loadNext()
-            } else {
-                resolve(spark.end())
-            }
-        }
-        fileReader.onerror = function () {
-        }
-
-        function loadNext() {
-            fileReader.readAsArrayBuffer(fileChunkList[currentChunk].file)
-        }
-
-        loadNext()
-    })
 }
 
 const formatSize = (size) => {

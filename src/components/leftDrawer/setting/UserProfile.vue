@@ -1,6 +1,6 @@
 <template>
-  <div style="height: 100vh">
-    <drawer-top :title="'编辑资料'" :sub="true" @close="close('SETTING_ITEM')"></drawer-top>
+  <div class="user-profile">
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')"></drawer-top>
     <div class="mt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -62,7 +62,7 @@
 <script>
 import {mdiCamera, mdiCheck} from "@mdi/js";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import {editProfile} from "@/net/message";
+import {editProfile} from "@/net/send-message";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {curUser} from "@/views/home/home";
 import ImUpload from "@/components/system/ImUpload";
@@ -77,7 +77,6 @@ export default {
     user: Object
   },
   setup(props, context) {
-
     watch(() => props.user, () => {
       initData()
     })
@@ -110,16 +109,16 @@ export default {
       upload.value.startUpload()
     }
 
-    const close = item => {
+    const open = (item) => {
       initData()
-      context.emit('close', item)
+      context.emit('open', item)
     }
 
     return {
       upload,
       username,
       showSure,
-      close,
+      open,
       sure,
       changeUserProfile,
       openUpload,
@@ -136,6 +135,11 @@ export default {
 <style lang="scss" scoped>
 
 @import "src/styles/theme";
+
+.user-profile {
+  height: 100%;
+  //position: absolute;
+}
 
 .header-img {
   border-radius: 120px;

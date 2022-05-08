@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="fill-height">
     <drawer-top
         :title="'资料'"
         @close="close">
       <template #right>
         <v-spacer></v-spacer>
-        <v-btn class="no-drag" icon @click="close('GROUP_EDIT')">
+        <v-btn class="no-drag" icon @click="open('GROUP_EDIT')">
           <v-icon>
             {{ icons.mdiPencilOutline }}
           </v-icon>
@@ -45,7 +45,7 @@
 
     <im-driver></im-driver>
 
-    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 296px)">
+    <div class="mx-2 overflow-y-auto fill-height">
       <v-list nav>
         <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
           <v-list-item-avatar>
@@ -69,30 +69,31 @@
         </v-list-item>
       </v-list>
     </div>
+<div>
+  <v-btn
+      transition="scroll-x-reverse-transition"
+      class="mr-8 mb-16"
+      color="primary"
+      dark
+      absolute
+      bottom
+      right
+      fab
+      @click="open('GROUP_INVITE_USER')"
+  >
+    <v-icon>{{ icons.mdiPlus }}</v-icon>
+  </v-btn>
+</div>
 
-    <v-fab-transition>
-      <v-btn
-          class="mr-8 mb-16"
-          color="primary"
-          dark
-          absolute
-          bottom
-          right
-          fab
-          @click="close('GROUP_INVITE_USER')"
-      >
-        <v-icon>{{ icons.mdiPlus }}</v-icon>
-      </v-btn>
-    </v-fab-transition>
   </div>
 </template>
 
 <script>
-import {joinUserGroup, userGroupConfig} from "@/net/message";
+import {joinUserGroup, userGroupConfig} from "@/net/send-message";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
-import {onMounted, ref, watch} from "@vue/composition-api";
+import {inject, onMounted, ref, watch} from "@vue/composition-api";
 
 export default {
   name: "GroupInfo",
@@ -104,6 +105,8 @@ export default {
     DrawerTop,
   },
   setup(props, context) {
+    const close = inject('close', ()=>{})
+    const open = inject('open', ()=>{})
 
     const notice = ref(true)
 
@@ -125,10 +128,6 @@ export default {
       userGroupConfig(param)
     }
 
-    const closeGroupInfo = () => {
-      context.emit('close')
-    }
-
     const startChat = (item) => {
       context.emit('chat', item)
     }
@@ -145,16 +144,14 @@ export default {
       joinUserGroup({group, users})
     }
 
-    const close = item => {
-      context.emit('close', item)
-    }
+
 
     return {
       notice,
       noticeChange,
+      open,
       close,
       joinGroup,
-      closeGroupInfo,
       startChat,
 
       icons: {

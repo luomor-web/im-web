@@ -45,9 +45,9 @@
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
-import {onMounted, ref, watch} from "@vue/composition-api";
+import {inject, onMounted, ref, watch} from "@vue/composition-api";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline} from "@mdi/js";
-import {userGroupConfig} from "@/net/message";
+import {userGroupConfig} from "@/net/send-message";
 
 export default {
   name: "UserInfo",
@@ -59,9 +59,11 @@ export default {
     DrawerTop,
     ImDriver
   },
-  setup(props, {emit}) {
+  setup(props) {
 
     const notice = ref(true)
+
+    const close = inject('close', () => {})
 
     watch(props.room , room => {
       notice.value = room.notice
@@ -87,14 +89,11 @@ export default {
 
     }
 
-    const close = () => {
-      emit('close')
-    }
     return {
       notice,
+      close,
       drawerTemporary,
       noticeChange,
-      close,
       changeUserProfile,
 
       icons : {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top :title="'编辑资料'" :sub="true" @close="close('GROUP_INFO')"></drawer-top>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('GROUP_INFO')"></drawer-top>
     <div class="pt-2 mx-2">
       <div class="d-table ma-auto">
         <v-hover>
@@ -42,7 +42,7 @@
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_USER_MANAGE')" v-if="isAdminOrSubAdmin">
+        <v-list-item v-ripple class="im-list-item" @click="open('GROUP_USER_MANAGE')" v-if="isAdminOrSubAdmin">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiLockOutline }}</v-icon>
           </v-list-item-icon>
@@ -51,7 +51,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-ripple class="im-list-item" @click="close('GROUP_HANDOVER_ADMIN')" v-if="isAdmin">
+        <v-list-item v-ripple class="im-list-item" @click="open('GROUP_HANDOVER_ADMIN')" v-if="isAdmin">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiPoliceBadgeOutline }}</v-icon>
           </v-list-item-icon>
@@ -109,9 +109,9 @@
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {computed, onMounted, ref, watch} from "@vue/composition-api";
+import {computed, inject, onMounted, ref, watch} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
-import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/message";
+import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/send-message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
 import ImUpload from "@/components/system/ImUpload";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
@@ -126,7 +126,7 @@ export default {
   props: {
     room: {type: Object}
   },
-  setup(props, {emit}) {
+  setup(props) {
     // 当前用户ID
     const curUserId = ref(localStoreUtil.getValue('userId'))
     // 当前用户
@@ -230,13 +230,8 @@ export default {
       init(props.room)
     })
 
-    const close = (item) => {
-      if (item) {
-        emit('close', item)
-        return
-      }
-      emit('close')
-    }
+    const close = inject('close',() => {})
+    const open = inject('open',() => {})
 
     return {
       img,
@@ -255,6 +250,7 @@ export default {
       roomNameChange,
       openUpload,
       sure,
+      open,
       close,
 
       icons: {

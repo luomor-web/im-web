@@ -8,18 +8,16 @@
       </v-btn>
       <slot>
         <v-toolbar-title class="font-weight-bold ">
-          {{ title }}
+          {{ title  }}
         </v-toolbar-title>
       </slot>
-      <slot name="right">
-
-      </slot>
+      <slot name="right"></slot>
     </v-toolbar>
   </div>
 </template>
 
 <script>
-import {mdiArrowLeft, mdiPencilOutline, mdiWindowClose} from "@mdi/js";
+import { mdiArrowLeft, mdiPencilOutline, mdiWindowClose } from "@mdi/js";
 
 export default {
   name: "DrawerTop",

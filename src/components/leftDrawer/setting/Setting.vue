@@ -1,14 +1,12 @@
 <template>
-  <div style="height: 100vh">
-    <v-window v-model="active">
+    <v-window v-model="active" class="setting-window">
       <v-window-item value="SETTING_ITEM">
-        <setting-item :curUser="curUser" @close="close"></setting-item>
+        <setting-item :curUser="curUser" @open="open"></setting-item>
       </v-window-item>
       <v-window-item value="USER_PROFILE">
-        <user-profile :user="curUser" @close="close"></user-profile>
+        <user-profile :user="curUser" @open="open"></user-profile>
       </v-window-item>
     </v-window>
-  </div>
 </template>
 
 <script>
@@ -26,18 +24,15 @@ export default {
   props:{
     curUser: Object
   },
-  setup(props, {emit}) {
+  setup() {
     const active = ref('')
 
-    const close = item => {
-      if(item){
-        active.value = item
-        return
-      }
-      emit('close')
+    const open = item => {
+      active.value = item
     }
 
     return {
+      open,
       close,
       active
     }
@@ -46,5 +41,7 @@ export default {
 </script>
 
 <style scoped>
-
+.setting-window {
+  height: 100%;
+}
 </style>

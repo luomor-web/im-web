@@ -1,8 +1,7 @@
 const {mergeSassVariables} = require('@vuetify/cli-plugin-utils')
 module.exports = {
-
     devServer: {
-        public: 'https://192.168.0.103:8888'
+        public: 'https://192.168.1.128:8888'
         // publicPath: process.env.VUE_APP_BASE_API,
         // proxy: {
         //     '/api': {
@@ -35,22 +34,43 @@ module.exports = {
     },
     pluginOptions: {
         electronBuilder: {
+            nodeIntegration: true,
             customFileProtocol: './',
+            chainWebpackMainProcess: (config) => {
+                config.output.filename('index.js');
+            },
             builderOptions: {
                 // options placed here will be merged with default configuration and passed to electron-builder
-                productName: "im",
-                appId: "org.s.electron-vue",
+                productName: "OA",
+                appId: "123456789",
                 copyright: "Copyright © 2022",//版权信息
                 directories: {
                     output: "./dist_electron"//输出文件路径
                 },
-                // "publish": {
-                //     "provider": "generic",
-                //     "url": "http://192.168.1.93:8090/"
-                // },
-                // "files": [
-                //   "dist/**/*"
-                // ],
+                releaseInfo: {
+                    releaseNotes: `{"forceVersion": "0.9.0", "wholeVersion": "0.9.0"}`
+                },
+                afterPack: './afterPack.js',
+                extraResources: [{
+                    from: "dist_electron/bundled",
+                    to: "app.asar.unpacked",
+                    filter: [
+                        "!**/icons",
+                        "!**/preload.js",
+                        "!**/node_modules",
+                        "!**/index.js"
+                    ]
+                }],
+                files: [
+                    "**/icons/*",
+                    "**/preload.js",
+                    "**/node_modules/**/*",
+                    "**/index.js"
+                ],
+                publish: {
+                    provider: "generic",
+                    url: process.env.VUE_APP_UPDATE_URL
+                },
                 nsis: {
                     oneClick: false,
                     perMachine: true,
@@ -64,6 +84,7 @@ module.exports = {
                 },
                 win: { // win相关配置
                     icon: "/public/icons/tray.ico",// 图标，当前图标在根目录下，注意这里有两个坑
+                    artifactName: "${productName}_${version}.${ext}",
                     target: [
                         {
                             target: "nsis",// 利用nsis制作安装程序
@@ -75,7 +96,9 @@ module.exports = {
                     ]
                 },
                 mac: {
-                    target: "dmg",
+                    target: ["dmg"],
+                    artifactName: "${productName}_${version}.${ext}",
+                    category: "public.app-category.productivity",
                     hardenedRuntime: true,
                     gatekeeperAssess: true,
                     extendInfo: {
@@ -105,23 +128,24 @@ module.exports = {
                         height: 500
                     }
                 },
-                // linux: {
-                //     desktop: {
-                //         StartupNotify: "false",
-                //         Encoding: "UTF-8",
-                //         MimeType: "x-scheme-handler/deeplink"
-                //     },
-                //     target: ["AppImage", "rpm", "deb"]
-                // },
-                // deb: {
-                //     priority: "optional",
-                //     afterInstall:"installer/linux/after-install.tpl",
-                // },
-                // rpm: {
-                //     fpm: ["--before-install", "installer/linux/before-install.tpl"],
-                //     afterInstall:"installer/linux/after-install.tpl",
-                // }
+                linux: {
+                    desktop: {
+                        StartupNotify: "false",
+                        Encoding: "UTF-8",
+                        MimeType: "x-scheme-handler/deeplink"
+                    },
+                    target: ["AppImage", "rpm", "deb"]
+                },
+                deb: {
+                    priority: "optional",
+                    afterInstall: "installer/linux/after-install.tpl",
+                },
+                rpm: {
+                    fpm: ["--before-install", "installer/linux/before-install.tpl"],
+                    afterInstall: "installer/linux/after-install.tpl",
+                }
             }
         }
     }
+
 }

@@ -16,7 +16,7 @@
         </div>
         <span class="d-table ma-auto text-h6">{{ curUser.username }}</span>
         <v-list nav>
-          <v-list-item v-ripple class="im-list-item" @click="close('USER_PROFILE')">
+          <v-list-item v-ripple class="im-list-item" @click="open('USER_PROFILE')">
             <v-list-item-icon>
               <v-icon>{{ icons.mdiPencilOutline }}</v-icon>
             </v-list-item-icon>
@@ -35,6 +35,7 @@
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {mdiBellOutline, mdiPencilOutline} from "@mdi/js";
 import ImDriver from "@/components/system/ImDriver";
+import {inject} from "@vue/composition-api";
 
 export default {
   name: "SettingItem",
@@ -47,11 +48,14 @@ export default {
   },
   setup(props, {emit}) {
 
-    const close = item => {
-      emit('close', item)
+    const close = inject('close',() => {})
+
+    const open = (item) => {
+      emit('open', item)
     }
 
     return {
+      open,
       close,
 
       icons: {

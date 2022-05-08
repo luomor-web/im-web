@@ -1,6 +1,6 @@
 // 已加载的房间列表
 import {ref} from "@vue/composition-api";
-import {clearUnReadMessage, getHistoryMessage} from "@/net/message";
+import {clearUnReadMessage, getHistoryMessage} from "@/net/send-message";
 
 // 当前用户ID
 export const currentUserId = ref('')
@@ -27,6 +27,10 @@ export const roomId = ref('')
 export const waitSendMessage = ref([])
 // 系统全部人员列表
 export const waitSelectUser = ref([])
+
+export const setCurUser = user => {
+    curUser.value = {...user}
+}
 
 export const changeRoom = item => {
     messages.value = messages.value.splice(0, messages.value.length)

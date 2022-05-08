@@ -1,6 +1,6 @@
 import {nextTick} from "@vue/composition-api";
 import msg from "@/plugins/msg";
-import {buildLastMessage, buildLastMessageTime, clearUnReadMessage} from "@/net/message";
+import {buildLastMessage, buildLastMessageTime, clearUnReadMessage} from "@/net/send-message";
 import {
     changeRoom, currentUserId,
     curUser, ding,
@@ -9,7 +9,7 @@ import {
     messageLoaded,
     messages,
     page, roomId,
-    roomsLoaded, sortedUser, upRoom, waitSelectUser, waitSendMessage
+    roomsLoaded, setCurUser, sortedUser, upRoom, waitSelectUser, waitSendMessage
 } from "@/views/home/home";
 
 export const init = () => {
@@ -82,6 +82,7 @@ const COMMAND_GET_MESSAGE_RESP = (data) => {
             messages.value.unshift(x)
         }
     })
+    console.log(messages.value)
 }
 
 // 聊天请求
@@ -211,7 +212,7 @@ const COMMAND_SEND_MESSAGE_REACTION_RESP = (data) => {
 // 编辑用户信息返回
 const COMMAND_EDIT_PROFILE_REST = (data) => {
     const {user} = data.data
-    curUser.value = {...user}
+    setCurUser(user)
 }
 
 // 群组用户移除返回
@@ -338,3 +339,27 @@ const COMMAND_USER_GROUP_CONFIG_RESP = (data) => {
 
 }
 
+export const msgDestroy = () => {
+    msg.$off('COMMAND_LOGIN_RESP')
+    msg.$off('COMMAND_JOIN_GROUP_NOTIFY_RESP')
+    msg.$off('COMMAND_CHAT_RESP')
+    msg.$off('COMMAND_HEARTBEAT_RESP')
+    msg.$off('COMMAND_GET_USER_RESP')
+    msg.$off('COMMAND_GET_MESSAGE_RESP')
+    msg.$off('COMMAND_USER_STATUS_RESP')
+    msg.$off('COMMAND_CREATE_GROUP_RESP')
+    msg.$off('COMMAND_MESSAGE_READ_RESP')
+    msg.$off('COMMAND_USER_LIST_RESP')
+    msg.$off('COMMAND_SEND_MESSAGE_REACTION_RESP')
+    msg.$off('COMMAND_EDIT_PROFILE_REST')
+    msg.$off('COMMAND_REMOVE_GROUP_USER_RESP')
+    msg.$off('COMMAND_MESSAGE_FILE_HISTORY_RESP')
+    msg.$off('COMMAND_MESSAGE_HISTORY_RESP')
+    msg.$off('COMMAND_DISBAND_GROUP_RESP')
+    msg.$off('COMMAND_HANDOVER_GROUP_RESP')
+    msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')
+    msg.$off('COMMAND_MESSAGE_DELETE_RESP')
+    msg.$off('COMMAND_SYSTEM_MESSAGE_RESP')
+    msg.$off('COMMAND_USER_GROUP_CONFIG_RESP')
+    msg.$off('COMMAND_VIDEO_RESP')
+}

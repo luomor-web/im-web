@@ -1,20 +1,18 @@
 <template>
   <div>
-    <float-menu v-show="!visible" @close="goTo"></float-menu>
+    <float-menu v-show="!visible"></float-menu>
     <v-expand-x-transition>
       <div class="im-left-drawer" v-show="visible">
-        <setting  v-if="activeSub === 'SETTING'" :curUser="curUser" @close="goTo"></setting>
-        <add-chat
-            v-else-if="activeSub === 'ADD_CHAT'"
-            @close="goTo"/>
-        <add-room v-else-if="activeSub === 'CREATE_GROUP'" @close="goTo"/>
+        <setting v-if="active === 'SETTING'" :curUser="curUser" @close="goTo"></setting>
+        <add-chat v-else-if="active === 'ADD_CHAT'" @close="goTo"/>
+        <add-room v-else-if="active === 'CREATE_GROUP'" @close="goTo"/>
       </div>
     </v-expand-x-transition>
   </div>
 </template>
 
 <script>
-import {ref, watch} from "@vue/composition-api";
+import {provide, ref} from "@vue/composition-api";
 import {curUser, loadedRooms} from "@/views/home/home";
 import {mdiPlus} from "@mdi/js";
 import FloatMenu from "@/components/leftDrawer/FloatMenu";
@@ -30,28 +28,38 @@ export default {
     AddChat,
     FloatMenu
   },
-  props: {
-    active: {type: String},
-  },
-  setup(props,{emit}) {
+  setup(props, {emit}) {
 
-    const activeSub = ref('')
+    const active = ref('')
     const visible = ref(false)
 
-    watch(() => props.active, active => {
-      activeSub.value = active
-      visible.value = !!activeSub.value
-    })
+    const open = (item) => {
+      active.value = item
+      visible.value = true
+    }
+    provide('open', open)
+
+    const close = () => {
+      active.value = ''
+      visible.value = false
+    }
+    provide('close', close)
+
+    const activeSub = ref('')
 
     const goTo = item => {
       activeSub.value = item
       visible.value = !!item
-      if(!visible.value) {
+      if (!visible.value) {
         emit('close')
       }
     }
 
     return {
+      active,
+      open,
+      close,
+
       loadedRooms,
       visible,
       curUser,

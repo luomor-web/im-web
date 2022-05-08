@@ -3,7 +3,7 @@
     <drawer-top @close="closeAddChat">
       <user-search @click-content="startChat"></user-search>
     </drawer-top>
-    <div class="overflow-y-auto" style="height: calc(100vh - 64px)">
+    <div class="overflow-y-auto fill-height">
       <user-select-column>
         <div slot="userAction" slot-scope="{item}">
           <v-btn icon @click="startChat(item)">
@@ -17,9 +17,9 @@
 
 <script>
 import {mdiChatOutline, mdiMagnify} from "@mdi/js";
-import {onMounted, ref} from "@vue/composition-api";
+import {ref} from "@vue/composition-api";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {createGroup} from "@/net/message";
+import {createGroup} from "@/net/send-message";
 import {changeRoom, loadedRooms, upRoom} from "@/views/home/home";
 import UserSelectColumn from "@/components/user/UserSelectColumn";
 import UserSearch from "@/components/user/UserSearch";
@@ -29,7 +29,6 @@ export default {
   components: {UserSearch, UserSelectColumn, DrawerTop},
   props: {},
   setup(props, context) {
-
     const userSelectModel = ref(false)
 
     const waitSelect = ref([])
@@ -50,10 +49,6 @@ export default {
       closeAddChat()
     }
 
-    onMounted(() => {
-
-    })
-
     return {
       userSelectModel,
       waitSelect,
@@ -70,6 +65,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .no-drag {
   -webkit-app-region: no-drag;
 }

@@ -23,15 +23,17 @@
         </v-btn>
       </div>
     </v-toolbar>
+    <update></update>
   </div>
 </template>
 
 <script>
 import {mdiWindowClose, mdiWindowMaximize, mdiWindowMinimize} from "@mdi/js"
+import Update from "@/components/update/Update";
 
 export default {
   name: "TopBar",
-
+  components: {Update},
   setup() {
 
     const handler = item => {

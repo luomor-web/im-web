@@ -1,12 +1,12 @@
 <template>
   <div class="fill-height">
 
-    <drawer-top :sub="true" @close="close">
+    <drawer-top :sub="true" @close="open('GROUP_EDIT')">
       <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索">
       </v-text-field>
     </drawer-top>
 
-    <div class="mx-2 overflow-y-auto" style="height: calc(100vh - 64px)">
+    <div class="mx-2 overflow-y-auto fill-height" >
       <v-list nav>
         <v-list-item v-ripple  v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
           <v-list-item-avatar>
@@ -26,8 +26,8 @@
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {computed, ref} from "@vue/composition-api";
-import {handoverUserGroup} from "@/net/message";
+import {computed, inject, ref} from "@vue/composition-api";
+import {handoverUserGroup} from "@/net/send-message";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
 import {curUser} from "@/views/home/home";
 
@@ -40,8 +40,7 @@ export default {
   props: {
     room: {type: Object}
   },
-  setup(props, {emit}) {
-
+  setup(props) {
     const searchName = ref('')
 
     // 操作动作
@@ -81,18 +80,16 @@ export default {
       close()
     }
 
-    const close = () => {
-      emit('close', 'GROUP_EDIT')
-    }
+    const open = inject('open', () => {})
 
     return {
       curUser,
+      open,
       filteredItems,
       searchName,
       action,
       startHandoverRoom,
-      handoverRoom,
-      close
+      handoverRoom
     }
   }
 }

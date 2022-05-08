@@ -5,14 +5,14 @@ import router from "@/router";
 
 let socket
 
-const webSocket = (username, password) => {
+const webSocket = (token) => {
+    const socketUrl = process.env.VUE_APP_SOCKET_URL + "/ws"
 
-    const protocol = location.protocol
+    // const protocol = location.protocol
     // const port = location.port
-    const host = location.host
-    const socketUrl = (protocol === 'https:' ? 'wss:' : 'ws:') + "//" + host + "/ws"
+    // const host = location.host
     socket = new WebsocketHeartbeatJs({
-        url: socketUrl + '?account=' + username + '&password=' + password,
+        url: socketUrl + '?token=' + token,
         pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
     })
     socket.onopen = () => {
@@ -145,9 +145,10 @@ const sendMsg = (data) => {
 }
 
 const initWebSocket = () => {
-    const username = getValue('username')
-    const password = getValue('password')
-    if (username === '' || username === undefined || username === null) {
+    // const username = getValue('username')
+    // const password = getValue('password')
+    const token = getValue('token')
+    if (token === '' || token === undefined || token === null) {
         if (socket) {
             try {
                 socket.close()
@@ -158,20 +159,16 @@ const initWebSocket = () => {
         localStoreUtil.clear()
         router.push('/login')
     }
-    const token = localStoreUtil.getValue('token');
-    if (token === '' || token === undefined || token === null) {
-        return
-    }
-    if (socket == null && username) {
-        webSocket(username, password)
+    if (socket == null && token) {
+        webSocket(token)
     }
 }
 
-const startWebSocket = (username, password) => {
+const startWebSocket = (token) => {
     if (socket) {
         close()
     }
-    webSocket(username, password)
+    webSocket(token)
 }
 
 export {webSocket, close, sendMsg, initWebSocket, startWebSocket, socket}
