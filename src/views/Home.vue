@@ -22,6 +22,7 @@
           @fetch-messages="fetchMessage"
           @send-message-reaction="sendMessageReaction"
           @delete-message="deleteMessage"
+          @open-file="openFile"
       >
 
         <template #rooms-header="{}">
@@ -117,6 +118,10 @@ export default {
     }
     provide('openLeftDrawer', openLeftDrawer)
 
+    const openFile = ({ message, file }) => {
+      console.log(message, file)
+    }
+
     const styles = ref({
       container: {
         boxShadow: ''
@@ -150,6 +155,7 @@ export default {
 
       upRoom,
       roomInfo,
+      openFile,
       changeRoom,
       sendMessage,
       fetchMessage,

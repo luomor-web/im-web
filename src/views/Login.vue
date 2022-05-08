@@ -149,6 +149,7 @@ import {close, startWebSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
 import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
+import {userLogin} from "@/net/api";
 
 export default {
 
@@ -171,11 +172,15 @@ export default {
     })
 
     const login = () => {
-      startWebSocket(username.value, password.value)
+      // startWebSocket(username.value, password.value)
+      userLogin({account: username.value, password: password.value}).then(response => {
+        console.log(response)
+        localStoreUtil.setValue('token', response.data)
+        startWebSocket(response.data)
+      })
     }
 
     onMounted(() => {
-      console.log(process.env)
       const value = localStoreUtil.getValue('username');
       if (value) {
         username.value = value
@@ -187,14 +192,13 @@ export default {
       }
       msg.$on("COMMAND_LOGIN_RESP", (data) => {
         if (data.success) {
-          localStoreUtil.setValue('token', '123456')
           localStoreUtil.setValue('username', username.value)
           localStoreUtil.setValue('userId', data.data._id)
           if (remember.value) {
             localStoreUtil.setValue('password', password.value)
           }
           router.push('/')
-        }else {
+        } else {
           snackbar.value.display = true
           snackbar.value.text = data.msg
           close()

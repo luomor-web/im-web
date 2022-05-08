@@ -1,7 +1,7 @@
 const {mergeSassVariables} = require('@vuetify/cli-plugin-utils')
 module.exports = {
     devServer: {
-        public: 'https://192.168.3.128:8888'
+        public: 'https://192.168.1.128:8888'
         // publicPath: process.env.VUE_APP_BASE_API,
         // proxy: {
         //     '/api': {

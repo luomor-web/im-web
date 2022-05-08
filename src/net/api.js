@@ -62,7 +62,7 @@ export function pullVideoStream(data, userId) {
     })
 }
 
-export function createSession( sessionId) {
+export function createSession(sessionId) {
 
     return request({
         url: `/openvidu/api/sessions`,
@@ -92,6 +92,14 @@ export function createToken(sessionId) {
         headers: {
             'Content-Type': 'application/json;charset=UTF-8'
         }
+    })
+}
+
+export function userLogin(data) {
+    return request({
+        url: '/account/login',
+        method: 'post',
+        data: data
     })
 }
 
