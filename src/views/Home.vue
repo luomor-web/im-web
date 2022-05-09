@@ -71,6 +71,7 @@ import {init, msgDestroy} from "@/views/home/on-message";
 import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 import {fetchMessage, sendMessage, sendMessageReaction} from "@/views/home/message";
+import download from "@/utils/download";
 
 export default {
   name: 'Home',
@@ -118,8 +119,10 @@ export default {
     }
     provide('openLeftDrawer', openLeftDrawer)
 
-    const openFile = ({ message, file }) => {
+    const openFile = ({message, file}) => {
       console.log(message, file)
+      if (file.action !== 'download') return
+      download.download(file.file)
     }
 
     const styles = ref({

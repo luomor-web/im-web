@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import log from "electron-log";
 
 export const downloadForUrl = async (url, name) => {
     let res = await request.get(url, {responseType: 'blob'})
@@ -25,7 +26,14 @@ export const downloadForUrl = async (url, name) => {
     }
 }
 
+const download = (file) => {
+    if (process.env.IS_ELECTRON) {
+        window.require('electron').ipcRenderer.send('download-file', file)
+        return
+    }
+    downloadForUrl(file.url, file.name).then().catch(e => log.error(e))
+}
 
 export default {
-    downloadForUrl
+    download
 }

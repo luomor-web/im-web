@@ -181,6 +181,34 @@ const hideWindow = () => {
     win.hide();
 }
 
+// 文件下载========================================
+ipcMain.handle('download-file', (event, file) => {
+    win.webContents.downloadURL(file.url)
+})
+
+win.webContents.session.on('will-download', (event, item) => {
+    item.setSavePath("")
+    item.on('updated', (event, updatedState) => {
+        if (updatedState === 'interrupted') {
+            console.log('下载中断。可以恢复',item.canResume())
+
+        } else if (updatedState === 'progressing') {
+            if (item.isPaused()) {
+                log.info("下载暂停");
+            } else {
+                log.info("下载中");
+                // console.log(`Received bytes: ${item.getReceivedBytes()}`)
+            }
+        }
+    })
+    item.once('done', (event, state) => {
+        console.log('下载完成',event, state)
+    })
+})
+
+
+// 系统更新========================================
+
 // 开启开发者模式更新
 // Object.defineProperty(app, 'isPackaged', {
 //     get() {
