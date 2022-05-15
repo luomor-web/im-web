@@ -1,13 +1,27 @@
 <template>
-  <v-dialog v-model="downloadAction" width="350">
+  <v-dialog v-model="downloadAction" width="450">
     <v-card>
       <v-card-title class="text-h5">
         文件下载
       </v-card-title>
 
       <v-card-text>
-        Let Google help apps determine location. This means sending anonymous location data to Google, even when no
-        apps are running.
+          <v-text-field
+              label="文件名"
+              required
+              value="12312312432235235235.jpg"
+          ></v-text-field>
+          <v-text-field
+              hide-details="auto"
+              label="文件路径"
+              required
+              value="C:\user\smart\Downloads"
+          ></v-text-field>
+          <v-checkbox
+              hide-details="auto"
+              v-model="checkbox"
+              :label="`默认下载地址，不再提示: ${checkbox.toString()}`"
+          ></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -43,6 +57,7 @@ export default {
   setup() {
     const file = ref(null)
     const downloadAction = ref(false)
+    const checkbox = ref(false)
     const closeDownloadAction = () => {
     }
 
@@ -53,6 +68,7 @@ export default {
 
     return {
       file,
+      checkbox,
       downloadAction,
       action,
       closeDownloadAction
