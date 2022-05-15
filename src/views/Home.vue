@@ -26,7 +26,7 @@
       >
 
         <template #rooms-header="{}">
-          <rooms-header :cur-user="curUser"/>
+          <rooms-header ref="roomHeader" :cur-user="curUser" />
         </template>
         <template #left-drawer="{}">
           <left-drawer ref="leftDrawer"/>
@@ -39,6 +39,7 @@
         </template>
 
       </chat-window>
+
     </div>
   </div>
 </template>
@@ -71,7 +72,6 @@ import {init, msgDestroy} from "@/views/home/on-message";
 import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 import {fetchMessage, sendMessage, sendMessageReaction} from "@/views/home/message";
-import download from "@/utils/download";
 
 export default {
   name: 'Home',
@@ -85,8 +85,10 @@ export default {
   },
   setup() {
 
+    const roomHeader = ref(null)
     const rightDrawer = ref(null)
     const leftDrawer = ref(null)
+    const downloadAction = ref(false)
 
     let isElectron = ref(process.env.IS_ELECTRON);
 
@@ -119,10 +121,10 @@ export default {
     }
     provide('openLeftDrawer', openLeftDrawer)
 
-    const openFile = ({message, file}) => {
-      console.log(message, file)
+    const openFile = ({file}) => {
       if (file.action !== 'download') return
-      download.download(file.file)
+      roomHeader.value.selectDownloadPath(file.file)
+      // download.download(file.file)
     }
 
     const styles = ref({
@@ -149,12 +151,15 @@ export default {
       loadingRooms,
       roomsLoaded,
 
+
       styles,
       curRoom,
+      roomHeader,
       leftDrawer,
       isElectron,
       pageHeight,
       rightDrawer,
+      downloadAction,
 
       upRoom,
       roomInfo,

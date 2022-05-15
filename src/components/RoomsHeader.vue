@@ -1,86 +1,113 @@
 <template>
-    <div class="room-header-container">
-      <v-menu
-          bottom
-          min-width="260px"
-          :rounded="'lg'"
-          offset-y
-          transition="scale-transition"
-          origin="left top"
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn
-              v-on="on"
-              icon
-              x-large
-          >
-            <v-avatar color="#b7c1ca">
-              <img
-                  :src="curUser.avatar"
-                  :alt="curUser.username"
-              >
-            </v-avatar>
-          </v-btn>
-        </template>
-        <v-card flat
-                class="mt-2">
-          <v-list>
-            <v-list-item class="im-list-item" @click="openLeftDrawer('SETTING')">
-              <v-list-item-icon>
-                <v-icon>{{ icons.mdiCog }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                设置
-              </v-list-item-content>
-            </v-list-item>
+  <div class="room-header-container">
+    <v-menu
+        bottom
+        min-width="260px"
+        :rounded="'lg'"
+        offset-y
+        transition="scale-transition"
+        origin="left top"
+    >
+      <template v-slot:activator="{ on }">
+        <v-btn
+            v-on="on"
+            icon
+            x-large
+        >
+          <v-avatar color="#b7c1ca">
+            <img
+                :src="curUser.avatar"
+                :alt="curUser.username"
+            >
+          </v-avatar>
+        </v-btn>
+      </template>
+      <v-card flat class="mt-2">
+        <v-list>
+          <v-list-item class="im-list-item" @click="openLeftDrawer('SETTING')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiCog }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              设置
+            </v-list-item-content>
+          </v-list-item>
 
-            <v-list-item class="im-list-item" @click="quit">
-              <v-list-item-icon>
-                <v-icon>{{ icons.mdiExitToApp }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                退出
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-card>
+          <v-list-item class="im-list-item" @click="openLeftDrawer('SETTING')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiCloudDownloadOutline }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              上传/下载
+            </v-list-item-content>
+          </v-list-item>
 
-      </v-menu>
+          <v-list-item class="im-list-item" @click="quit">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiExitToApp }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              退出
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-card>
 
-      <h3 class="ml-3">
-        {{ curUser.username }}
-      </h3>
-      <v-spacer></v-spacer>
-    </div>
+    </v-menu>
+    <im-download-path ref="downloadPath"></im-download-path>
+    <h3 class="ml-3">
+      {{ curUser.username }}
+    </h3>
+    <v-spacer></v-spacer>
+  </div>
 </template>
 
 <script>
-import {mdiAccountOutline, mdiChevronDown, mdiCog, mdiExitToApp, mdiPencilOutline} from "@mdi/js";
+import {
+  mdiAccountOutline,
+  mdiChevronDown,
+  mdiCloudDownloadOutline,
+  mdiCog,
+  mdiExitToApp,
+  mdiPencilOutline
+} from "@mdi/js";
 import {quitSystem} from "@/net/send-message";
-import {inject} from "@vue/composition-api";
+import {inject, ref} from "@vue/composition-api";
+import ImDownloadPath from "@/components/system/ImDownloadPath";
 
 export default {
   name: "RoomsHeader",
   props: {
     curUser: Object,
   },
-  components: {},
+  components: {
+    ImDownloadPath
+  },
   setup() {
-    const openLeftDrawer = inject('openLeftDrawer', () => {})
+    const downloadPath = ref(null)
+    const openLeftDrawer = inject('openLeftDrawer', () => {
+    })
 
     const quit = () => {
       quitSystem()
     }
 
+    const selectDownloadPath = (file) => {
+      downloadPath.value.action(file)
+    }
+
     return {
 
+      downloadPath,
       openLeftDrawer,
       quit,
+      selectDownloadPath,
       icons: {
         mdiPencilOutline,
         mdiAccountOutline,
         mdiChevronDown,
         mdiCog,
+        mdiCloudDownloadOutline,
         mdiExitToApp
       }
     }

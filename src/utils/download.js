@@ -28,6 +28,7 @@ export const downloadForUrl = async (url, name) => {
 
 const download = (file) => {
     if (process.env.IS_ELECTRON) {
+        console.log('electron')
         window.require('electron').ipcRenderer.send('download-file', file)
         return
     }
