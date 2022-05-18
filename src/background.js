@@ -212,6 +212,25 @@ const willDownload = () => {
     })
 }
 
+ipcMain.handle('open-file-dialog', (event, oldPath) => openFileDialog(oldPath))
+ipcMain.handle('downloads-path', () => app.getPath('downloads'))
+
+/**
+ * 打开文件选择框
+ * @param oldPath - 上一次打开的路径
+ */
+const openFileDialog = async (oldPath= app.getPath('downloads')) => {
+    if (!win) return oldPath
+
+    const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+        title: '选择保存位置',
+        properties: ['openDirectory', 'createDirectory'],
+        defaultPath: oldPath,
+    })
+
+    return !canceled ? filePaths[0] : oldPath
+}
+
 // 系统更新========================================
 
 // 开启开发者模式更新

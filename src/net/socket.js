@@ -156,7 +156,7 @@ const initWebSocket = () => {
                 console.error(e)
             }
         }
-        localStoreUtil.clear()
+        // localStoreUtil.clear()
         router.push('/login')
     }
     if (socket == null && token) {
