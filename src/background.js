@@ -184,15 +184,15 @@ const hideWindow = () => {
 }
 
 // 文件下载========================================
-let fileName = ''
+let downloadPath = ''
 ipcMain.on('download-file', (event, file) => {
-    fileName = file.name
+    downloadPath = file.downloadPath + "\\" + file.name
     win.webContents.downloadURL(file.url)
 })
 
 const willDownload = () => {
     win.webContents.session.on('will-download', (event, item) => {
-        item.setSavePath(homedir() + '\\Downloads\\' + fileName)
+        item.setSavePath(downloadPath)
         console.log(item.getSavePath());
         item.on('updated', (event, updatedState) => {
             if (updatedState === 'interrupted') {

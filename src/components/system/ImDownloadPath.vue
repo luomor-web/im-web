@@ -32,7 +32,7 @@
         <v-btn
             color="green darken-1"
             text
-            @click="downloadAction = false"
+            @click="resetDownload"
         >
           取消
         </v-btn>
@@ -72,11 +72,32 @@ export default {
 
     const action = (downloadFile) => {
       file.value = downloadFile
+      if (checkbox.value) {
+        sendDownload()
+        return
+      }
+
       downloadAction.value = true
     }
 
+    const resetDownload = () => {
+      downloadAction.value = false
+      // downloadPath.value = localStoreUtil.getValue('download-path');
+      checkbox.value = false
+    }
+
+    const sendDownload = () => {
+      window.require('electron').ipcRenderer.send("download-file", {
+        name: file.value.name,
+        url: file.value.url,
+        downloadPath: downloadPath.value
+      })
+    }
+
     const sureDownload = () => {
-      localStoreUtil.setValue('default-download',checkbox.value   )
+      localStoreUtil.setValue('default-download', checkbox.value)
+      sendDownload()
+      downloadAction.value = false
     }
 
     onMounted(() => {
@@ -88,15 +109,18 @@ export default {
         })
       }
       downloadPath.value = value
+
+      checkbox.value = !!localStoreUtil.getValue('default-download');
     })
 
     return {
       file,
       checkbox,
-      downloadAction,
       downloadPath,
+      downloadAction,
       action,
       selectFolder,
+      resetDownload,
       sureDownload
     }
 

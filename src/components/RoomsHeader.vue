@@ -33,7 +33,7 @@
             </v-list-item-content>
           </v-list-item>
 
-          <v-list-item class="im-list-item" @click="openLeftDrawer('SETTING')">
+          <v-list-item class="im-list-item" @click="openLeftDrawer('DOWNLOAD_HISTORY')">
             <v-list-item-icon>
               <v-icon>{{ icons.mdiCloudDownloadOutline }}</v-icon>
             </v-list-item-icon>

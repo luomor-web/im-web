@@ -26,6 +26,16 @@
           </v-list-item>
         </v-list>
         <im-driver></im-driver>
+        <v-list nav>
+          <v-list-item v-ripple class="im-list-item" @click="open('DOWNLOAD_SETTING')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiDownloadOutline }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>下载设置</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
       </div>
     </div>
   </div>
@@ -33,7 +43,7 @@
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {mdiBellOutline, mdiPencilOutline} from "@mdi/js";
+import {mdiBellOutline, mdiDownloadOutline, mdiPencilOutline} from "@mdi/js";
 import ImDriver from "@/components/system/ImDriver";
 import {inject} from "@vue/composition-api";
 
@@ -60,7 +70,8 @@ export default {
 
       icons: {
         mdiPencilOutline,
-        mdiBellOutline
+        mdiBellOutline,
+        mdiDownloadOutline,
       }
     }
   }
