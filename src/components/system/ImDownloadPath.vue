@@ -40,7 +40,7 @@
         <v-btn
             color="green darken-1"
             text
-            @click="downloadAction = false"
+            @click="sureDownload"
         >
           确定
         </v-btn>
@@ -62,12 +62,8 @@ export default {
     const checkbox = ref(false)
     const downloadPath = ref('')
 
-    const closeDownloadAction = () => {
-
-    }
-
     const selectFolder = () => {
-      window.require('electron').ipcRenderer.invoke('open-file-dialog',downloadPath.value).then((result) => {
+      window.require('electron').ipcRenderer.invoke('open-file-dialog', downloadPath.value).then((result) => {
         downloadPath.value = result
         localStoreUtil.setValue('download-path', result);
       })
@@ -77,6 +73,10 @@ export default {
     const action = (downloadFile) => {
       file.value = downloadFile
       downloadAction.value = true
+    }
+
+    const sureDownload = () => {
+      localStoreUtil.setValue('default-download',checkbox.value   )
     }
 
     onMounted(() => {
@@ -97,7 +97,7 @@ export default {
       downloadPath,
       action,
       selectFolder,
-      closeDownloadAction
+      sureDownload
     }
 
   }
