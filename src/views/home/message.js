@@ -32,7 +32,6 @@ export const fetchMessage = ({room}) => {
 }
 
 export const sendMessage = async ({content, roomId, files, replyMessage}) => {
-    console.log(files)
     // 如果发送了文件, 那么给每一个文件生成一个ID
     files?.forEach(x => {
         x.id = uuid()

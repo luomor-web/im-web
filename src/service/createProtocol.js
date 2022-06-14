@@ -33,6 +33,8 @@ export default (scheme, serverPath = __dirname) => {
                     mimeType = 'application/wasm'
                 } else if (extension === ".ico") {
                     mimeType = "image/x-icon";
+                } else if (extension === ".wav") {
+                    mimeType = "audio/mpeg";
                 }
                 respond({ mimeType, data })
             })

@@ -13,9 +13,10 @@ const webSocket = (token) => {
     // const host = location.host
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?token=' + token,
-        pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
+        pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 6000,pongTimeout:6000
     })
     socket.onopen = () => {
+        msg.$emit("SOCKET_CONNECTING")
         // websocketHeartbeatJs.send('{"code":REDAY}')
     }
     socket.onmessage = (event) => {
@@ -118,12 +119,9 @@ const webSocket = (token) => {
         }
     }
     socket.onclose = () => {
-        localStoreUtil.removeKey('userId')
-        localStoreUtil.removeKey('token')
-        router.push('/Login')
     }
     socket.onreconnect = () => {
-        msg.$emit("RECONNECTING")
+        msg.$emit("SOCKET_RECONNECTING")
     }
 
     socket.onerror = () => {
@@ -131,8 +129,11 @@ const webSocket = (token) => {
 }
 
 const close = () => {
+    localStoreUtil.removeKey('userId')
+    localStoreUtil.removeKey('token')
     socket.heartReset()
     socket.close()
+    router.push('/Login')
 }
 
 const sendMsg = (data) => {
@@ -166,7 +167,7 @@ const initWebSocket = () => {
 
 const startWebSocket = (token) => {
     if (socket) {
-        close()
+        socket.close()
     }
     webSocket(token)
 }

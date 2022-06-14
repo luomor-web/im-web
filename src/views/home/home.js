@@ -65,9 +65,23 @@ export const upRoom = (roomId) => {
 }
 
 export const ding = () => {
-    const element = document.getElementById('audio');
-    element.currentTime = 0
-    element.play()
+    let audio = document.querySelector("#audio1");
+    if (!audio) {
+        audio = document.createElement("audio");
+        audio.id = "audio1";
+        let source = document.createElement("source");
+        source.src = require('@/assets/music/tip.mp3')
+        source.className='d-none'
+        source.type = "audio/mpeg";
+        audio.append(source);
+        document.body.append(audio);
+    }
+    const aid = document.querySelector("#audio1");
+    aid.load();
+    let timer = setTimeout(() => {
+        clearTimeout(timer);
+        aid.play();
+    }, 200);
 }
 
 export const sortedUser = (users) => {

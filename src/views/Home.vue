@@ -2,7 +2,6 @@
   <div>
     <top-bar v-if="isElectron"></top-bar>
     <div>
-      <audio class="d-none" id="audio" controls="controls" :src="require('@/assets/music/tip.wav')"></audio>
       <chat-window
           :height="pageHeight"
           :styles="styles"
