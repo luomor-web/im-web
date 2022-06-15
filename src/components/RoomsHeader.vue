@@ -65,6 +65,8 @@
           border="left"
           type="warning"
           class="mb-0"
+          dense
+          :icon="icons.mdiAlertOutline"
       >
         网络断线,正在重连...
       </v-alert>
@@ -75,10 +77,11 @@
 <script>
 import {
   mdiAccountOutline,
+  mdiAlertOutline,
   mdiChevronDown,
   mdiCloudDownloadOutline,
   mdiCog,
-  mdiExitToApp, mdiLoading,
+  mdiExitToApp,
   mdiPencilOutline
 } from "@mdi/js";
 import {getUserInfo, quitSystem} from "@/net/send-message";
@@ -98,7 +101,7 @@ export default {
   setup() {
     const downloadPath = ref(null)
     const openLeftDrawer = inject('openLeftDrawer', () => {})
-    const reconnect = ref(false)
+    const reconnect = ref(true)
 
     const quit = () => {
       quitSystem()
@@ -134,7 +137,7 @@ export default {
         mdiCog,
         mdiCloudDownloadOutline,
         mdiExitToApp,
-        mdiLoading
+        mdiAlertOutline
       }
     }
   }
