@@ -2,17 +2,43 @@
   <div class="fill-height">
     <drawer-top :title="'下载设置'" :sub="true" @close="open('SETTING_ITEM')"></drawer-top>
 
-    <div class="mx-2 mb-2 mt-8">
-      <v-text-field
-          outlined
-          hide-details="auto"
-          label="文件路径"
-          required
-          :value="downloadPath"
-          append-outer-icon="mdi-folder-outline"
-          @click:append-outer="selectFolder"
-      ></v-text-field>
-    </div>
+    <v-list nav>
+      <v-subheader>下载设置</v-subheader>
+      <v-list-item v-ripple class="im-list-item">
+        <v-list-item-icon>
+          <v-icon>{{ icons.mdiHelp }}</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>下载时不询问</v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-switch
+              v-model="autoDownload"
+              @change="autoDownloadChange"
+          ></v-switch>
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
+    <v-list nav>
+      <v-subheader>下载目录</v-subheader>
+      <v-list-item v-ripple class="im-list-item">
+        <v-list-item-content>
+          <v-list-item-title>
+            <v-text-field
+                outlined
+                dense
+                hide-details="auto"
+                label=""
+                required
+                :value="downloadPath"
+            ></v-text-field>
+          </v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-btn icon @click="selectFolder"><v-icon>{{icons.mdiFolderOutline}}</v-icon></v-btn>
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
 
   </div>
 </template>
@@ -21,6 +47,7 @@
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {onMounted, ref} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
+import {mdiCheck, mdiFolderOutline, mdiHelp} from "@mdi/js";
 export default {
   name: "DownloadSetting",
   components: {
@@ -29,12 +56,18 @@ export default {
   setup(props,context){
 
     const downloadPath = ref('')
+    const autoDownload = ref(false)
 
     const open = (item) => {
       context.emit('open', item)
     }
 
+    const autoDownloadChange = (item) => {
+      localStoreUtil.setValue('default-download', item)
+    }
+
     onMounted(() => {
+      autoDownload.value = localStoreUtil.getValue('default-download') !== 'false';
       const value = localStoreUtil.getValue('download-path');
       if (!value) {
         window.require('electron').ipcRenderer.invoke('downloads-path').then(result => {
@@ -55,7 +88,15 @@ export default {
     return {
       open,
       downloadPath,
-      selectFolder
+      selectFolder,
+      autoDownload,
+      autoDownloadChange,
+
+      icons: {
+        mdiCheck,
+        mdiFolderOutline,
+        mdiHelp
+      }
     }
   }
 }

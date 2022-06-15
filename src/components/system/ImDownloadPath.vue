@@ -70,7 +70,10 @@ export default {
 
     }
 
+    // 上级组件直接调用
     const action = (downloadFile) => {
+      checkbox.value = localStoreUtil.getValue('default-download') !== 'false';
+      console.log('action',checkbox.value,localStoreUtil.getValue('default-download'))
       file.value = downloadFile
       if (checkbox.value) {
         sendDownload()
@@ -110,7 +113,7 @@ export default {
       }
       downloadPath.value = value
 
-      checkbox.value = !!localStoreUtil.getValue('default-download');
+      checkbox.value = localStoreUtil.getValue('default-download') !== 'false';
     })
 
     return {

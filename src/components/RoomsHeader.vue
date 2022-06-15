@@ -101,7 +101,7 @@ export default {
   setup() {
     const downloadPath = ref(null)
     const openLeftDrawer = inject('openLeftDrawer', () => {})
-    const reconnect = ref(true)
+    const reconnect = ref(false)
 
     const quit = () => {
       quitSystem()
