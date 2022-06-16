@@ -1,12 +1,16 @@
 <template>
   <div>
-    <drawer-top @close="close" title="下载/上传"></drawer-top>
+    <drawer-top @close="close" title="文件传输"></drawer-top>
+    <v-list>
+
+    </v-list>
   </div>
 </template>
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {inject} from "@vue/composition-api";
+import {inject, onMounted, ref} from "@vue/composition-api";
+
 export default {
   name: "DownloadHistory",
   components: {
@@ -15,7 +19,25 @@ export default {
   setup() {
     const close = inject('close',() => {})
 
+    const tab  = ref('')
+
+    onMounted(()=>{
+      window.require('electron').ipcRenderer.on('download-file-start',(event, args)=>{
+        console.log('download-file-start',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-interrupted',(event, args)=>{
+        console.log('download-file-interrupted',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-paused',(event, args)=>{
+        console.log('download-file-paused',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-done',(event, args)=>{
+        console.log(args)
+      })
+    })
+
     return {
+      tab,
       close
     }
   }

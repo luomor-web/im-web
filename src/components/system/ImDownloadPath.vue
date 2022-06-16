@@ -52,6 +52,7 @@
 <script>
 import {onMounted, ref} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
+import {uuid} from "@/utils/id-util";
 
 export default {
   name: "ImDownloadPath",
@@ -91,6 +92,7 @@ export default {
 
     const sendDownload = () => {
       window.require('electron').ipcRenderer.send("download-file", {
+        id: uuid(),
         name: file.value.name,
         url: file.value.url,
         downloadPath: downloadPath.value

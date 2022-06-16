@@ -71,6 +71,7 @@ import {init, msgDestroy} from "@/views/home/on-message";
 import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 import {fetchMessage, sendMessage, sendMessageReaction} from "@/views/home/message";
+import download from "@/utils/download";
 
 export default {
   name: 'Home',
@@ -122,8 +123,11 @@ export default {
 
     const openFile = ({file}) => {
       if (file.action !== 'download') return
-      roomHeader.value.selectDownloadPath(file.file)
-      // download.download(file.file)
+      if(process.env.IS_ELECTRON){
+        roomHeader.value.selectDownloadPath(file.file)
+        return
+      }
+      download.download(file.file)
     }
 
     const styles = ref({

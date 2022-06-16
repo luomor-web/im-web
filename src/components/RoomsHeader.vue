@@ -15,12 +15,20 @@
               icon
               x-large
           >
-            <v-avatar color="#b7c1ca">
-              <img
-                  :src="curUser.avatar"
-                  :alt="curUser.username"
-              >
-            </v-avatar>
+            <v-badge
+                color="pink"
+                dot
+                bottom
+                offset-x="10"
+                offset-y="10"
+                :value="haveDownloadFile">
+              <v-avatar color="#b7c1ca">
+                <img
+                    :src="curUser.avatar"
+                    :alt="curUser.username"
+                >
+              </v-avatar>
+            </v-badge>
           </v-btn>
         </template>
         <v-card flat class="mt-2">
@@ -36,7 +44,15 @@
 
           <v-list-item class="im-list-item" @click="openLeftDrawer('DOWNLOAD_HISTORY')">
             <v-list-item-icon>
-              <v-icon>{{ icons.mdiCloudDownloadOutline }}</v-icon>
+              <v-badge
+                  color="pink"
+                  dot
+                  bottom
+                  offset-x="5"
+                  offset-y="5"
+                  :value="haveDownloadFile">
+                <v-icon>{{ icons.mdiCloudDownloadOutline }}</v-icon>
+              </v-badge>
             </v-list-item-icon>
             <v-list-item-content>
               上传/下载
@@ -89,6 +105,7 @@ import {inject, onMounted, ref} from "@vue/composition-api";
 import ImDownloadPath from "@/components/system/ImDownloadPath";
 import msg from "@/plugins/msg";
 import {currentUserId} from "@/views/home/home";
+import localStoreUtil  from "@/utils/local-store";
 
 export default {
   name: "RoomsHeader",
@@ -102,6 +119,7 @@ export default {
     const downloadPath = ref(null)
     const openLeftDrawer = inject('openLeftDrawer', () => {})
     const reconnect = ref(false)
+    const haveDownloadFile = ref(false)
 
     const quit = () => {
       quitSystem()
@@ -121,7 +139,42 @@ export default {
         }
         reconnect.value = false
       })
+      handleDownloadFile()
     })
+
+    const handleDownloadFile = () => {
+      window.require('electron').ipcRenderer.on('download-file-start',(event, args)=>{
+        const downloadFileList = localStoreUtil.getJsonValue('download-file-list') || []
+
+        downloadFileList.unshift({...args,state:'start'})
+        localStoreUtil.setJsonValue('download-file-list', downloadFileList)
+        haveDownloadFile.value = true
+        console.log('download-file-start',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-interrupted',(event, args)=>{
+        console.log('download-file-interrupted',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-paused',(event, args)=>{
+        console.log('download-file-paused',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-ing',(event, args)=>{
+        console.log('download-file-ing',args)
+      })
+      window.require('electron').ipcRenderer.on('download-file-done',(event, args)=>{
+        console.log('download-file-done',args)
+        // 获取缓存的所有下载文件
+        const downloadFileList = localStoreUtil.getJsonValue('download-file-list')
+        // 查找ID并设置值
+        const index = downloadFileList.findIndex(x => x.id === args.id);
+        downloadFileList[index].state = 'done'
+        localStoreUtil.setJsonValue('download-file-list', downloadFileList)
+        // 检查是否所有的文件全部下载完成，设置没有角标
+        const notDoneIndex = downloadFileList.findIndex(x => x.state !== 'done');
+        if(notDoneIndex === -1){
+          haveDownloadFile.value = false
+        }
+      })
+    }
 
     return {
 
@@ -130,6 +183,7 @@ export default {
       quit,
       reconnect,
       selectDownloadPath,
+      haveDownloadFile,
       icons: {
         mdiPencilOutline,
         mdiAccountOutline,

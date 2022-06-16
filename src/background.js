@@ -4,7 +4,6 @@ import {app, BrowserWindow, dialog, ipcMain, Menu, protocol, Tray} from 'electro
 import createProtocol from './service/createProtocol'
 import {autoUpdater} from 'electron-updater'
 import update from "@/utils/update";
-import {homedir} from 'os'
 
 const log = require("electron-log")
 
@@ -184,30 +183,40 @@ const hideWindow = () => {
 }
 
 // 文件下载========================================
-let downloadPath = ''
+let downloadFile
 ipcMain.on('download-file', (event, file) => {
-    downloadPath = file.downloadPath + "\\" + file.name
+    console.log('file',file)
+    downloadFile = {
+        ...file,
+        downloadPath : file.downloadPath + "\\" + file.name
+    }
     win.webContents.downloadURL(file.url)
 })
 
 const willDownload = () => {
     win.webContents.session.on('will-download', (event, item) => {
-        item.setSavePath(downloadPath)
-        console.log(item.getSavePath());
+        item.setSavePath(downloadFile.downloadPath)
+        // 发送下载记录给界面
+        item.file = downloadFile
+        win.webContents.send('download-file-start', item.file)
         item.on('updated', (event, updatedState) => {
             if (updatedState === 'interrupted') {
-                console.log('下载中断。可以恢复', item.canResume())
+                win.webContents.send('download-file-interrupted', item.file)
+                console.log('下载中断。可以恢复', item.canResume(),item.file)
             } else if (updatedState === 'progressing') {
                 if (item.isPaused()) {
-                    log.info("下载暂停");
+                    log.info("下载暂停",item.file);
+                    win.webContents.send('download-file-paused', item.file)
                 } else {
-                    log.info("下载中");
+                    log.info("下载中",item.file);
+                    win.webContents.send('download-file-ing', item.file)
                     // console.log(`Received bytes: ${item.getReceivedBytes()}`)
                 }
             }
         })
         item.once('done', (event, state) => {
-            console.log('下载完成', event, state)
+            console.log('下载完成',  state)
+            win.webContents.send('download-file-done', item.file)
         })
     })
 }
