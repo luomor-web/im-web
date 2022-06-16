@@ -28,7 +28,7 @@ const addFiles = async (f, cb) => {
             // 总数量大小
             fileSizeByte: file.size,
             // 总大小
-            fileSize: formatSize(file.size),
+            fileSize: getFileSize(file.size),
             // 原始文件
             file: file,
             // url
@@ -105,8 +105,8 @@ const countSpeed = (data) => {
     const useTime = new Date().getTime() - data.uploadTime
     const speed = uploaded / (useTime / 1000)
     data.percentage = uploaded <= 0 ? 0 : Math.round((uploaded / data.fileSizeByte) * 10000) / 100.0
-    data.uploaded = formatSize(uploaded)
-    data.speed = formatSize(speed)
+    data.uploaded = getFileSize(uploaded)
+    data.speed = getFileSize(speed)
     // console.log('总大小:', data.fileSize, ' 上传速度:', data.speed, ' 上传百分比:', data.percentage, ' 已上传:', data.uploaded)
 }
 
@@ -136,16 +136,24 @@ const createFileChunk = async (file, cb) => {
     return list;
 }
 
-const formatSize = (size) => {
-    if (size < 1024) {
-        return size.toFixed(0) + ' bytes'
-    } else if (size < 1024 * 1024) {
-        return (size / 1024.0).toFixed(0) + ' KB'
-    } else if (size < 1024 * 1024 * 1024) {
-        return (size / 1024.0 / 1024.0).toFixed(1) + ' MB'
-    } else {
-        return (size / 1024.0 / 1024.0 / 1024.0).toFixed(1) + ' GB'
+/**
+ * 处理文件大小
+ * @param bytes - 字节
+ * @param isUnit - 是否需要单位，默认 `true`
+ */
+export const getFileSize = (bytes, isUnit) => {
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+    isUnit = isUnit ?? true
+
+    if (bytes === 0) {
+        return isUnit ? '0B' : '0'
     }
+
+    const i = Math.floor(Math.log(bytes) / Math.log(1024))
+    if (i === 0) {
+        return bytes + (isUnit ? sizes[i] : '')
+    }
+    return (bytes / 1024 ** i).toFixed(2) + (isUnit ? sizes[i] : '')
 }
 
 export {

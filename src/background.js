@@ -1,9 +1,11 @@
 'use strict'
 
-import {app, BrowserWindow, dialog, ipcMain, Menu, protocol, Tray} from 'electron'
+import {app, BrowserWindow, dialog, ipcMain, Menu, protocol, shell, Tray} from 'electron'
 import createProtocol from './service/createProtocol'
 import {autoUpdater} from 'electron-updater'
 import update from "@/utils/update";
+import {separator} from "@/utils/electron-util";
+import {existsSync} from "fs";
 
 const log = require("electron-log")
 
@@ -184,42 +186,77 @@ const hideWindow = () => {
 
 // 文件下载========================================
 let downloadFile
-ipcMain.on('download-file', (event, file) => {
-    console.log('file',file)
+ipcMain.on('download-file', (event, file, again) => {
     downloadFile = {
         ...file,
-        downloadPath : file.downloadPath + "\\" + file.name
+        downloadPath: again ? file.downloadPath : file.downloadPath + separator(file.downloadPath) + file.name
     }
     win.webContents.downloadURL(file.url)
 })
+
+let downloadItemList = new Map()
 
 const willDownload = () => {
     win.webContents.session.on('will-download', (event, item) => {
         item.setSavePath(downloadFile.downloadPath)
         // 发送下载记录给界面
         item.file = downloadFile
-        win.webContents.send('download-file-start', item.file)
+        win.webContents.send('download-file-start', {
+            ...item.file,
+            receivedBytes: item.getReceivedBytes(),
+            totalBytes: item.getTotalBytes()
+        })
+        // 设置当前下载的列表,用来停止下载
+        downloadItemList.set(downloadFile.id, item)
         item.on('updated', (event, updatedState) => {
+
             if (updatedState === 'interrupted') {
-                win.webContents.send('download-file-interrupted', item.file)
-                console.log('下载中断。可以恢复', item.canResume(),item.file)
+                // 中断的话直接删除
+                downloadItemList.delete(downloadFile.id)
+                win.webContents.send('download-file-interrupted', {
+                    ...item.file,
+                    receivedBytes: item.getReceivedBytes(),
+                    totalBytes: item.getTotalBytes()
+                })
             } else if (updatedState === 'progressing') {
                 if (item.isPaused()) {
-                    log.info("下载暂停",item.file);
-                    win.webContents.send('download-file-paused', item.file)
+                    win.webContents.send('download-file-paused', {
+                        ...item.file,
+                        receivedBytes: item.getReceivedBytes(),
+                        totalBytes: item.getTotalBytes()
+                    })
                 } else {
-                    log.info("下载中",item.file);
-                    win.webContents.send('download-file-ing', item.file)
+                    win.webContents.send('download-file-ing', {
+                        ...item.file,
+                        receivedBytes: item.getReceivedBytes(),
+                        totalBytes: item.getTotalBytes()
+                    })
                     // console.log(`Received bytes: ${item.getReceivedBytes()}`)
                 }
             }
         })
         item.once('done', (event, state) => {
-            console.log('下载完成',  state)
-            win.webContents.send('download-file-done', item.file)
+            // 结束的话直接删除
+            downloadItemList.delete(downloadFile.id)
+            if (state === 'completed') {
+                win.webContents.send('download-file-done', {
+                    ...item.file,
+                    receivedBytes: item.getReceivedBytes(),
+                    totalBytes: item.getTotalBytes()
+                })
+            }
         })
     })
 }
+
+ipcMain.handle('download-file-stop', (event, file) => {
+    const downloadItem = downloadItemList.get(file.id);
+    if (downloadItem) {
+        downloadItem.cancel()
+        return true
+    }
+    return false
+})
 
 ipcMain.handle('open-file-dialog', (event, oldPath) => openFileDialog(oldPath))
 ipcMain.handle('downloads-path', () => app.getPath('downloads'))
@@ -228,10 +265,10 @@ ipcMain.handle('downloads-path', () => app.getPath('downloads'))
  * 打开文件选择框
  * @param oldPath - 上一次打开的路径
  */
-const openFileDialog = async (oldPath= app.getPath('downloads')) => {
+const openFileDialog = async (oldPath = app.getPath('downloads')) => {
     if (!win) return oldPath
 
-    const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    const {canceled, filePaths} = await dialog.showOpenDialog(win, {
         title: '选择保存位置',
         properties: ['openDirectory', 'createDirectory'],
         defaultPath: oldPath,
@@ -239,6 +276,18 @@ const openFileDialog = async (oldPath= app.getPath('downloads')) => {
 
     return !canceled ? filePaths[0] : oldPath
 }
+
+ipcMain.handle('open-file-folder', (event, item) => {
+    if (!existsSync(item.downloadPath)) return false
+    shell.showItemInFolder(item.downloadPath)
+    return true
+})
+
+ipcMain.handle('open-file-shell', async (event, item) => {
+    if (!existsSync(item.downloadPath)) return false
+    await shell.openPath(item.downloadPath)
+    return true
+})
 
 // 系统更新========================================
 
