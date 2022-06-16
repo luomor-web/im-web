@@ -86,8 +86,9 @@
       >
         网络断线,正在重连...
       </v-alert>
-      <im-warn-dialog :action="warnAction"></im-warn-dialog>
+
     </div>
+    <im-warn-dialog :action="warnAction"></im-warn-dialog>
   </div>
 </template>
 
@@ -132,6 +133,7 @@ export default {
         warnAction.value.model = false
       },
       sure: () => {
+        clearDownloadFileList();
         quitSystem()
       }
     })
@@ -160,6 +162,7 @@ export default {
         }
         reconnect.value = false
       })
+      clearDownloadFileList()
       handleDownloadFile()
     })
 
@@ -200,6 +203,20 @@ export default {
       downloadFileList[index].totalBytes = args.totalBytes
       localStoreUtil.setJsonValue('download-file-list', downloadFileList)
       return downloadFileList
+    }
+
+    const clearDownloadFileList = () => {
+
+      const downloadFileList = localStoreUtil.getJsonValue('download-file-list')
+      const downloadFileListTemp = []
+
+      downloadFileList.forEach(x => {
+        if(x.state === 'done' || x.state === 'not-found'){
+          downloadFileListTemp.push(x)
+        }
+      })
+        console.log('z')
+      localStoreUtil.setJsonValue('download-file-list',downloadFileListTemp)
     }
 
     return {

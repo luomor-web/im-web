@@ -3,11 +3,11 @@
     <drawer-top @close="close" title="文件传输"></drawer-top>
     <v-list dense class="overflow-y-auto" style="height: calc(100% - 60px)">
       <v-list-item v-ripple v-for="(item,index) of downloadFileList" :key="index" class="im-list-item"
-                   @click="openFile(item)">
-        <v-list-item-avatar tile>
+                   >
+        <v-list-item-avatar tile @click="openFile(item)">
           <v-icon>{{ getIcon(item) }}</v-icon>
         </v-list-item-avatar>
-        <v-list-item-content>
+        <v-list-item-content @click="openFile(item)">
           <v-list-item-title>{{ item.name }}</v-list-item-title>
           <v-list-item-subtitle>
             <span v-if="item.state === 'ing'">{{ getFileSize(item.receivedBytes) }} / </span>
@@ -140,6 +140,7 @@ export default {
     }
 
     const openFile = (item) => {
+      console.log('openFile')
       window.require('electron').ipcRenderer.invoke('open-file-shell', item).then(result => {
         console.log(result)
         if (!result) {
@@ -150,6 +151,7 @@ export default {
     }
 
     const openFileLocation = (item) => {
+      console.log('openFileLocation')
       window.require('electron').ipcRenderer.invoke('open-file-folder', item).then(result => {
         console.log(result)
         if (!result) {

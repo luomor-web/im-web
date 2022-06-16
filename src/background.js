@@ -209,7 +209,6 @@ const willDownload = () => {
         // 设置当前下载的列表,用来停止下载
         downloadItemList.set(downloadFile.id, item)
         item.on('updated', (event, updatedState) => {
-
             if (updatedState === 'interrupted') {
                 // 中断的话直接删除
                 downloadItemList.delete(downloadFile.id)
