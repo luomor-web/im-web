@@ -27,7 +27,7 @@
         </v-list>
         <im-driver></im-driver>
         <v-list nav>
-          <v-list-item v-ripple class="im-list-item" @click="open('DOWNLOAD_SETTING')">
+          <v-list-item  v-if="isElectron" v-ripple class="im-list-item" @click="open('DOWNLOAD_SETTING')" >
             <v-list-item-icon>
               <v-icon>{{ icons.mdiDownloadOutline }}</v-icon>
             </v-list-item-icon>
@@ -45,7 +45,7 @@
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {mdiBellOutline, mdiDownloadOutline, mdiPencilOutline} from "@mdi/js";
 import ImDriver from "@/components/system/ImDriver";
-import {inject} from "@vue/composition-api";
+import {inject, ref} from "@vue/composition-api";
 
 export default {
   name: "SettingItem",
@@ -60,6 +60,8 @@ export default {
 
     const close = inject('close',() => {})
 
+    const isElectron = ref(process.env.IS_ELECTRON)
+
     const open = (item) => {
       emit('open', item)
     }
@@ -67,6 +69,7 @@ export default {
     return {
       open,
       close,
+      isElectron,
 
       icons: {
         mdiPencilOutline,

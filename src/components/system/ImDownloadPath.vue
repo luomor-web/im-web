@@ -68,13 +68,12 @@ export default {
         downloadPath.value = result
         localStoreUtil.setValue('download-path', result);
       })
-
     }
 
     // 上级组件直接调用
     const action = (downloadFile) => {
       checkbox.value = localStoreUtil.getValue('default-download') !== 'false';
-      console.log('action',checkbox.value,localStoreUtil.getValue('default-download'))
+      console.log('action', checkbox.value, localStoreUtil.getValue('default-download'))
       file.value = downloadFile
       if (checkbox.value) {
         sendDownload()
@@ -106,6 +105,9 @@ export default {
     }
 
     onMounted(() => {
+      if (!process.env.IS_ELECTRON) {
+        return
+      }
       const value = localStoreUtil.getValue('download-path');
       if (!value) {
         window.require('electron').ipcRenderer.invoke('downloads-path').then(result => {

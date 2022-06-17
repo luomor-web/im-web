@@ -42,7 +42,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item class="im-list-item" @click="openLeftDrawer('DOWNLOAD_HISTORY')">
+            <v-list-item class="im-list-item" @click="openLeftDrawer('DOWNLOAD_HISTORY')" v-if="isElectron">
               <v-list-item-icon>
                 <v-badge
                     color="pink"
@@ -125,6 +125,8 @@ export default {
     })
     const reconnect = ref(false)
     const haveDownloadFile = ref(false)
+    const isElectron = ref(process.env.IS_ELECTRON)
+
     const warnAction = ref({
       model: false,
       title: '文件传输',
@@ -162,8 +164,10 @@ export default {
         }
         reconnect.value = false
       })
-      clearDownloadFileList()
-      handleDownloadFile()
+      if(process.env.IS_ELECTRON){
+        clearDownloadFileList()
+        handleDownloadFile()
+      }
     })
 
     const handleDownloadFile = () => {
@@ -171,7 +175,7 @@ export default {
         const downloadFileList = localStoreUtil.getJsonValue('download-file-list') || []
 
         downloadFileList.unshift({...args, state: 'start', receivedBytes: 0, totalBytes: 0})
-        localStoreUtil.setJsonValue('download-file-list', downloadFileList)
+        localStoreUtil.setJsonValue('download-file-list', downloadFileList.slice(0,60))
         haveDownloadFile.value = true
       })
       window.require('electron').ipcRenderer.on('download-file-interrupted', (event, args) => {
@@ -226,6 +230,7 @@ export default {
       quit,
       reconnect,
       warnAction,
+      isElectron,
       selectDownloadPath,
       haveDownloadFile,
       icons: {
