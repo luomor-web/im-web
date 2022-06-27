@@ -1,14 +1,4 @@
-import {
-    changeRoom,
-    currentUserId,
-    curUser,
-    messages, number,
-    page,
-    roomId,
-    sendPage,
-    upRoom,
-    waitSendMessage
-} from "@/views/home/home";
+import {changeRoom, currentUserId, curUser, messages, roomId, upRoom, waitSendMessage} from "@/views/home/home";
 import {getHistoryMessage, messageReaction, sendChatMessage} from "@/net/send-message";
 import {addFiles} from "@/utils/file";
 import {uuid} from "@/utils/id-util";
@@ -19,16 +9,22 @@ export const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
 }
 
 // 查找更多消息
-export const fetchMessage = ({room}) => {
-    if (room.roomId !== roomId.value) {
+export const fetchMessage = ({room, options = {}}) => {
+    if (options.reset) {
+        console.log(options.reset)
         changeRoom(room.roomId)
         return
     }
-    if (page.value === sendPage.value) {
-        return
+    // 向下刷
+    if (options.type === 'down') {
+        getHistoryMessage({roomId: roomId.value, type: options.type, messageId: messages.value[messages.value.length - 1]?._id})
+    } else {
+        getHistoryMessage({roomId: roomId.value, type: options.type, messageId: messages.value[0]?._id})
     }
-    sendPage.value = page.value
-    getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
+    // if (page.value === sendPage.value) return
+
+    // sendPage.value = page.value
+    // getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
 }
 
 export const sendMessage = async ({content, roomId, files, replyMessage}) => {

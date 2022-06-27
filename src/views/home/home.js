@@ -16,11 +16,8 @@ export const roomsLoaded = ref(true)
 export const messages = ref([])
 // 消息是否加载完成
 export const messageLoaded = ref(false)
-// 当前消息页数
-export const page = ref(0)
-export const sendPage = ref(-1)
-// 当前消息分页数
-export const number = ref(20)
+// 是否开启消息搜索模式
+export const searchMessage = ref(false)
 // 当前房间ID
 export const roomId = ref('')
 // 等待发送的消息
@@ -32,6 +29,7 @@ export const setCurUser = user => {
     curUser.value = {...user}
 }
 
+// 重新定位房间
 export const changeRoom = item => {
     messages.value = messages.value.splice(0, messages.value.length)
     messages.value = []
@@ -42,8 +40,7 @@ export const changeRoom = item => {
     })
 
     messageLoaded.value = false
-    page.value = 0
-    sendPage.value = 0
+    searchMessage.value = false
     roomId.value = item
     const roomIndex = loadedRooms.value.findIndex(r => item === r.roomId)
     loadedRooms.value[roomIndex].users = sortedUser(loadedRooms.value[roomIndex].users)
@@ -51,10 +48,11 @@ export const changeRoom = item => {
     loadedRooms.value[roomIndex].unreadCount = 0;
     loadedRooms.value = [...loadedRooms.value]
 
-    getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
+    getHistoryMessage({roomId: roomId.value})
     clearUnReadMessage(roomId.value)
 }
 
+// 房间升级
 export const upRoom = (roomId) => {
     const roomIndex = loadedRooms.value.findIndex(r => roomId === r.roomId)
     if (roomIndex === -1) {
@@ -64,6 +62,15 @@ export const upRoom = (roomId) => {
     loadedRooms.value = [...loadedRooms.value]
 }
 
+// 开启搜索模式
+export const startHistoryMessage= (item) => {
+    searchMessage.value = true
+    messages.value = []
+    messages.value.push(item)
+    messages.value = [...messages.value]
+}
+
+// 提示音
 export const ding = () => {
     let audio = document.querySelector("#audio1");
     if (!audio) {

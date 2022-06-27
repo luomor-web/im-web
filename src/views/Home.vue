@@ -11,11 +11,12 @@
           :rooms="loadedRooms"
           :loading-rooms="loadingRooms"
           :messages="messages"
-          :messagesLoaded="messageLoaded"
+          :messages-loaded="messageLoaded"
           :rooms-loaded="roomsLoaded"
           :text-messages="textMessages"
           :message-actions="messageActions"
           :room-info-enabled="true"
+          :search-message="searchMessage"
           @room-info="roomInfo"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
@@ -65,6 +66,7 @@ import {
   messages,
   roomId,
   roomsLoaded,
+  searchMessage,
   upRoom
 } from "@/views/home/home";
 import {init, msgDestroy} from "@/views/home/on-message";
@@ -152,6 +154,7 @@ export default {
       loadedRooms,
       messageActions,
       loadingRooms,
+      searchMessage,
       roomsLoaded,
 
 

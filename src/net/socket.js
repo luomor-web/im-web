@@ -74,14 +74,6 @@ const webSocket = (token) => {
             case 33:
                 msg.$emit("COMMAND_REMOVE_GROUP_USER_RESP", data)
                 break;
-            // 获取历史文件响应
-            case 35:
-                msg.$emit("COMMAND_MESSAGE_FILE_HISTORY_RESP", data)
-                break;
-            // 获取历史消息响应
-            case 37:
-                msg.$emit("COMMAND_MESSAGE_HISTORY_RESP", data)
-                break;
             // 解散群聊响应
             case 39:
                 msg.$emit("COMMAND_DISBAND_GROUP_RESP", data)

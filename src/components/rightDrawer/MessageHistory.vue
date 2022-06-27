@@ -1,5 +1,5 @@
 <template>
-  <div class="message-history" >
+  <div class="message-history">
     <drawer-top @close="close">
       <template #default>
         <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search">
@@ -45,9 +45,9 @@
       </template>
     </drawer-top>
 
-    <div class="overflow-y-auto message-history-content" >
+    <div class="overflow-y-auto message-history-content">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messages"
+        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messagesSearched"
                      :key="index" two-line @click="scroll(item)">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>
@@ -78,11 +78,12 @@
 <script>
 import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {onMounted, onUnmounted, ref,inject} from "@vue/composition-api";
+import {inject, onMounted, onUnmounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/send-message";
 import {buildDisplayTime} from "@/utils/date-util";
 import {scrollToView} from "@/utils/dom";
+import {startHistoryMessage} from "@/views/home/home";
 
 export default {
   name: "MessageHistory",
@@ -99,9 +100,10 @@ export default {
     const picker = ref(null)
     const searchName = ref('')
 
-    const messages = ref([])
+    const messagesSearched = ref([])
 
-    const close = inject('close',()=>{})
+    const close = inject('close', () => {
+    })
 
     const open = () => {
 
@@ -109,7 +111,7 @@ export default {
 
     const search = item => {
       if (!item) {
-        messages.value = []
+        messagesSearched.value = []
         return
       }
 
@@ -118,7 +120,10 @@ export default {
 
     const scroll = item => {
       const element = document.getElementById(item._id);
-      if (!element) return
+      if (!element) {
+        startHistoryMessage(item)
+        return
+      }
 
       // element.parentNode.scrollTop = element.offsetTop
       element.parentNode.scrollTop = element.offsetTop - 30;
@@ -140,7 +145,7 @@ export default {
 
     onMounted(() => {
       msg.$on('COMMAND_SEARCH_MESSAGE_RESP', data => {
-        messages.value = [...data.data]
+        messagesSearched.value = [...data.data]
       })
     })
 
@@ -157,7 +162,7 @@ export default {
       modal,
       searchName,
       picker,
-      messages,
+      messagesSearched,
       scroll,
       buildDisplayTime,
       search,

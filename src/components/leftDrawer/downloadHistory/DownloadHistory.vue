@@ -11,11 +11,11 @@
           <v-list-item-title>{{ item.name }}</v-list-item-title>
           <v-list-item-subtitle>
             <v-icon :size="20">{{ item.type === 'upload' ? icons.mdiArrowUp : icons.mdiArrowDown }}</v-icon>
-            <span v-if="item.state === 'ing'">{{ getFileSize(item.receivedBytes) }} / </span>
+            <span v-if="isDownloading(item)">{{ getFileSize(item.receivedBytes) }} / </span>
             {{ getFileSize(item.totalBytes) }}
-            <span v-if="item.state === 'not-found'" style="color: red;float: right">文件不存在</span>
+            <span v-if="isNotFound(item)" style="color: red;float: right">文件不存在</span>
           </v-list-item-subtitle>
-          <v-list-item-subtitle v-if="item.state === 'ing'">
+          <v-list-item-subtitle v-if="isDownloading(item)">
             <v-progress-linear
                 :buffer-value="item.receivedBytes / item.totalBytes * 100"
                 color="cyan"
@@ -168,6 +168,13 @@ export default {
       window.require('electron').ipcRenderer.send("download-file", item, true)
     }
 
+    const isDownloading = (item) => {
+      return item.state === 'ing'
+    }
+    const isNotFound = (item) => {
+      return item.state === 'not-found'
+    }
+
     return {
       close,
       downloadFileList,
@@ -175,6 +182,8 @@ export default {
       openFile,
       getFileSize,
       delHistory,
+      isDownloading,
+      isNotFound,
       stopDownload,
       againDownload,
       openFileLocation,

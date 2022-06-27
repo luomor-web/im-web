@@ -2,14 +2,21 @@ import {nextTick} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {buildLastMessage, buildLastMessageTime, clearUnReadMessage} from "@/net/send-message";
 import {
-    changeRoom, currentUserId,
-    curUser, ding,
+    changeRoom,
+    currentUserId,
+    curUser,
+    ding,
     loadedRooms,
     loadingRooms,
     messageLoaded,
     messages,
-    page, roomId,
-    roomsLoaded, setCurUser, sortedUser, upRoom, waitSelectUser, waitSendMessage
+    roomId,
+    roomsLoaded, searchMessage,
+    setCurUser,
+    sortedUser,
+    upRoom,
+    waitSelectUser,
+    waitSendMessage
 } from "@/views/home/home";
 
 export const init = () => {
@@ -70,19 +77,30 @@ const COMMAND_GET_USER_RESP = (data) => {
 // 获取历史消息响应
 const COMMAND_GET_MESSAGE_RESP = (data) => {
     if (data.data.length === 0) {
-        setTimeout(() => {
+        console.log('消息加载完成')
+        nextTick(() => {
             messageLoaded.value = true
         })
         return
     }
-    page.value += 1
     data.data.forEach(x => {
         const index = messages.value.findIndex(r => r._id === x._id);
-        if (index === -1) {
+        if (index === -1 && data.msg === 'TOP') {
             messages.value.unshift(x)
+        } else if (index === -1 && data.msg === 'DOWN') {
+            messages.value.push(x)
         }
     })
-    console.log(messages.value)
+
+    if (data.data.length < 20) {
+        nextTick(() => {
+            if(data.msg === 'DOWN'){
+                searchMessage.value = false
+            } else {
+                messageLoaded.value = true
+            }
+        })
+    }
 }
 
 // 聊天请求
@@ -326,10 +344,10 @@ const COMMAND_USER_GROUP_CONFIG_RESP = (data) => {
     console.log(config)
 
     const index = loadedRooms.value.findIndex(r => r.roomId === config.roomId);
-    if(index === -1){
-         return
+    if (index === -1) {
+        return
     }
-    switch (config.type){
+    switch (config.type) {
         case 'NOTICE':
             loadedRooms.value[index].notice = config.notice
             break;
@@ -353,8 +371,6 @@ export const msgDestroy = () => {
     msg.$off('COMMAND_SEND_MESSAGE_REACTION_RESP')
     msg.$off('COMMAND_EDIT_PROFILE_REST')
     msg.$off('COMMAND_REMOVE_GROUP_USER_RESP')
-    msg.$off('COMMAND_MESSAGE_FILE_HISTORY_RESP')
-    msg.$off('COMMAND_MESSAGE_HISTORY_RESP')
     msg.$off('COMMAND_DISBAND_GROUP_RESP')
     msg.$off('COMMAND_HANDOVER_GROUP_RESP')
     msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')

@@ -132,27 +132,6 @@ const disbandGroup = ({roomId}) => {
     sendMsg(param)
 }
 
-// 请求历史文件消息
-const messageFileHistory = ({roomId, date}) => {
-    const param = {
-        cmd: 34,
-        roomId,
-        date
-    }
-    sendMsg(param)
-}
-
-// 请求历史消息
-const messageHistory = ({roomId, page, number}) => {
-    const param = {
-        cmd: 36,
-        roomId,
-        page,
-        number
-    }
-    sendMsg(param)
-}
-
 // 修改群组信息
 const editGroupProfile = ({roomId, roomName, avatar}) => {
     const param = {
@@ -209,7 +188,7 @@ const quitSystem = () => {
 const buildLastMessage = (data) => {
     let content = data.deleted ?  '删除了一条消息' : data.content
     if (!data.content && data.files.length > 0) {
-        content += ("[附件] - " + data.files[0].name)
+        content += ("[文件] - " + data.files[0].name)
         content += (data.files.length === 1 ? '' : '等多个文件')
     }
 
@@ -253,8 +232,6 @@ export {
     editProfile,
     joinUserGroup,
     removeUserGroup,
-    messageFileHistory,
-    messageHistory,
     editGroupProfile,
     messageDelete,
     buildLastMessageTime,

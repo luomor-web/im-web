@@ -175,8 +175,13 @@ export default {
       // startWebSocket(username.value, password.value)
       userLogin({account: username.value, password: password.value}).then(response => {
         console.log(response)
-        localStoreUtil.setValue('token', response.data)
-        startWebSocket(response.data)
+        if (response.success) {
+          localStoreUtil.setValue('token', response.data)
+          startWebSocket(response.data)
+        } else {
+          snackbar.value.display = true
+          snackbar.value.text = response.msg
+        }
       })
     }
 
