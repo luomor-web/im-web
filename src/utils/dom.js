@@ -207,5 +207,21 @@ export const isInContainer = (el, container) => {
 };
 
 export const scrollToView = (el) => {
+
+    // element.parentNode.scrollTop = element.offsetTop
+    el.parentNode.scrollTop = el.offsetTop - 30;
+    // element.scroll({top: element.offsetTop, behavior: 'smooth'})
+
+    el.style.transition = "background-color .5s ease-in-out"
+    el.style.backgroundColor = "#dfe1e5"
+    el.style.borderRadius = "8px"
+
     el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+    setTimeout(() => {
+        el.style.transition = "background-color .5s ease-in-out"
+        el.style.borderRadius = "8px"
+        el.style.backgroundColor = ""
+    }, 500)
+
 }

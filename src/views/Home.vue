@@ -23,6 +23,7 @@
           @send-message-reaction="sendMessageReaction"
           @delete-message="deleteMessage"
           @open-file="openFile"
+          @click-scroll-icon="clickScrollIcon"
       >
 
         <template #rooms-header="{}">
@@ -57,7 +58,7 @@ import {messageActions} from "@/locales/message-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
 import {
-  changeRoom,
+  changeRoom, clickScrollIcon,
   currentUserId,
   curUser,
   loadedRooms,
@@ -132,6 +133,8 @@ export default {
       download.download(file.file)
     }
 
+
+
     const styles = ref({
       container: {
         boxShadow: ''
@@ -175,6 +178,7 @@ export default {
       fetchMessage,
       deleteMessage,
       openRightDrawer,
+      clickScrollIcon,
       sendMessageReaction,
 
 

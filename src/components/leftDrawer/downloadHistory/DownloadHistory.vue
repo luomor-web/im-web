@@ -11,7 +11,9 @@
           <v-list-item-title>{{ item.name }}</v-list-item-title>
           <v-list-item-subtitle>
             <v-icon :size="20">{{ item.type === 'upload' ? icons.mdiArrowUp : icons.mdiArrowDown }}</v-icon>
+
             <span v-if="isDownloading(item)">{{ getFileSize(item.receivedBytes) }} / </span>
+
             {{ getFileSize(item.totalBytes) }}
             <span v-if="isNotFound(item)" style="color: red;float: right">文件不存在</span>
           </v-list-item-subtitle>

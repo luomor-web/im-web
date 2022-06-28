@@ -1,6 +1,6 @@
 // 已加载的房间列表
 import {ref} from "@vue/composition-api";
-import {clearUnReadMessage, getHistoryMessage} from "@/net/send-message";
+import {clearUnReadMessage, getHistoryMessage, searchMessagePage} from "@/net/send-message";
 
 // 当前用户ID
 export const currentUserId = ref('')
@@ -66,8 +66,20 @@ export const upRoom = (roomId) => {
 export const startHistoryMessage= (item) => {
     searchMessage.value = true
     messages.value = []
-    messages.value.push(item)
-    messages.value = [...messages.value]
+    searchMessagePage({roomId: roomId.value, messageId: item._id})
+}
+
+// 点击右下角图标,关闭角标
+export const clickScrollIcon = () => {
+    if(searchMessage.value) {
+        searchMessage.value = false
+        messages.value = []
+        messages.value = [...messages.value]
+        messageLoaded.value = false
+        setTimeout(()=>{
+            getHistoryMessage({roomId: roomId.value})
+        },200)
+    }
 }
 
 // 提示音

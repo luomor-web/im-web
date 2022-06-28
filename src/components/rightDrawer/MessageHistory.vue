@@ -124,23 +124,7 @@ export default {
         startHistoryMessage(item)
         return
       }
-
-      // element.parentNode.scrollTop = element.offsetTop
-      element.parentNode.scrollTop = element.offsetTop - 30;
-      // element.scroll({top: element.offsetTop, behavior: 'smooth'})
-
-      element.style.transition = "background-color .5s ease-in-out"
-      element.style.backgroundColor = "#dfe1e5"
-      element.style.borderRadius = "8px"
-
       scrollToView(element)
-
-      setTimeout(() => {
-        element.style.transition = "background-color .5s ease-in-out"
-        element.style.borderRadius = "8px"
-        element.style.backgroundColor = ""
-      }, 500)
-
     }
 
     onMounted(() => {
