@@ -214,7 +214,7 @@ export default {
       const downloadFileList = localStoreUtil.getJsonValue('download-file-list')
       const downloadFileListTemp = []
 
-      downloadFileList.forEach(x => {
+      downloadFileList?.forEach(x => {
         if(x.state === 'done' || x.state === 'not-found'){
           downloadFileListTemp.push(x)
         }

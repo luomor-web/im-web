@@ -133,8 +133,6 @@ export default {
       download.download(file.file)
     }
 
-
-
     const styles = ref({
       container: {
         boxShadow: ''

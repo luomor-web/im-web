@@ -10,8 +10,8 @@ export const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
 
 // 查找更多消息
 export const fetchMessage = ({room, options = {}}) => {
-    if (options.reset) {
-        console.log(options.reset)
+    if (options.reset && room.roomId !== roomId.value) {
+        console.log(options.reset,'222')
         changeRoom(room.roomId)
         return
     }

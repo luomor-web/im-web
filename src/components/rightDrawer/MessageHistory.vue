@@ -119,6 +119,10 @@ export default {
     }
 
     const scroll = item => {
+      // 是否在当前已加载的消息列表中 如果在的话直接跳转
+
+      // 否则的话刷掉
+
       const element = document.getElementById(item._id);
       if (!element) {
         startHistoryMessage(item)

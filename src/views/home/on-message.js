@@ -11,14 +11,14 @@ import {
     messageLoaded,
     messages,
     roomId,
-    roomsLoaded, searchMessage,
+    roomsLoaded,
+    searchMessage,
     setCurUser,
     sortedUser,
     upRoom,
     waitSelectUser,
     waitSendMessage
 } from "@/views/home/home";
-import {scrollToView} from "@/utils/dom";
 
 export const init = () => {
     // 获取用户信息响应
@@ -37,8 +37,6 @@ export const init = () => {
     msg.$on("COMMAND_EDIT_PROFILE_REST", COMMAND_EDIT_PROFILE_REST)
     // 群组用户移除返回
     msg.$on("COMMAND_REMOVE_GROUP_USER_RESP", COMMAND_REMOVE_GROUP_USER_RESP)
-    // 消息搜索模式开启第一次加载
-    msg.$on("COMMAND_SEARCH_MESSAGE_PAGE_RESP", COMMAND_SEARCH_MESSAGE_PAGE_RESP)
     // 解散群聊响应
     msg.$on("COMMAND_DISBAND_GROUP_RESP", COMMAND_DISBAND_GROUP_RESP)
     // 移交群主响应
@@ -79,25 +77,25 @@ const COMMAND_GET_USER_RESP = (data) => {
 
 // 获取历史消息响应
 const COMMAND_GET_MESSAGE_RESP = (data) => {
-    if (data.data.length === 0) {
+    const {type, messages: loadMessages} = data.data
+    if (loadMessages.length === 0) {
         console.log('消息加载完成')
         nextTick(() => {
             messageLoaded.value = true
         })
         return
     }
-    data.data.forEach(x => {
+    loadMessages.forEach(x => {
         const index = messages.value.findIndex(r => r._id === x._id);
-        if (index === -1 && data.msg === 'TOP') {
+        if (index === -1 && type === 'TOP') {
             messages.value.unshift(x)
-        } else if (index === -1 && data.msg === 'DOWN') {
-            console.log(x.indexId || x._id)
+        } else if (index === -1 && type === 'DOWN') {
             messages.value.push(x)
         }
     })
-    if (data.data.length < 20) {
+    if (loadMessages.length < 20) {
         nextTick(() => {
-            if (data.msg === 'DOWN') {
+            if (type === 'DOWN') {
                 searchMessage.value = false
             } else {
                 messageLoaded.value = true
@@ -259,21 +257,6 @@ const COMMAND_REMOVE_GROUP_USER_RESP = (data) => {
 
 }
 
-const COMMAND_SEARCH_MESSAGE_PAGE_RESP = (data) => {
-    const {messageId, messages: loadMessage} = data.data
-    console.log(loadMessage, 'messages')
-    loadMessage.forEach(x => {
-        const index = messages.value.findIndex(r => r._id === x._id);
-        if (index === -1) {
-            messages.value.push(x)
-        }
-    })
-    const element = document.getElementById(messageId);
-    if (element) {
-        scrollToView(element)
-    }
-}
-
 // 解散群聊响应
 const COMMAND_DISBAND_GROUP_RESP = (data) => {
     const {roomId: disbandRoomId} = data.data
@@ -389,7 +372,6 @@ export const msgDestroy = () => {
     msg.$off('COMMAND_SEND_MESSAGE_REACTION_RESP')
     msg.$off('COMMAND_EDIT_PROFILE_REST')
     msg.$off('COMMAND_REMOVE_GROUP_USER_RESP')
-    msg.$off('COMMAND_SEARCH_MESSAGE_PAGE_RESP')
     msg.$off('COMMAND_DISBAND_GROUP_RESP')
     msg.$off('COMMAND_HANDOVER_GROUP_RESP')
     msg.$off('COMMAND_EDIT_GROUP_PROFILE_RESP')

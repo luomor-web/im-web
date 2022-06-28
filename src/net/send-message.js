@@ -162,15 +162,7 @@ const searchMessage = ({content,roomId}) => {
     sendMsg(param)
 }
 
-// 获取开始分页的第一页消息
-const searchMessagePage = ({roomId,messageId}) => {
-  const param = {
-      cmd: 34,
-      roomId,
-      messageId
-  }
-  sendMsg(param)
-}
+
 
 // 群组配置
 const userGroupConfig = (data) => {
@@ -246,6 +238,5 @@ export {
     editGroupProfile,
     messageDelete,
     buildLastMessageTime,
-    userGroupConfig,
-    searchMessagePage
+    userGroupConfig
 }

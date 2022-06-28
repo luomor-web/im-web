@@ -74,10 +74,6 @@ const webSocket = (token) => {
             case 33:
                 msg.$emit("COMMAND_REMOVE_GROUP_USER_RESP", data)
                 break;
-            // 消息搜索模式开启第一次加载
-            case 35:
-                msg.$emit("COMMAND_SEARCH_MESSAGE_PAGE_RESP", data)
-                break;
             // 解散群聊响应
             case 39:
                 msg.$emit("COMMAND_DISBAND_GROUP_RESP", data)
