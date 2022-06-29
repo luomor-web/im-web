@@ -153,11 +153,10 @@ const messageDelete = ({messageId}) => {
 }
 
 // 搜索聊天记录
-const searchMessage = ({content,roomId}) => {
+const searchMessage = (data) => {
     const param = {
         cmd: 48,
-        content,
-        roomId
+        ...data
     }
     sendMsg(param)
 }

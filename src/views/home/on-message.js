@@ -77,13 +77,21 @@ const COMMAND_GET_USER_RESP = (data) => {
 
 // 获取历史消息响应
 const COMMAND_GET_MESSAGE_RESP = (data) => {
-    const {type, messages: loadMessages} = data.data
+    const {type, messages: loadMessages, returnDefault} = data.data
     if (loadMessages.length === 0) {
         console.log('消息加载完成')
         nextTick(() => {
-            messageLoaded.value = true
+            if (type === 'DOWN') {
+                searchMessage.value = false
+            } else {
+                messageLoaded.value = true
+            }
         })
         return
+    }
+    if (returnDefault) {
+        messages.value = []
+        searchMessage.value = false
     }
     loadMessages.forEach(x => {
         const index = messages.value.findIndex(r => r._id === x._id);
@@ -93,6 +101,7 @@ const COMMAND_GET_MESSAGE_RESP = (data) => {
             messages.value.push(x)
         }
     })
+
     if (loadMessages.length < 20) {
         nextTick(() => {
             if (type === 'DOWN') {

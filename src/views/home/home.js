@@ -64,9 +64,9 @@ export const upRoom = (roomId) => {
 }
 
 // 开启搜索模式
-export const startHistoryMessage= (item) => {
+export const startHistoryMessage = (item) => {
     searchMessage.value = true
-    console.log('lastMessage', messages.value[messages.value.length -1].indexId ||  messages.value[messages.value.length -1]._id)
+    console.log('lastMessage', messages.value[messages.value.length - 1].indexId || messages.value[messages.value.length - 1]._id)
     messages.value = []
     messages.value.push(item)
     messages.value = [...messages.value]
@@ -82,7 +82,10 @@ export const startHistoryMessage= (item) => {
 // 点击右下角图标,关闭角标
 export const clickScrollIcon = ({roomId}) => {
     console.log(roomId)
-    changeRoom(roomId)
+    setTimeout(() => {
+        messages.value = []
+    })
+    getHistoryMessage({roomId: roomId, returnDefault: true})
 }
 
 // 提示音
@@ -93,7 +96,7 @@ export const ding = () => {
         audio.id = "audio1";
         let source = document.createElement("source");
         source.src = require('@/assets/music/tip.mp3')
-        source.className='d-none'
+        source.className = 'd-none'
         source.type = "audio/mpeg";
         audio.append(source);
         document.body.append(audio);

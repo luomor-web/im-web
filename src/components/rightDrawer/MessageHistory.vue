@@ -6,13 +6,14 @@
         </v-text-field>
       </template>
       <template #right>
-        <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker">
+        <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker" @input="pickerDataChange">
 
           <template v-slot:activator="{ on, attrs }">
             <v-btn
                 v-bind="attrs"
                 v-on="on"
                 icon
+                :color="picker.length === 2 ? 'primary' : ''"
             >
               <v-icon>{{ icons.mdiCalendarBlankOutline }}</v-icon>
             </v-btn>
@@ -24,8 +25,16 @@
               :landscape="true"
               :first-day-of-week="0"
               locale="zh-cn"
+              range
           >
             <v-spacer></v-spacer>
+            <v-btn
+                text
+                color="primary"
+                @click="resetPicker"
+            >
+              重置
+            </v-btn>
             <v-btn
                 text
                 color="primary"
@@ -97,7 +106,9 @@ export default {
   filters: {},
   setup(props) {
     const modal = ref(false)
-    const picker = ref(null)
+    const startDate = ref(null)
+    const endDate = ref(null)
+    const picker = ref([])
     const searchName = ref('')
 
     const messagesSearched = ref([])
@@ -106,7 +117,6 @@ export default {
     })
 
     const open = () => {
-
     }
 
     const search = item => {
@@ -115,14 +125,13 @@ export default {
         return
       }
 
-      searchMessage({content: item, roomId: props.room.roomId})
+      searchMessage({content: item, roomId: props.room.roomId, startDate: startDate.value, endDate: endDate.value})
     }
 
     const scroll = item => {
       // 是否在当前已加载的消息列表中 如果在的话直接跳转
 
       // 否则的话刷掉
-
       const element = document.getElementById(item._id);
       if (!element) {
         startHistoryMessage(item)
@@ -141,9 +150,16 @@ export default {
       msg.$off('COMMAND_SEARCH_MESSAGE_RESP')
     })
 
-    const resetAndClose = () => {
-      picker.value = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
-      close()
+    const resetPicker = () => {
+      picker.value = []
+    }
+
+    const pickerDataChange = (item) => {
+      if (picker.value.length === 2 && !item) {
+        startDate.value = picker.value[0]
+        endDate.value = picker.value[1]
+        search(searchName.value)
+      }
     }
 
     return {
@@ -154,9 +170,10 @@ export default {
       scroll,
       buildDisplayTime,
       search,
+      resetPicker,
       open,
       close,
-      resetAndClose,
+      pickerDataChange,
 
       icons: {
         mdiCalendarBlankOutline,
