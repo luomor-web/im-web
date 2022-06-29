@@ -13,9 +13,10 @@ const webSocket = (token) => {
     // const host = location.host
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?token=' + token,
-        pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 40000
+        pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 6000,pongTimeout:6000
     })
     socket.onopen = () => {
+        msg.$emit("SOCKET_CONNECTING")
         // websocketHeartbeatJs.send('{"code":REDAY}')
     }
     socket.onmessage = (event) => {
@@ -73,14 +74,6 @@ const webSocket = (token) => {
             case 33:
                 msg.$emit("COMMAND_REMOVE_GROUP_USER_RESP", data)
                 break;
-            // 获取历史文件响应
-            case 35:
-                msg.$emit("COMMAND_MESSAGE_FILE_HISTORY_RESP", data)
-                break;
-            // 获取历史消息响应
-            case 37:
-                msg.$emit("COMMAND_MESSAGE_HISTORY_RESP", data)
-                break;
             // 解散群聊响应
             case 39:
                 msg.$emit("COMMAND_DISBAND_GROUP_RESP", data)
@@ -118,12 +111,9 @@ const webSocket = (token) => {
         }
     }
     socket.onclose = () => {
-        localStoreUtil.removeKey('userId')
-        localStoreUtil.removeKey('token')
-        router.push('/Login')
     }
     socket.onreconnect = () => {
-        msg.$emit("RECONNECTING")
+        msg.$emit("SOCKET_RECONNECTING")
     }
 
     socket.onerror = () => {
@@ -131,8 +121,11 @@ const webSocket = (token) => {
 }
 
 const close = () => {
+    localStoreUtil.removeKey('userId')
+    localStoreUtil.removeKey('token')
     socket.heartReset()
     socket.close()
+    router.push('/Login')
 }
 
 const sendMsg = (data) => {
@@ -156,7 +149,7 @@ const initWebSocket = () => {
                 console.error(e)
             }
         }
-        localStoreUtil.clear()
+        // localStoreUtil.clear()
         router.push('/login')
     }
     if (socket == null && token) {
@@ -166,7 +159,7 @@ const initWebSocket = () => {
 
 const startWebSocket = (token) => {
     if (socket) {
-        close()
+        socket.close()
     }
     webSocket(token)
 }

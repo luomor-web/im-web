@@ -6,6 +6,12 @@
       <v-window-item value="USER_PROFILE">
         <user-profile :user="curUser" @open="open"></user-profile>
       </v-window-item>
+      <v-window-item value="DOWNLOAD_SETTING">
+        <download-setting :user="curUser" @open="open"></download-setting>
+      </v-window-item>
+      <v-window-item value="D">
+<!--        <download-setting :user="curUser" @open="open"></download-setting>-->
+      </v-window-item>
     </v-window>
 </template>
 
@@ -14,10 +20,12 @@
 import {ref} from "@vue/composition-api";
 import SettingItem from "@/components/leftDrawer/setting/SettingItem";
 import UserProfile from "@/components/leftDrawer/setting/UserProfile";
+import DownloadSetting from "@/components/leftDrawer/setting/DownloadSetting";
 
 export default {
   name: "Setting",
   components: {
+    DownloadSetting,
     UserProfile,
     SettingItem
   },

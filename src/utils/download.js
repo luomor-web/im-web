@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import log from "electron-log";
 
 export const downloadForUrl = async (url, name) => {
     let res = await request.get(url, {responseType: 'blob'})
@@ -25,7 +26,10 @@ export const downloadForUrl = async (url, name) => {
     }
 }
 
+const download = (file) => {
+    downloadForUrl(file.url, file.name).then().catch(e => log.error(e))
+}
 
 export default {
-    downloadForUrl
+    download
 }

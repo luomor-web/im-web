@@ -1,7 +1,7 @@
 const {mergeSassVariables} = require('@vuetify/cli-plugin-utils')
 module.exports = {
     devServer: {
-        public: 'https://192.168.1.128:8888'
+        public: 'https://192.168.3.128:8888'
         // publicPath: process.env.VUE_APP_BASE_API,
         // proxy: {
         //     '/api': {
@@ -41,7 +41,7 @@ module.exports = {
             },
             builderOptions: {
                 // options placed here will be merged with default configuration and passed to electron-builder
-                productName: "OA",
+                productName: "im",
                 appId: "123456789",
                 copyright: "Copyright © 2022",//版权信息
                 directories: {

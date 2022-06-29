@@ -6,12 +6,14 @@
         <setting v-if="active === 'SETTING'" :curUser="curUser" @close="goTo"></setting>
         <add-chat v-else-if="active === 'ADD_CHAT'" @close="goTo"/>
         <add-room v-else-if="active === 'CREATE_GROUP'" @close="goTo"/>
+        <download-history v-else-if="active === 'DOWNLOAD_HISTORY'" @close="goTo"/>
       </div>
     </v-expand-x-transition>
   </div>
 </template>
 
 <script>
+import DownloadHistory from "@/components/leftDrawer/downloadHistory/DownloadHistory";
 import {provide, ref} from "@vue/composition-api";
 import {curUser, loadedRooms} from "@/views/home/home";
 import {mdiPlus} from "@mdi/js";
@@ -26,7 +28,8 @@ export default {
     Setting,
     AddRoom,
     AddChat,
-    FloatMenu
+    FloatMenu,
+    DownloadHistory
   },
   setup(props, {emit}) {
 

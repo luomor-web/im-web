@@ -1,5 +1,5 @@
 <template>
-  <div class="user-profile">
+  <div class="fill-height">
     <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')"></drawer-top>
     <div class="mt-2">
       <div class="mx-2">
@@ -135,11 +135,6 @@ export default {
 <style lang="scss" scoped>
 
 @import "src/styles/theme";
-
-.user-profile {
-  height: 100%;
-  //position: absolute;
-}
 
 .header-img {
   border-radius: 120px;

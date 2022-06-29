@@ -1,18 +1,19 @@
 <template>
-  <div class="message-history" >
+  <div class="message-history">
     <drawer-top @close="close">
       <template #default>
         <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search">
         </v-text-field>
       </template>
       <template #right>
-        <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker">
+        <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker" @input="pickerDataChange">
 
           <template v-slot:activator="{ on, attrs }">
             <v-btn
                 v-bind="attrs"
                 v-on="on"
                 icon
+                :color="picker.length === 2 ? 'primary' : ''"
             >
               <v-icon>{{ icons.mdiCalendarBlankOutline }}</v-icon>
             </v-btn>
@@ -24,8 +25,16 @@
               :landscape="true"
               :first-day-of-week="0"
               locale="zh-cn"
+              range
           >
             <v-spacer></v-spacer>
+            <v-btn
+                text
+                color="primary"
+                @click="resetPicker"
+            >
+              重置
+            </v-btn>
             <v-btn
                 text
                 color="primary"
@@ -45,9 +54,9 @@
       </template>
     </drawer-top>
 
-    <div class="overflow-y-auto message-history-content" >
+    <div class="overflow-y-auto message-history-content">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messages"
+        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messagesSearched"
                      :key="index" two-line @click="scroll(item)">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>
@@ -78,11 +87,12 @@
 <script>
 import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {onMounted, onUnmounted, ref,inject} from "@vue/composition-api";
+import {inject, onMounted, onUnmounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/send-message";
 import {buildDisplayTime} from "@/utils/date-util";
 import {scrollToView} from "@/utils/dom";
+import {startHistoryMessage} from "@/views/home/home";
 
 export default {
   name: "MessageHistory",
@@ -96,51 +106,43 @@ export default {
   filters: {},
   setup(props) {
     const modal = ref(false)
-    const picker = ref(null)
+    const startDate = ref(null)
+    const endDate = ref(null)
+    const picker = ref([])
     const searchName = ref('')
 
-    const messages = ref([])
+    const messagesSearched = ref([])
 
-    const close = inject('close',()=>{})
+    const close = inject('close', () => {
+    })
 
     const open = () => {
-
     }
 
     const search = item => {
       if (!item) {
-        messages.value = []
+        messagesSearched.value = []
         return
       }
 
-      searchMessage({content: item, roomId: props.room.roomId})
+      searchMessage({content: item, roomId: props.room.roomId, startDate: startDate.value, endDate: endDate.value})
     }
 
     const scroll = item => {
+      // 是否在当前已加载的消息列表中 如果在的话直接跳转
+
+      // 否则的话刷掉
       const element = document.getElementById(item._id);
-      if (!element) return
-
-      // element.parentNode.scrollTop = element.offsetTop
-      element.parentNode.scrollTop = element.offsetTop - 30;
-      // element.scroll({top: element.offsetTop, behavior: 'smooth'})
-
-      element.style.transition = "background-color .5s ease-in-out"
-      element.style.backgroundColor = "#dfe1e5"
-      element.style.borderRadius = "8px"
-
+      if (!element) {
+        startHistoryMessage(item)
+        return
+      }
       scrollToView(element)
-
-      setTimeout(() => {
-        element.style.transition = "background-color .5s ease-in-out"
-        element.style.borderRadius = "8px"
-        element.style.backgroundColor = ""
-      }, 500)
-
     }
 
     onMounted(() => {
       msg.$on('COMMAND_SEARCH_MESSAGE_RESP', data => {
-        messages.value = [...data.data]
+        messagesSearched.value = [...data.data]
       })
     })
 
@@ -148,22 +150,30 @@ export default {
       msg.$off('COMMAND_SEARCH_MESSAGE_RESP')
     })
 
-    const resetAndClose = () => {
-      picker.value = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
-      close()
+    const resetPicker = () => {
+      picker.value = []
+    }
+
+    const pickerDataChange = (item) => {
+      if (picker.value.length === 2 && !item) {
+        startDate.value = picker.value[0]
+        endDate.value = picker.value[1]
+        search(searchName.value)
+      }
     }
 
     return {
       modal,
       searchName,
       picker,
-      messages,
+      messagesSearched,
       scroll,
       buildDisplayTime,
       search,
+      resetPicker,
       open,
       close,
-      resetAndClose,
+      pickerDataChange,
 
       icons: {
         mdiCalendarBlankOutline,
