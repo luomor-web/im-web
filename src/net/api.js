@@ -103,4 +103,7 @@ export function userLogin(data) {
     })
 }
 
+export default {
+    upload
+}
 
