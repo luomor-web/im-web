@@ -12,7 +12,7 @@ export async function uploadFiles(files, cb) {
         const md5 = await readMd5(file.file);
         const len = Math.ceil(file.size / CHUNK_SIZE)
         const param = {
-            filename: file.file.name, partCount: len, md5: md5, size: file.size
+            filename: file.name, partCount: len, md5: md5, size: file.size
         }
         const response = await init(param);
         const {objectName, uploadId, uploadUrls, quick} = response.data
