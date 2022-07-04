@@ -7,26 +7,35 @@ export async function uploadFiles(files, cb) {
     for (let i = 0; i < files.length; i++) {
         const file = {
             ...files[i], // 上传进度
-            percentage: 0, uploadTotal: 0, url: ''
+            percentage: 0,
+            uploadTotal: [],
+            url: '',
         }
         const md5 = await readMd5(file.file);
         const len = Math.ceil(file.size / CHUNK_SIZE)
         const param = {
-            filename: file.name, partCount: len, md5: md5, size: file.size
+            filename: file.name + '.' + file.extension, partCount: len, md5: md5, size: file.size
         }
         const response = await init(param);
-        const {objectName, uploadId, uploadUrls, quick} = response.data
+        const {objectName, uploadId, uploadUrls, quick} = response
         if (!quick) {
             const t = setInterval(() => {
                 countSpeed(file, cb)
             }, 300)
             await asyncPool(3, uploadUrls, upload, file)
-            const complete = await mergeMultipartUpload({uploadId, objectName, md5, name: file.name, size: file.size});
+            const complete = await mergeMultipartUpload({
+                uploadId,
+                objectName,
+                md5,
+                name: file.name + '.' + file.extension,
+                size: file.size
+            });
             if (complete === true) {
                 clearInterval(t)
             }
         }
-        if (i === files.size - 1) {
+        file.url = objectName
+        if (i === (files.length - 1)) {
             cb(file, true)
             continue
         }
@@ -35,8 +44,12 @@ export async function uploadFiles(files, cb) {
 }
 
 function countSpeed(file, cb) {
-    if (file.size === file.uploadTotal) return
-    const progress = file.uploadTotal <= 0 ? 0 : Math.round((file.uploadTotal / file.size) * 10000) / 100.0
+    console.log(file.uploadTotal, 'file.uploadTotal')
+    let total = 0
+    file.uploadTotal.forEach(x => {
+        total += x
+    })
+    const progress = total <= 0 ? 0 : Math.round((total / file.size) * 10000) / 100.0
     cb({...file, progress}, false)
     return true
 }
@@ -87,15 +100,16 @@ const readMd5 = async (file) => {
 }
 
 const upload = (item, arr, file) => {
-    return new Promise(resolve => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async resolve => {
         const index = arr.findIndex(x => x === item);
         let endPoint = index * CHUNK_SIZE + CHUNK_SIZE
         if (index === (arr.length - 1)) {
             endPoint = file.size
         }
         console.log(item, index, index * CHUNK_SIZE, endPoint)
-        api.upload(item, file.file.slice(index * CHUNK_SIZE, endPoint), (loaded) => {
-            file.uploadTotal += loaded
+        await api.upload(item, file.file.slice(index * CHUNK_SIZE, endPoint), (loaded) => {
+            file.uploadTotal[index] = loaded
         })
         resolve(item)
     })

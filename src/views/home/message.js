@@ -1,8 +1,8 @@
 import {changeRoom, currentUserId, curUser, messages, roomId, upRoom, waitSendMessage} from "@/views/home/home";
 import {getHistoryMessage, messageReaction, sendChatMessage} from "@/net/send-message";
-import {addFiles} from "@/utils/file";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
+import {uploadFiles} from "@/utils/upload";
 
 export const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
     messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
@@ -82,8 +82,8 @@ const operationMessage = async message => {
         return
     }
 
-    await addFiles(message.files, (file, isOver) => {
-
+    await uploadFiles(message.files, (file, isOver) => {
+        console.log(file, isOver)
         if (file.progress) {
             updateProgress(file, message._id)
             return

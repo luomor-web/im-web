@@ -89,6 +89,7 @@
 
     </div>
     <im-warn-dialog :action="warnAction"></im-warn-dialog>
+    <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
   </div>
 </template>
 
@@ -109,6 +110,7 @@ import msg from "@/plugins/msg";
 import {currentUserId} from "@/views/home/home";
 import localStoreUtil from "@/utils/local-store";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
+import ImTip from "@/components/system/ImTip";
 
 export default {
   name: "RoomsHeader",
@@ -117,7 +119,8 @@ export default {
   },
   components: {
     ImWarnDialog,
-    ImDownloadPath
+    ImDownloadPath,
+    ImTip
   },
   setup() {
     const downloadPath = ref(null)
@@ -140,6 +143,17 @@ export default {
       }
     })
 
+    const snackbar = ref({
+      display: false,
+      text: '',
+      timeout: 1000
+    })
+
+    const tip = (text) => {
+      snackbar.value.display = true
+      snackbar.value.text = text
+    }
+
     const quit = () => {
       // 检查是否存在下载的任务
       if (haveDownloadFile.value) {
@@ -155,6 +169,9 @@ export default {
     }
 
     onMounted(() => {
+      msg.$on('SYSTEM_FLUSH_DOWNLOAD_STATE', () => {
+        flushDownloadState()
+      })
       msg.$on("SOCKET_RECONNECTING", () => {
         reconnect.value = true
       })
@@ -164,7 +181,7 @@ export default {
         }
         reconnect.value = false
       })
-      if(process.env.IS_ELECTRON){
+      if (process.env.IS_ELECTRON) {
         clearDownloadFileList()
         handleDownloadFile()
       }
@@ -175,8 +192,9 @@ export default {
         const downloadFileList = localStoreUtil.getJsonValue('download-file-list') || []
 
         downloadFileList.unshift({...args, state: 'start', receivedBytes: 0, totalBytes: 0})
-        localStoreUtil.setJsonValue('download-file-list', downloadFileList.slice(0,60))
+        localStoreUtil.setJsonValue('download-file-list', downloadFileList.slice(0, 60))
         haveDownloadFile.value = true
+        tip('开始下载')
       })
       window.require('electron').ipcRenderer.on('download-file-interrupted', (event, args) => {
         updateDownloadFileState(args, 'interrupted')
@@ -188,12 +206,9 @@ export default {
         updateDownloadFileState(args, 'ing')
       })
       window.require('electron').ipcRenderer.on('download-file-done', (event, args) => {
-        const downloadFileList = updateDownloadFileState(args, 'done')
-        // 检查是否所有的文件全部下载完成，设置没有角标
-        const notDoneIndex = downloadFileList.findIndex(x => x.state !== 'done' && x.state !== 'not-found');
-        if (notDoneIndex === -1) {
-          haveDownloadFile.value = false
-        }
+        updateDownloadFileState(args, 'done')
+        flushDownloadState()
+        tip('下载完成')
       })
     }
 
@@ -215,12 +230,20 @@ export default {
       const downloadFileListTemp = []
 
       downloadFileList?.forEach(x => {
-        if(x.state === 'done' || x.state === 'not-found'){
+        if (x.state === 'done' || x.state === 'not-found') {
           downloadFileListTemp.push(x)
         }
       })
-        console.log('z')
-      localStoreUtil.setJsonValue('download-file-list',downloadFileListTemp)
+      localStoreUtil.setJsonValue('download-file-list', downloadFileListTemp)
+    }
+
+    const flushDownloadState = () => {
+      const downloadFileList = localStoreUtil.getJsonValue('download-file-list')
+      // 检查是否所有的文件全部下载完成，设置没有角标
+      const notDoneIndex = downloadFileList.findIndex(x => x.state !== 'done' && x.state !== 'not-found');
+      if (notDoneIndex === -1) {
+        haveDownloadFile.value = false
+      }
     }
 
     return {
@@ -228,6 +251,7 @@ export default {
       downloadPath,
       openLeftDrawer,
       quit,
+      snackbar,
       reconnect,
       warnAction,
       isElectron,

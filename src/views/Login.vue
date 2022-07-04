@@ -121,23 +121,7 @@
           src="@/assets/images/misc/tree-3.png"
       ></v-img>
     </div>
-
-    <v-snackbar
-        v-model="snackbar.display"
-    >
-      {{ snackbar.text }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="snackbar.display = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
+    <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
   </div>
 </template>
 
@@ -150,11 +134,13 @@ import msg from '@/plugins/msg'
 import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
 import {userLogin} from "@/net/api";
+import ImTip from "@/components/system/ImTip";
 
 export default {
 
   name: "Login",
   components: {
+    ImTip,
     TopBar
   },
   setup() {

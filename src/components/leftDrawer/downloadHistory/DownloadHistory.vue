@@ -77,6 +77,7 @@ import {
 } from "@mdi/js";
 import {isApplicationFile, isAudioFile, isImageFile, isPackageFile, isVideoFile, suffix} from "@/utils/media-file";
 import {getFileSize} from "@/utils/file";
+import msg from "@/plugins/msg";
 
 export default {
   name: "DownloadHistory",
@@ -140,13 +141,12 @@ export default {
     const stopDownload = (item) => {
       window.require('electron').ipcRenderer.invoke('download-file-stop', item).then(() => {
         delHistory(item)
+        msg.$emit('SYSTEM_FLUSH_DOWNLOAD_STATE')
       })
     }
 
     const openFile = (item) => {
-      console.log('openFile')
       window.require('electron').ipcRenderer.invoke('open-file-shell', item).then(result => {
-        console.log(result)
         if (!result) {
           updateDownloadFileState(item, 'not-found')
           localStore.setJsonValue('download-file-list', downloadFileList.value)
