@@ -22,6 +22,7 @@ export async function uploadFiles(files, cb) {
             const t = setInterval(() => {
                 countSpeed(file, cb)
             }, 300)
+            
             await asyncPool(3, uploadUrls, upload, file)
             const complete = await mergeMultipartUpload({
                 uploadId,
@@ -114,3 +115,5 @@ const upload = (item, arr, file) => {
         resolve(item)
     })
 }
+
+

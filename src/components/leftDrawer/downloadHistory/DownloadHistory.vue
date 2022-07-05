@@ -76,8 +76,8 @@ import {
   mdiZipBox
 } from "@mdi/js";
 import {isApplicationFile, isAudioFile, isImageFile, isPackageFile, isVideoFile, suffix} from "@/utils/media-file";
-import {getFileSize} from "@/utils/file";
 import msg from "@/plugins/msg";
+import {getFileSize} from "@/utils/util";
 
 export default {
   name: "DownloadHistory",
