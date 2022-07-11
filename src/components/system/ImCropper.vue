@@ -36,8 +36,8 @@ import {ref} from "@vue/composition-api";
 import {Cropper} from 'vue-advanced-cropper'
 import 'vue-advanced-cropper/dist/style.css';
 import 'vue-advanced-cropper/dist/theme.compact.css';
-import {addFiles} from "@/utils/file";
 import SparkMD5 from "spark-md5"
+import {uploadFiles} from "@/utils/upload";
 
 export default {
   name: "ImCropper",
@@ -67,14 +67,14 @@ export default {
             md5 = spark.end()
 
             const file = {
-              blob: blob,
+              file: blob,
               name: 'header',
               size: blob.size,
               type: 'image/jpeg',
               extension: 'jpeg',
               md5: md5
             }
-            addFiles([file], (file, over) => {
+            uploadFiles([file], (file, over) => {
               if (over) {
                 context.emit("sure", picUrl.value + file.url)
               }

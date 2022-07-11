@@ -30,6 +30,7 @@ const download = (file) => {
     downloadForUrl(file.url, file.name).then().catch(e => log.error(e))
 }
 
+
 export default {
     download
 }

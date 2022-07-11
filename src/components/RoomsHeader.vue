@@ -59,6 +59,14 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item class="im-list-item" @click="about.visible = true">
+              <v-list-item-icon>
+                <v-icon>mdi-information-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                关于
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item class="im-list-item" @click="quit">
               <v-list-item-icon>
                 <v-icon>{{ icons.mdiExitToApp }}</v-icon>
@@ -75,6 +83,17 @@
         {{ curUser.username }}
       </h3>
       <v-spacer></v-spacer>
+      <v-tooltip bottom z-index="11" v-if="!isElectron">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon
+                 @click="downloadDesktop"
+                 v-bind="attrs"
+                 v-on="on">
+            <v-icon>{{ icons.mdiLaptop }}</v-icon>
+          </v-btn>
+        </template>
+        <span>客户端下载</span>
+      </v-tooltip>
     </div>
     <div class="error-container" v-if="reconnect">
       <v-alert
@@ -89,6 +108,8 @@
 
     </div>
     <im-warn-dialog :action="warnAction"></im-warn-dialog>
+    <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
+    <about :action="about"></about>
   </div>
 </template>
 
@@ -99,7 +120,7 @@ import {
   mdiChevronDown,
   mdiCloudDownloadOutline,
   mdiCog,
-  mdiExitToApp,
+  mdiExitToApp, mdiLaptop,
   mdiPencilOutline
 } from "@mdi/js";
 import {getUserInfo, quitSystem} from "@/net/send-message";
@@ -109,6 +130,9 @@ import msg from "@/plugins/msg";
 import {currentUserId} from "@/views/home/home";
 import localStoreUtil from "@/utils/local-store";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
+import ImTip from "@/components/system/ImTip";
+import {downloadDesktop} from "@/utils/desktop-util";
+import About from "@/components/update/About";
 
 export default {
   name: "RoomsHeader",
@@ -116,8 +140,10 @@ export default {
     curUser: Object,
   },
   components: {
+    About,
     ImWarnDialog,
-    ImDownloadPath
+    ImDownloadPath,
+    ImTip
   },
   setup() {
     const downloadPath = ref(null)
@@ -126,6 +152,12 @@ export default {
     const reconnect = ref(false)
     const haveDownloadFile = ref(false)
     const isElectron = ref(process.env.IS_ELECTRON)
+    const about = ref({
+      visible: false,
+      close: () => {
+        about.value.visible = false
+      }
+    })
 
     const warnAction = ref({
       model: false,
@@ -139,6 +171,17 @@ export default {
         quitSystem()
       }
     })
+
+    const snackbar = ref({
+      display: false,
+      text: '',
+      timeout: 1000
+    })
+
+    const tip = (text) => {
+      snackbar.value.display = true
+      snackbar.value.text = text
+    }
 
     const quit = () => {
       // 检查是否存在下载的任务
@@ -155,6 +198,9 @@ export default {
     }
 
     onMounted(() => {
+      msg.$on('SYSTEM_FLUSH_DOWNLOAD_STATE', () => {
+        flushDownloadState()
+      })
       msg.$on("SOCKET_RECONNECTING", () => {
         reconnect.value = true
       })
@@ -164,7 +210,7 @@ export default {
         }
         reconnect.value = false
       })
-      if(process.env.IS_ELECTRON){
+      if (process.env.IS_ELECTRON) {
         clearDownloadFileList()
         handleDownloadFile()
       }
@@ -175,8 +221,9 @@ export default {
         const downloadFileList = localStoreUtil.getJsonValue('download-file-list') || []
 
         downloadFileList.unshift({...args, state: 'start', receivedBytes: 0, totalBytes: 0})
-        localStoreUtil.setJsonValue('download-file-list', downloadFileList.slice(0,60))
+        localStoreUtil.setJsonValue('download-file-list', downloadFileList.slice(0, 60))
         haveDownloadFile.value = true
+        tip('开始下载')
       })
       window.require('electron').ipcRenderer.on('download-file-interrupted', (event, args) => {
         updateDownloadFileState(args, 'interrupted')
@@ -188,12 +235,9 @@ export default {
         updateDownloadFileState(args, 'ing')
       })
       window.require('electron').ipcRenderer.on('download-file-done', (event, args) => {
-        const downloadFileList = updateDownloadFileState(args, 'done')
-        // 检查是否所有的文件全部下载完成，设置没有角标
-        const notDoneIndex = downloadFileList.findIndex(x => x.state !== 'done' && x.state !== 'not-found');
-        if (notDoneIndex === -1) {
-          haveDownloadFile.value = false
-        }
+        updateDownloadFileState(args, 'done')
+        flushDownloadState()
+        tip('下载完成')
       })
     }
 
@@ -215,12 +259,20 @@ export default {
       const downloadFileListTemp = []
 
       downloadFileList?.forEach(x => {
-        if(x.state === 'done' || x.state === 'not-found'){
+        if (x.state === 'done' || x.state === 'not-found') {
           downloadFileListTemp.push(x)
         }
       })
-        console.log('z')
-      localStoreUtil.setJsonValue('download-file-list',downloadFileListTemp)
+      localStoreUtil.setJsonValue('download-file-list', downloadFileListTemp)
+    }
+
+    const flushDownloadState = () => {
+      const downloadFileList = localStoreUtil.getJsonValue('download-file-list')
+      // 检查是否所有的文件全部下载完成，设置没有角标
+      const notDoneIndex = downloadFileList.findIndex(x => x.state !== 'done' && x.state !== 'not-found');
+      if (notDoneIndex === -1) {
+        haveDownloadFile.value = false
+      }
     }
 
     return {
@@ -228,9 +280,12 @@ export default {
       downloadPath,
       openLeftDrawer,
       quit,
+      about,
+      snackbar,
       reconnect,
       warnAction,
       isElectron,
+      downloadDesktop,
       selectDownloadPath,
       haveDownloadFile,
       icons: {
@@ -240,7 +295,8 @@ export default {
         mdiCog,
         mdiCloudDownloadOutline,
         mdiExitToApp,
-        mdiAlertOutline
+        mdiAlertOutline,
+        mdiLaptop
       }
     }
   }

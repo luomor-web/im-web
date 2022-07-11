@@ -1,8 +1,8 @@
 import {changeRoom, currentUserId, curUser, messages, roomId, upRoom, waitSendMessage} from "@/views/home/home";
 import {getHistoryMessage, messageReaction, sendChatMessage} from "@/net/send-message";
-import {addFiles} from "@/utils/file";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
+import {uploadFiles} from "@/utils/upload";
 
 export const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
     messageReaction({reaction: reaction.unicode, remove, messageId, roomId})
@@ -11,13 +11,15 @@ export const sendMessageReaction = ({reaction, remove, messageId, roomId}) => {
 // 查找更多消息
 export const fetchMessage = ({room, options = {}}) => {
     if (options.reset && room.roomId !== roomId.value) {
-        console.log(options.reset,'222')
+        console.log(options.reset, '222')
         changeRoom(room.roomId)
         return
     }
     // 向下刷
     if (options.type === 'down') {
-        getHistoryMessage({roomId: roomId.value, type: options.type, messageId: messages.value[messages.value.length - 1]?._id})
+        getHistoryMessage({
+            roomId: roomId.value, type: options.type, messageId: messages.value[messages.value.length - 1]?._id
+        })
     } else {
         getHistoryMessage({roomId: roomId.value, type: options.type, messageId: messages.value[0]?._id})
     }
@@ -35,11 +37,7 @@ export const sendMessage = async ({content, roomId, files, replyMessage}) => {
     })
 
     const message = {
-        senderId: currentUserId.value,
-        content,
-        roomId,
-        replyMessage: replyMessage,
-        files: files
+        senderId: currentUserId.value, content, roomId, replyMessage: replyMessage, files: files
     }
 
     // 如果存在文件, 则把文件加入到上传列表,等待上传完毕后发送
@@ -84,8 +82,8 @@ const operationMessage = async message => {
         return
     }
 
-    await addFiles(message.files, (file, isOver) => {
-
+    await uploadFiles(message.files, (file, isOver) => {
+        console.log(file, isOver)
         if (file.progress) {
             updateProgress(file, message._id)
             return
