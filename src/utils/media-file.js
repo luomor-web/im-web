@@ -31,10 +31,14 @@ export function isPackageFile(file) {
 
 export function suffix(file) {
     if(!file) return ''
-    return file.substring(file.lastIndexOf('.') + 1)
+    const lastIndexOf = file.lastIndexOf('.');
+    if(lastIndexOf === -1) return ''
+    return file.substring(lastIndexOf + 1)
 }
 
 export function prefix(file) {
     if(!file) return
+    const lastIndexOf = file.lastIndexOf('.');
+    if(lastIndexOf === -1) return file
     return file.substring(0,file.lastIndexOf('.'))
 }
