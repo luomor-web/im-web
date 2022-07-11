@@ -91,7 +91,7 @@ const operationMessage = async message => {
 
         sendFileMessage({
             id: file.id,
-            name: file.name + '.' + file.extension,
+            name: file.name + (file.extension ? '.' : '') + file.extension,
             size: file.size,
             type: file.type,
             url: file.url,

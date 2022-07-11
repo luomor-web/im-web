@@ -133,6 +133,7 @@ import ImWarnDialog from "@/components/system/ImWarnDialog";
 import ImTip from "@/components/system/ImTip";
 import {downloadDesktop} from "@/utils/desktop-util";
 import About from "@/components/update/About";
+import localStore from "@/utils/local-store";
 
 export default {
   name: "RoomsHeader",
@@ -239,6 +240,20 @@ export default {
         flushDownloadState()
         tip('下载完成')
       })
+      window.require('electron').ipcRenderer.on('download-file-fail', (event, args) => {
+        delHistory(args)
+        flushDownloadState()
+        tip('下载错误,错误的路径或已被清理')
+      })
+    }
+
+    const delHistory = (item) => {
+      // 获取缓存的所有下载文件
+      const defaultDownloadList = localStore.getJsonValue('download-file-list');
+      const index = defaultDownloadList.findIndex(x => x.id === item.id);
+      if (index === -1) return
+      defaultDownloadList.splice(index, 1)
+      localStore.setJsonValue('download-file-list', defaultDownloadList)
     }
 
     const updateDownloadFileState = (args, state) => {

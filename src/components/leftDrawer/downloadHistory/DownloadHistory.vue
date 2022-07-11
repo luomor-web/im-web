@@ -105,6 +105,9 @@ export default {
       window.require('electron').ipcRenderer.on('download-file-done', (event, args) => {
         updateDownloadFileState(args, 'done')
       })
+      window.require('electron').ipcRenderer.on('download-file-fail', (event, args) => {
+        delHistory(args)
+      })
       downloadFileList.value = localStore.getJsonValue('download-file-list');
     })
 

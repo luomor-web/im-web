@@ -4,8 +4,10 @@ import {app, BrowserWindow, dialog, ipcMain, Menu, protocol, shell, Tray} from '
 import createProtocol from './service/createProtocol'
 import {autoUpdater} from 'electron-updater'
 import update from "@/utils/update";
-import {separator} from "@/utils/electron-util";
+import {getDownloadPath, separator} from "@/utils/electron-util";
 import {existsSync} from "fs";
+import {prefix, suffix} from "@/utils/media-file";
+import {renameSync} from "fs-extra";
 
 const log = require("electron-log")
 
@@ -187,9 +189,11 @@ const hideWindow = () => {
 // 文件下载========================================
 let downloadFile
 ipcMain.on('download-file', (event, file, again) => {
+    const path = again ? file.downloadPath : file.downloadPath + separator(file.downloadPath) + file.name;
+    const downloadPath = getDownloadPath(prefix(path), suffix(path), 0);
     downloadFile = {
         ...file,
-        downloadPath: again ? file.downloadPath : file.downloadPath + separator(file.downloadPath) + file.name
+        downloadPath
     }
     win.webContents.downloadURL(file.url)
 })
@@ -198,7 +202,7 @@ let downloadItemList = new Map()
 
 const willDownload = () => {
     win.webContents.session.on('will-download', (event, item) => {
-        item.setSavePath(downloadFile.downloadPath)
+        item.setSavePath(downloadFile.downloadPath + ".tmp")
         // 发送下载记录给界面
         item.file = downloadFile
         win.webContents.send('download-file-start', {
@@ -210,6 +214,7 @@ const willDownload = () => {
         downloadItemList.set(downloadFile.id, item)
         item.on('updated', (event, updatedState) => {
             if (updatedState === 'interrupted') {
+                log.info('download-file-interrupted')
                 // 中断的话直接删除
                 downloadItemList.delete(downloadFile.id)
                 win.webContents.send('download-file-interrupted', {
@@ -238,7 +243,14 @@ const willDownload = () => {
             // 结束的话直接删除
             downloadItemList.delete(downloadFile.id)
             if (state === 'completed') {
+                renameSync(item.file.downloadPath + ".tmp", item.file.downloadPath)
                 win.webContents.send('download-file-done', {
+                    ...item.file,
+                    receivedBytes: item.getReceivedBytes(),
+                    totalBytes: item.getTotalBytes()
+                })
+            } else {
+                win.webContents.send('download-file-fail', {
                     ...item.file,
                     receivedBytes: item.getReceivedBytes(),
                     totalBytes: item.getTotalBytes()
@@ -305,7 +317,8 @@ const updateHandle = () => {
     autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = false
 
-    autoUpdater.checkForUpdates().then(() => {})
+    autoUpdater.checkForUpdates().then(() => {
+    })
     autoUpdater.on('error', (info) => {
         console.log('更新失败', info)
     })
@@ -346,7 +359,7 @@ const updateHandle = () => {
     })
     // 监听消息检查更新
     ipcMain.on('check-update', () => {
-        if (isDevelopment){
+        if (isDevelopment) {
             win.webContents.send('development-model')
             return
         }
