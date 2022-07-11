@@ -305,8 +305,7 @@ const updateHandle = () => {
     autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = false
 
-    autoUpdater.checkForUpdates().then(() => {
-    })
+    autoUpdater.checkForUpdates().then(() => {})
     autoUpdater.on('error', (info) => {
         console.log('更新失败', info)
     })
@@ -347,6 +346,10 @@ const updateHandle = () => {
     })
     // 监听消息检查更新
     ipcMain.on('check-update', () => {
+        if (isDevelopment){
+            win.webContents.send('development-model')
+            return
+        }
         autoUpdater.checkForUpdates().then(() => {
         })
     })

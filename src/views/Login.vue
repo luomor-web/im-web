@@ -3,6 +3,12 @@
     <div v-if="isElectron">
       <top-bar></top-bar>
     </div>
+    <div class="download-client" v-if="!isElectron">
+      <v-btn text @click="downloadDesktop">
+        <v-icon>{{ icons.mdiLaptop }}</v-icon>
+        客户端下载
+      </v-btn>
+    </div>
     <div class="auth-wrapper auth-v1">
       <div class="auth-inner">
         <v-card class="auth-card">
@@ -121,13 +127,14 @@
           src="@/assets/images/misc/tree-3.png"
       ></v-img>
     </div>
+
     <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
   </div>
 </template>
 
 <script>
 import TopBar from "../components/system/TopBar";
-import {mdiEyeOffOutline, mdiEyeOutline} from '@mdi/js'
+import {mdiEyeOffOutline, mdiEyeOutline, mdiLaptop} from '@mdi/js'
 import {onMounted, ref} from '@vue/composition-api'
 import {close, startWebSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
@@ -135,6 +142,7 @@ import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
 import {userLogin} from "@/net/api";
 import ImTip from "@/components/system/ImTip";
+import {downloadDesktop} from "@/utils/desktop-util";
 
 export default {
 
@@ -210,10 +218,12 @@ export default {
 
       login,
       forgotPassword,
+      downloadDesktop,
 
       icons: {
         mdiEyeOutline,
         mdiEyeOffOutline,
+        mdiLaptop
       },
 
       isElectron
@@ -225,4 +235,11 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/plugins/auth.scss';
+
+.download-client {
+  position: absolute;
+  z-index: 1;
+  top: 65px;
+  right: 85px;
+}
 </style>

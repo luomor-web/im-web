@@ -59,6 +59,14 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item class="im-list-item" @click="about.visible = true">
+              <v-list-item-icon>
+                <v-icon>mdi-information-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                关于
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item class="im-list-item" @click="quit">
               <v-list-item-icon>
                 <v-icon>{{ icons.mdiExitToApp }}</v-icon>
@@ -75,6 +83,17 @@
         {{ curUser.username }}
       </h3>
       <v-spacer></v-spacer>
+      <v-tooltip bottom z-index="11" v-if="!isElectron">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon
+                 @click="downloadDesktop"
+                 v-bind="attrs"
+                 v-on="on">
+            <v-icon>{{ icons.mdiLaptop }}</v-icon>
+          </v-btn>
+        </template>
+        <span>客户端下载</span>
+      </v-tooltip>
     </div>
     <div class="error-container" v-if="reconnect">
       <v-alert
@@ -90,6 +109,7 @@
     </div>
     <im-warn-dialog :action="warnAction"></im-warn-dialog>
     <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
+    <about :action="about"></about>
   </div>
 </template>
 
@@ -100,7 +120,7 @@ import {
   mdiChevronDown,
   mdiCloudDownloadOutline,
   mdiCog,
-  mdiExitToApp,
+  mdiExitToApp, mdiLaptop,
   mdiPencilOutline
 } from "@mdi/js";
 import {getUserInfo, quitSystem} from "@/net/send-message";
@@ -111,6 +131,8 @@ import {currentUserId} from "@/views/home/home";
 import localStoreUtil from "@/utils/local-store";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
 import ImTip from "@/components/system/ImTip";
+import {downloadDesktop} from "@/utils/desktop-util";
+import About from "@/components/update/About";
 
 export default {
   name: "RoomsHeader",
@@ -118,6 +140,7 @@ export default {
     curUser: Object,
   },
   components: {
+    About,
     ImWarnDialog,
     ImDownloadPath,
     ImTip
@@ -129,6 +152,12 @@ export default {
     const reconnect = ref(false)
     const haveDownloadFile = ref(false)
     const isElectron = ref(process.env.IS_ELECTRON)
+    const about = ref({
+      visible: false,
+      close: () => {
+        about.value.visible = false
+      }
+    })
 
     const warnAction = ref({
       model: false,
@@ -251,10 +280,12 @@ export default {
       downloadPath,
       openLeftDrawer,
       quit,
+      about,
       snackbar,
       reconnect,
       warnAction,
       isElectron,
+      downloadDesktop,
       selectDownloadPath,
       haveDownloadFile,
       icons: {
@@ -264,7 +295,8 @@ export default {
         mdiCog,
         mdiCloudDownloadOutline,
         mdiExitToApp,
-        mdiAlertOutline
+        mdiAlertOutline,
+        mdiLaptop
       }
     }
   }

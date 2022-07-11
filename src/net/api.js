@@ -95,6 +95,13 @@ export function createToken(sessionId) {
     })
 }
 
+function downloadClient(){
+    return request({
+        method: 'get',
+        url: process.env.VUE_APP_UPDATE_URL+'latest.yml'
+    })
+}
+
 export function userLogin(data) {
     return request({
         url: '/user/login',
@@ -104,6 +111,7 @@ export function userLogin(data) {
 }
 
 export default {
-    upload
+    upload,
+    downloadClient
 }
 
