@@ -40,7 +40,7 @@ export default {
   props: {
     action: {type: Object}
   },
-  setup(){
+  setup(props){
     const loading = ref(false)
     const isElectron = ref(process.env.IS_ELECTRON)
 
@@ -52,16 +52,19 @@ export default {
       window.require('electron').ipcRenderer.on('update-not-available', (event, info) => {
         log.info('未发现可用更新', info)
         loading.value = false
+        if (!props.action.visible) return
         returnText.value = '当前已是最新版本'
       })
       // 当发现一个可用更新的时候触发，更新包下载会自动开始。
       window.require('electron').ipcRenderer.on('update-available', (info) => {
         loading.value = false
+        if (!props.action.visible) return
         returnText.value = `发现新版本：${info.version}`
       })
       // 当前处于开发者模式下
       window.require('electron').ipcRenderer.on('development-model', () => {
         loading.value = false
+        if (!props.action.visible) return
         returnText.value = '开发者模式'
       })
     })

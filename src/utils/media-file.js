@@ -33,3 +33,8 @@ export function suffix(file) {
     if(!file) return ''
     return file.substring(file.lastIndexOf('.') + 1)
 }
+
+export function prefix(file) {
+    if(!file) return
+    return file.substring(0,file.lastIndexOf('.'))
+}

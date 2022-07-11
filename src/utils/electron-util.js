@@ -12,6 +12,16 @@ export function openFileLocation(path) {
    return true
 }
 
+export  function getDownloadPath(path, type, n) {
+   const joinStr = path + (n ? `(${n})` : '') + '.' + type;
+   const res = existsSync(joinStr);
+   if (res) {
+      return getDownloadPath(path, type, ++n);
+   } else {
+      return joinStr
+   }
+}
+
 export default {
    openFileLocation,
    separator
