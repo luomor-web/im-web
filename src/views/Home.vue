@@ -17,6 +17,7 @@
           :message-actions="messageActions"
           :room-info-enabled="true"
           :search-message="searchMessage"
+          @open-failed-message="openFailedMessage"
           @room-info="roomInfo"
           @send-message="sendMessage"
           @fetch-messages="fetchMessage"
@@ -73,7 +74,7 @@ import {
 import {init, msgDestroy} from "@/views/home/on-message";
 import RightDrawer from "@/components/rightDrawer/RightDrawer";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
-import {fetchMessage, sendMessage, sendMessageReaction} from "@/views/home/message";
+import {fetchMessage, openFailedMessage, sendMessage, sendMessageReaction} from "@/views/home/message";
 import download from "@/utils/download";
 
 export default {
@@ -173,12 +174,12 @@ export default {
       openFile,
       changeRoom,
       sendMessage,
+      openFailedMessage,
       fetchMessage,
       deleteMessage,
       openRightDrawer,
       clickScrollIcon,
       sendMessageReaction,
-
 
       icons: {
         mdiWindowClose,

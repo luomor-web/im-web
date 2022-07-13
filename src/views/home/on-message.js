@@ -16,9 +16,9 @@ import {
     setCurUser,
     sortedUser,
     upRoom,
-    waitSelectUser,
-    waitSendMessage
+    waitSelectUser
 } from "@/views/home/home";
+import {removeWaitSendMessage} from "@/views/home/message";
 
 export const init = () => {
     // 获取用户信息响应
@@ -148,10 +148,7 @@ const COMMAND_CHAT_RESP = (data) => {
                 messages.value.push(message)
             }
             // 检查等待发送列表
-            const waitIndex = waitSendMessage.value.findIndex(r => r._id === message._id)
-            if (waitIndex !== -1) {
-                waitSendMessage.value.splice(waitIndex, 1)
-            }
+            removeWaitSendMessage(message._id)
         } else {
             messages.value.push(message)
         }

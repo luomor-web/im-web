@@ -1,4 +1,4 @@
-import {changeRoom, currentUserId, curUser, messages, roomId, upRoom, waitSendMessage} from "@/views/home/home";
+import {changeRoom, currentUserId, curUser, messages, roomId, timers, upRoom, waitSendMessage} from "@/views/home/home";
 import {getHistoryMessage, messageReaction, sendChatMessage} from "@/net/send-message";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
@@ -23,10 +23,6 @@ export const fetchMessage = ({room, options = {}}) => {
     } else {
         getHistoryMessage({roomId: roomId.value, type: options.type, messageId: messages.value[0]?._id})
     }
-    // if (page.value === sendPage.value) return
-
-    // sendPage.value = page.value
-    // getHistoryMessage({roomId: roomId.value, page: page.value, number: number.value})
 }
 
 export const sendMessage = async ({content, roomId, files, replyMessage}) => {
@@ -56,6 +52,17 @@ export const sendMessage = async ({content, roomId, files, replyMessage}) => {
 
 }
 
+export const openFailedMessage = async ({ message}) => {
+    removeWaitSendMessage(message._id)
+    const index = messages.value.findIndex(x => x._id === message._id);
+    if(index !== -1) {
+        messages.value.splice(index,1)
+        messages.value = [...messages.value]
+    }
+    message.failure = false
+    await operationMessage(message)
+}
+
 
 const sendFileMessage = (file, roomId, isLast) => {
     const index = waitSendMessage.value.findIndex(r => r.roomId === roomId)
@@ -75,7 +82,8 @@ const sendFileMessage = (file, roomId, isLast) => {
 const operationMessage = async message => {
 
     messages.value.push(message)
-    waitSendMessage.value.push(message)
+
+    addWaitSendMessage(message)
 
     if (!message.files) {
         sendChatMessage(message)
@@ -96,7 +104,7 @@ const operationMessage = async message => {
             url: file.url,
             progress: file.progress
         }, message.roomId, isOver)
-    // 捕获发送过程中的异常, 消息发送失败处理
+        // 捕获发送过程中的异常, 消息发送失败处理
     }).catch(() => {
         handleFailMessage(message._id)
     })
@@ -104,12 +112,19 @@ const operationMessage = async message => {
 
 const handleFailMessage = (messageId) => {
     const message = messages.value.find(r => r._id === messageId);
-    if(!message) return
+    if (!message) return
     message.failure = true
-    message.files.forEach(x => x.progress = -1)
+    message.files?.forEach(x => x.progress = -1)
     messages.value = [...messages.value]
-}
 
+    setWaitSendMessageFail(messageId)
+
+    const t = timers.value.get(messageId);
+    if (t) {
+        clearTimeout(t)
+    }
+    timers.value.delete(messageId)
+}
 
 const updateProgress = (file, messageId) => {
     const message = messages.value.find(r => r._id === messageId);
@@ -119,3 +134,31 @@ const updateProgress = (file, messageId) => {
     messages.value = [...messages.value]
 }
 
+const addWaitSendMessage = (message) => {
+    waitSendMessage.value.push(message)
+    const t = setTimeout(() => {
+        handleFailMessage(message._id)
+    }, 12000);
+    timers.value.set(message._id, t)
+    console.log(timers.value)
+}
+
+export const removeWaitSendMessage = (messageId) => {
+    const waitIndex = waitSendMessage.value.findIndex(r => r._id === messageId)
+    if (waitIndex !== -1) {
+        waitSendMessage.value.splice(waitIndex, 1)
+    }
+    const t = timers.value.get(messageId);
+    if (t) {
+        clearTimeout(t)
+    }
+    timers.value.delete(messageId)
+}
+
+const setWaitSendMessageFail = (messageId) => {
+    const waitIndex = waitSendMessage.value.findIndex(r => r._id === messageId)
+    if (waitIndex !== -1) {
+        waitSendMessage.value[waitIndex].failure = true
+    }
+    waitSendMessage.value = [...waitSendMessage.value]
+}

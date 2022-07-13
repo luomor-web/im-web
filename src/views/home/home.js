@@ -23,6 +23,8 @@ export const searchMessage = ref(false)
 export const roomId = ref('')
 // 等待发送的消息
 export const waitSendMessage = ref([])
+// 全局定时器
+export const timers = ref(new Map())
 // 系统全部人员列表
 export const waitSelectUser = ref([])
 

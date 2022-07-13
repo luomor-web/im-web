@@ -13,7 +13,7 @@ const webSocket = (token) => {
     // const host = location.host
     socket = new WebsocketHeartbeatJs({
         url: socketUrl + '?token=' + token,
-        pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 6000,pongTimeout:6000
+        pingMsg: '{"cmd":13,"hbbyte":"-127"}', pingTimeout: 6000, pongTimeout:6000
     })
     socket.onopen = () => {
         msg.$emit("SOCKET_CONNECTING")
