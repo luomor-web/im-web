@@ -12,6 +12,9 @@ export function upload(url, data, cb) {
     return request({
         url: url,
         method: 'put',
+        retry: 3,
+        timeout: 500000,
+        retryDelay: 1000,
         onUploadProgress: (event) => {
             cb(event.loaded, event.total)
         },

@@ -14,16 +14,24 @@ export async function uploadFiles(files, cb) {
         const md5 = await readMd5(file.file);
         const len = Math.ceil(file.size / CHUNK_SIZE)
         const param = {
-            filename: file.name + (file.extension ? '.' : '') + file.extension, partCount: len, md5: md5, size: file.size
+            filename: file.name + (file.extension ? '.' : '') + file.extension,
+            partCount: len,
+            md5: md5,
+            size: file.size
         }
-        const response = await init(param);
+        const response = await init(param).catch(() => {
+            throw 'request error'
+        });
         const {objectName, uploadId, uploadUrls, quick} = response
         if (!quick) {
             const t = setInterval(() => {
                 countSpeed(file, cb)
             }, 300)
-            
-            await asyncPool(3, uploadUrls, upload, file)
+
+            await asyncPool(3, uploadUrls, upload, file).catch(() => {
+                clearInterval(t)
+                throw 'GG 思密达'
+            })
             const complete = await mergeMultipartUpload({
                 uploadId,
                 objectName,
@@ -45,7 +53,6 @@ export async function uploadFiles(files, cb) {
 }
 
 function countSpeed(file, cb) {
-    console.log(file.uploadTotal, 'file.uploadTotal')
     let total = 0
     file.uploadTotal.forEach(x => {
         total += x
@@ -64,7 +71,9 @@ function asyncPool(poolLimit, array, iteratorFn, file) {
             return Promise.resolve();
         }
         const item = array[i++];
-        const p = Promise.resolve().then(() => iteratorFn(item, array, file));
+        const p = Promise.resolve().then(() => iteratorFn(item, array, file).catch(() => {
+            throw "片上传失败"
+        }));
         ret.push(p);
 
         let r = Promise.resolve();
@@ -102,7 +111,7 @@ const readMd5 = async (file) => {
 
 const upload = (item, arr, file) => {
     // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
         const index = arr.findIndex(x => x === item);
         let endPoint = index * CHUNK_SIZE + CHUNK_SIZE
         if (index === (arr.length - 1)) {
@@ -111,9 +120,9 @@ const upload = (item, arr, file) => {
         console.log(item, index, index * CHUNK_SIZE, endPoint)
         await api.upload(item, file.file.slice(index * CHUNK_SIZE, endPoint), (loaded) => {
             file.uploadTotal[index] = loaded
+        }).catch((err) => {
+            reject(err)
         })
         resolve(item)
     })
 }
-
-

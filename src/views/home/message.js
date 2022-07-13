@@ -83,7 +83,6 @@ const operationMessage = async message => {
     }
 
     await uploadFiles(message.files, (file, isOver) => {
-        console.log(file, isOver)
         if (file.progress) {
             updateProgress(file, message._id)
             return
@@ -97,9 +96,20 @@ const operationMessage = async message => {
             url: file.url,
             progress: file.progress
         }, message.roomId, isOver)
-
+    // 捕获发送过程中的异常, 消息发送失败处理
+    }).catch(() => {
+        handleFailMessage(message._id)
     })
 }
+
+const handleFailMessage = (messageId) => {
+    const message = messages.value.find(r => r._id === messageId);
+    if(!message) return
+    message.failure = true
+    message.files.forEach(x => x.progress = -1)
+    messages.value = [...messages.value]
+}
+
 
 const updateProgress = (file, messageId) => {
     const message = messages.value.find(r => r._id === messageId);
