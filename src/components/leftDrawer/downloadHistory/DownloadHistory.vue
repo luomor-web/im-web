@@ -133,12 +133,6 @@ export default {
     const delHistory = (item) => {
       const localIndex = downloadFileList.value.findIndex(x => x.id === item.id);
       downloadFileList.value.splice(localIndex, 1);
-
-      const defaultDownloadList = localStore.getJsonValue('download-file-list');
-      const index = defaultDownloadList.findIndex(x => x.id === item.id);
-      if (index === -1) return
-      defaultDownloadList.splice(index, 1)
-      localStore.setJsonValue('download-file-list', defaultDownloadList)
     }
 
     const stopDownload = (item) => {

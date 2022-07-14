@@ -52,11 +52,11 @@ export const sendMessage = async ({content, roomId, files, replyMessage}) => {
 
 }
 
-export const openFailedMessage = async ({ message}) => {
+export const openFailedMessage = async ({message}) => {
     removeWaitSendMessage(message._id)
     const index = messages.value.findIndex(x => x._id === message._id);
-    if(index !== -1) {
-        messages.value.splice(index,1)
+    if (index !== -1) {
+        messages.value.splice(index, 1)
         messages.value = [...messages.value]
     }
     message.failure = false
@@ -74,6 +74,7 @@ const sendFileMessage = (file, roomId, isLast) => {
     waitSendMessage.value[index].files[fileIndex] = file
     if (!isLast) return
 
+    setCheckTimer(waitSendMessage.value[index])
     sendChatMessage(waitSendMessage.value[index])
 
     // waitSendMessage.value.splice(index, 1)
@@ -83,13 +84,13 @@ const operationMessage = async message => {
 
     messages.value.push(message)
 
-    addWaitSendMessage(message)
 
     if (!message.files) {
+        addWaitSendMessage(message)
         sendChatMessage(message)
         return
     }
-
+    addWaitSendMessage(message,true)
     await uploadFiles(message.files, (file, isOver) => {
         if (file.progress) {
             updateProgress(file, message._id)
@@ -134,13 +135,18 @@ const updateProgress = (file, messageId) => {
     messages.value = [...messages.value]
 }
 
-const addWaitSendMessage = (message) => {
+const addWaitSendMessage = (message, haveFile) => {
     waitSendMessage.value.push(message)
+    if (!haveFile) {
+        setCheckTimer(message)
+    }
+}
+
+const setCheckTimer = (message) => {
     const t = setTimeout(() => {
         handleFailMessage(message._id)
     }, 12000);
     timers.value.set(message._id, t)
-    console.log(timers.value)
 }
 
 export const removeWaitSendMessage = (messageId) => {

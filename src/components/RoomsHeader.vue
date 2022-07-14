@@ -245,6 +245,11 @@ export default {
         flushDownloadState()
         tip('下载错误,错误的路径或已被清理')
       })
+      window.require('electron').ipcRenderer.on('download-file-cancelled', (event, args) => {
+        delHistory(args)
+        flushDownloadState()
+        tip('下载取消')
+      })
     }
 
     const delHistory = (item) => {

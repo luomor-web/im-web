@@ -200,11 +200,10 @@ ipcMain.on('ding', () => {
 
 let t
 const closeFlash = () => {
-    log.info('窗口聚焦')
     win.flashFrame(false)
     appIcon.setImage(iconPath);
     clearInterval(t)
-    t=null
+    t = null
 }
 
 let count = 0
@@ -245,12 +244,12 @@ const willDownload = () => {
             totalBytes: item.getTotalBytes()
         })
         // 设置当前下载的列表,用来停止下载
-        downloadItemList.set(downloadFile.id, item)
+        downloadItemList.set(item.file.id, item)
         item.on('updated', (event, updatedState) => {
             if (updatedState === 'interrupted') {
                 log.info('download-file-interrupted')
                 // 中断的话直接删除
-                downloadItemList.delete(downloadFile.id)
+                downloadItemList.delete(item.file.id)
                 win.webContents.send('download-file-interrupted', {
                     ...item.file,
                     receivedBytes: item.getReceivedBytes(),
@@ -269,31 +268,47 @@ const willDownload = () => {
                         receivedBytes: item.getReceivedBytes(),
                         totalBytes: item.getTotalBytes()
                     })
-                    win.setProgressBar(item.getReceivedBytes() / item.getTotalBytes())
+                    setProgressBar()
                     // console.log(`Received bytes: ${item.getReceivedBytes()}`)
                 }
             }
         })
         item.once('done', (event, state) => {
             // 结束的话直接删除
-            downloadItemList.delete(downloadFile.id)
-            win.setProgressBar(-1)
+            downloadItemList.delete(item.file.id)
+            setProgressBar()
             if (state === 'completed') {
                 renameSync(item.file.downloadPath + ".tmp", item.file.downloadPath)
                 win.webContents.send('download-file-done', {
-                    ...item.file,
-                    receivedBytes: item.getReceivedBytes(),
-                    totalBytes: item.getTotalBytes()
+                    ...item.file
+                })
+            } else if (state === 'cancelled'){
+                win.webContents.send('download-file-cancelled', {
+                    ...item.file
                 })
             } else {
                 win.webContents.send('download-file-fail', {
-                    ...item.file,
-                    receivedBytes: item.getReceivedBytes(),
-                    totalBytes: item.getTotalBytes()
+                    ...item.file
                 })
             }
         })
     })
+}
+
+const setProgressBar = () => {
+    if (!downloadItemList) {
+        win.setProgressBar(-1)
+        return
+    }
+    let progress = -1
+
+    downloadItemList.forEach((v)=>{
+        const number = v.getReceivedBytes() / v.getTotalBytes();
+        if (number  > progress) {
+            progress = number
+        }
+    })
+    win.setProgressBar(progress)
 }
 
 ipcMain.handle('download-file-stop', (event, file) => {
