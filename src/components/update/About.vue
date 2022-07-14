@@ -56,7 +56,7 @@ export default {
         returnText.value = '当前已是最新版本'
       })
       // 当发现一个可用更新的时候触发，更新包下载会自动开始。
-      window.require('electron').ipcRenderer.on('update-available', (info) => {
+      window.require('electron').ipcRenderer.on('update-available', (event, info) => {
         loading.value = false
         if (!props.action.visible) return
         returnText.value = `发现新版本：${info.version}`

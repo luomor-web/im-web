@@ -48,7 +48,7 @@ module.exports = {
                     output: "./dist_electron"//输出文件路径
                 },
                 releaseInfo: {
-                    releaseNotes: `{"forceVersion": "0.9.0", "wholeVersion": "0.9.0"}`
+                    releaseNotes: `{"forceVersion": "0.0.0", "wholeVersion": "0.0.0"}`
                 },
                 afterPack: './afterPack.js',
                 extraResources: [{
