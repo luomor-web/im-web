@@ -60,6 +60,8 @@ function createWindow() {
     win.on('ready-to-show', function () {
         win.show() // 初始化后再显示
     })
+
+    win.on('focus', closeFlash)
 }
 
 app.commandLine.appendSwitch('ignore-certificate-errors')    //忽略证书的检测
@@ -152,8 +154,10 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
 ]))
 
 // 绑定托盘
+let iconPath, blankIconPath;
 const bindTray = () => {
-    const iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.ico' : './icons/tray.ico')
+    iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.ico' : './icons/tray.ico');
+    blankIconPath = path.join(__dirname, isDevelopment ? '../public/icons/black_tray.ico' : './icons/black_tray.ico');
     log.info('图标路径', iconPath)
     appIcon = new Tray(iconPath)
     appIcon.setContextMenu(Menu.buildFromTemplate([
@@ -170,7 +174,7 @@ const bindTray = () => {
             }
         }
     ]))
-    appIcon.setToolTip('信使')
+    appIcon.setToolTip(isDevelopment ? '信使开发版' : '信使')
     appIcon.on('click', () => {
         showWindow()
     })
@@ -184,6 +188,36 @@ const showWindow = () => {
 const hideWindow = () => {
     win.setSkipTaskbar(true);
     win.hide();
+}
+
+
+// 通知栏和任务栏闪烁 ===============================
+// 通知栏闪烁定时器
+
+ipcMain.on('ding', () => {
+    startFlash()
+})
+
+let t
+const closeFlash = () => {
+    log.info('窗口聚焦')
+    win.flashFrame(false)
+    appIcon.setImage(iconPath);
+    clearInterval(t)
+    t=null
+}
+
+let count = 0
+const startFlash = () => {
+    if (t || win.isFocused()) return
+    win.flashFrame(true)
+    t = setInterval(function () {
+        if (count++ % 2 === 0) {
+            appIcon.setImage(iconPath);
+        } else {
+            appIcon.setImage(blankIconPath);
+        }
+    }, 600);
 }
 
 // 文件下载========================================
@@ -235,6 +269,7 @@ const willDownload = () => {
                         receivedBytes: item.getReceivedBytes(),
                         totalBytes: item.getTotalBytes()
                     })
+                    win.setProgressBar(item.getReceivedBytes() / item.getTotalBytes())
                     // console.log(`Received bytes: ${item.getReceivedBytes()}`)
                 }
             }
@@ -242,6 +277,7 @@ const willDownload = () => {
         item.once('done', (event, state) => {
             // 结束的话直接删除
             downloadItemList.delete(downloadFile.id)
+            win.setProgressBar(-1)
             if (state === 'completed') {
                 renameSync(item.file.downloadPath + ".tmp", item.file.downloadPath)
                 win.webContents.send('download-file-done', {

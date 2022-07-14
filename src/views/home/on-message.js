@@ -123,20 +123,15 @@ const COMMAND_CHAT_RESP = (data) => {
 
     if (loadedRooms.value[roomIndex].notice && message.senderId !== curUser.value._id) {
         ding()
+        if (!process.env.IS_ELECTRON) return
+        window.require('electron').ipcRenderer.send('ding')
     }
 
-    const lastMessage = buildLastMessage(message)
+    // 设置最后一条消息
+    loadedRooms.value[roomIndex].lastMessage = buildLastMessage(message)
 
-    if (!loadedRooms.value[roomIndex].lastMessage) {
-
-        loadedRooms.value[roomIndex] = {
-            ...loadedRooms.value[roomIndex],
-            lastMessage
-        }
-    } else {
-        loadedRooms.value[roomIndex].lastMessage = lastMessage
-    }
-
+    // 将目标消息置顶
+    upRoom(message.roomId)
     if (message.roomId === roomId.value) {
         clearUnReadMessage(roomId.value)
         if (currentUserId.value === message.senderId) {
@@ -154,8 +149,6 @@ const COMMAND_CHAT_RESP = (data) => {
         }
         return
     }
-    // 将目标消息置顶
-    upRoom(message.roomId)
     loadedRooms.value[roomIndex].unreadCount = message.unreadCount
     loadedRooms.value = [...loadedRooms.value]
 }
