@@ -8,6 +8,7 @@ import {getDownloadPath, separator} from "@/utils/electron-util";
 import {existsSync} from "fs";
 import {prefix, suffix} from "@/utils/media-file";
 import {renameSync} from "fs-extra";
+import {removeKey} from "@/utils/local-store";
 
 const log = require("electron-log")
 
@@ -97,7 +98,10 @@ ipcMain.on('close', () => {
     hideWindow()
 })
 
-ipcMain.on('quit', () => app.quit())
+ipcMain.on('quit', () => {
+    removeKey('token')
+    app.quit()
+})
 
 ipcMain.handle('win-version', (event, v) => {
     version = v
