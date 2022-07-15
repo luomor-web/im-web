@@ -140,9 +140,11 @@ import {close, startWebSocket} from "@/net/socket";
 import msg from '@/plugins/msg'
 import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
+import sessionStoreUtil from "@/utils/session-store";
 import {userLogin} from "@/net/api";
 import ImTip from "@/components/system/ImTip";
 import {downloadDesktop} from "@/utils/desktop-util";
+import store from "@/store";
 
 export default {
 
@@ -168,9 +170,8 @@ export default {
     const login = () => {
       // startWebSocket(username.value, password.value)
       userLogin({account: username.value, password: password.value}).then(response => {
-        console.log(response)
         if (response.success) {
-          localStoreUtil.setValue('token', response.data)
+          sessionStoreUtil.setValue('token', response.data)
           startWebSocket(response.data)
         } else {
           snackbar.value.display = true
@@ -192,7 +193,8 @@ export default {
       msg.$on("COMMAND_LOGIN_RESP", (data) => {
         if (data.success) {
           localStoreUtil.setValue('username', username.value)
-          localStoreUtil.setValue('userId', data.data._id)
+          store.commit('setCurrentUserId', data.data._id)
+          console.log(store.state.currentUserId)
           if (remember.value) {
             localStoreUtil.setValue('password', password.value)
           }

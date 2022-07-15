@@ -1,7 +1,8 @@
 import WebsocketHeartbeatJs from 'websocket-heartbeat-js'
 import msg from '../plugins/msg'
-import localStoreUtil, {getValue} from "@/utils/local-store";
+import sessionStoreUtil from "@/utils/session-store";
 import router from "@/router";
+import store from "@/store";
 
 let socket
 
@@ -28,83 +29,83 @@ const webSocket = (token) => {
                 break
             // 加入群组通知
             case 9:
-                msg.$emit("COMMAND_JOIN_GROUP_NOTIFY_RESP", data)
+                store.commit("COMMAND_JOIN_GROUP_NOTIFY_RESP", data)
                 break;
             // 聊天请求
             case 11:
-                msg.$emit("COMMAND_CHAT_RESP", data)
+                store.commit("COMMAND_CHAT_RESP", data)
                 break;
             // 心跳响应
             case 13:
-                msg.$emit("COMMAND_HEARTBEAT_RESP", data)
+                // store.commit("COMMAND_HEARTBEAT_RESP", data)
                 break;
             // 获取用户信息相应
             case 18:
-                msg.$emit("COMMAND_GET_USER_RESP", data)
+                store.commit("COMMAND_GET_USER_RESP", data)
                 break;
             // 获取历史消息
             case 20:
-                msg.$emit("COMMAND_GET_MESSAGE_RESP", data)
+                store.commit("COMMAND_GET_MESSAGE_RESP", data)
                 break;
             // 用户上下线消息
             case 21:
-                msg.$emit("COMMAND_USER_STATUS_RESP", data)
+                store.commit("COMMAND_USER_STATUS_RESP", data)
                 break
             // 群组创建成功 (暂不关注)
             case 23:
-                msg.$emit("COMMAND_CREATE_GROUP_RESP", data)
+                store.commit("COMMAND_CREATE_GROUP_RESP", data)
                 break
             // 消息已读响应
             case 25:
-                msg.$emit("COMMAND_MESSAGE_READ_RESP", data)
+                store.commit("COMMAND_MESSAGE_READ_RESP", data)
                 break;
             // 当前用户列表
             case 27:
-                msg.$emit("COMMAND_USER_LIST_RESP", data)
+                store.commit("COMMAND_USER_LIST_RESP", data)
                 break;
             // 表情回复消息
             case 29:
-                msg.$emit("COMMAND_SEND_MESSAGE_REACTION_RESP", data)
+                store.commit("COMMAND_SEND_MESSAGE_REACTION_RESP", data)
                 break;
             // 修改信息返回
             case 31:
-                msg.$emit("COMMAND_EDIT_PROFILE_REST", data)
+                store.commit('COMMAND_EDIT_PROFILE_REST', data)
                 break;
             // 群组移除用户返回
             case 33:
-                msg.$emit("COMMAND_REMOVE_GROUP_USER_RESP", data)
+                store.commit("COMMAND_REMOVE_GROUP_USER_RESP", data)
                 break;
             // 解散群聊响应
             case 39:
-                msg.$emit("COMMAND_DISBAND_GROUP_RESP", data)
+                store.commit("COMMAND_DISBAND_GROUP_RESP", data)
                 break;
             // 移交群主响应
             case 41:
-                msg.$emit("COMMAND_HANDOVER_GROUP_RESP", data)
+                store.commit("COMMAND_HANDOVER_GROUP_RESP", data)
                 break;
             // 修改群组信息响应
             case 43:
-                msg.$emit("COMMAND_EDIT_GROUP_PROFILE_RESP", data)
+                store.commit("COMMAND_EDIT_GROUP_PROFILE_RESP", data)
                 break;
             // 删除信息响应
             case 45:
-                msg.$emit("COMMAND_MESSAGE_DELETE_RESP", data)
+                store.commit("COMMAND_MESSAGE_DELETE_RESP", data)
                 break;
             // 删除信息响应
             case 49:
-                msg.$emit("COMMAND_SEARCH_MESSAGE_RESP", data)
+                store.commit("COMMAND_SEARCH_MESSAGE_RESP", data)
                 break;
             // 系统消息会话消息
             case 51:
-                msg.$emit("COMMAND_SYSTEM_MESSAGE_RESP", data)
+                store.commit("COMMAND_SYSTEM_MESSAGE_RESP", data)
                 break;
             // 群组配置修改
             case 53:
-                msg.$emit("COMMAND_USER_GROUP_CONFIG_RESP", data)
+                store.commit("COMMAND_USER_GROUP_CONFIG_RESP", data)
                 break;
             // 音视频通话消息
             case 56:
-                msg.$emit("COMMAND_VIDEO_RESP", data)
+                store.commit("COMMAND_VIDEO_RESP", data)
                 break;
             default:
                 break
@@ -121,11 +122,11 @@ const webSocket = (token) => {
 }
 
 const close = () => {
-    localStoreUtil.removeKey('userId')
-    localStoreUtil.removeKey('token')
+    sessionStoreUtil.removeKey('token')
     socket.heartReset()
     socket.close()
-    router.push('/Login')
+    socket = null
+    router.push('/Login').then(() => {})
 }
 
 const sendMsg = (data) => {
@@ -140,7 +141,8 @@ const sendMsg = (data) => {
 const initWebSocket = () => {
     // const username = getValue('username')
     // const password = getValue('password')
-    const token = getValue('token')
+
+    const token = sessionStoreUtil.getValue('token')
     if (token === '' || token === undefined || token === null) {
         if (socket) {
             try {
@@ -150,9 +152,12 @@ const initWebSocket = () => {
             }
         }
         // localStoreUtil.clear()
-        router.push('/login')
+        router.push('/login').then(() => {})
     }
+
+    console.log('初始化Token1')
     if (socket == null && token) {
+        console.log('初始化Token2')
         webSocket(token)
     }
 }

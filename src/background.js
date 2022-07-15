@@ -8,7 +8,6 @@ import {getDownloadPath, separator} from "@/utils/electron-util";
 import {existsSync} from "fs";
 import {prefix, suffix} from "@/utils/media-file";
 import {renameSync} from "fs-extra";
-import {removeKey} from "@/utils/local-store";
 
 const log = require("electron-log")
 
@@ -99,7 +98,6 @@ ipcMain.on('close', () => {
 })
 
 ipcMain.on('quit', () => {
-    removeKey('token')
     app.quit()
 })
 
@@ -181,6 +179,12 @@ const bindTray = () => {
     appIcon.setToolTip(isDevelopment ? '信使开发版' : '信使')
     appIcon.on('click', () => {
         showWindow()
+    })
+    appIcon.on('mouse-enter', (event, position) => {
+        console.log(event,position)
+    })
+    appIcon.on('mouse-leave', (event, position) => {
+        console.log(event,position)
     })
 }
 
@@ -373,9 +377,6 @@ const updateHandle = () => {
     autoUpdater.autoInstallOnAppQuit = false
 
     autoUpdater.checkForUpdates().then(() => {
-    })
-    autoUpdater.on('error', (info) => {
-        console.log('更新失败', info)
     })
     // 更新失败
     autoUpdater.on('error', (info) => {

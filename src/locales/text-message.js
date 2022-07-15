@@ -11,5 +11,5 @@ export const textMessages =  ref({
     SEARCH: '搜索',
     IS_ONLINE: '当前在线',
     LAST_SEEN: '最后上线时间 ',
-    IS_TYPING: 'is writing...'
+    IS_TYPING: '正在输入...'
 })

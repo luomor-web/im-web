@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import {waitSelectUser} from "@/views/home/home";
 import {computed} from "@vue/composition-api";
+import store from "@/store";
 
 export default {
   name: "UserSelectColumn",
@@ -31,7 +31,7 @@ export default {
     }
   },
   setup(props, {emit}) {
-
+    const waitSelectUser = computed(()=> store.state.waitSelectUser)
     const clickContent = (item) => {
       emit('click-content', item)
     }

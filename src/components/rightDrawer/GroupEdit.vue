@@ -110,11 +110,11 @@
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {computed, inject, onMounted, ref, watch} from "@vue/composition-api";
-import localStoreUtil from "@/utils/local-store";
 import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/send-message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
 import ImUpload from "@/components/system/ImUpload";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
+import store from "@/store";
 
 export default {
   name: "GroupEdit",
@@ -128,7 +128,7 @@ export default {
   },
   setup(props) {
     // 当前用户ID
-    const curUserId = ref(localStoreUtil.getValue('userId'))
+    const curUserId = computed(()=> store.state.currentUserId)
     // 当前用户
     const curUser = ref(null)
     // 当前房间名称

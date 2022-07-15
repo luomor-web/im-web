@@ -64,8 +64,8 @@ import {mdiCamera, mdiCheck} from "@mdi/js";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import {editProfile} from "@/net/send-message";
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {curUser} from "@/views/home/home";
 import ImUpload from "@/components/system/ImUpload";
+import store from "@/store";
 
 export default {
   name: "UserProfile",
@@ -77,6 +77,8 @@ export default {
     user: Object
   },
   setup(props, context) {
+    const curUser = computed(() => store.state.curUser)
+
     watch(() => props.user, () => {
       initData()
     })

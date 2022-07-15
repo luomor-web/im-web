@@ -14,13 +14,13 @@
 
 <script>
 import DownloadHistory from "@/components/leftDrawer/downloadHistory/DownloadHistory";
-import {provide, ref} from "@vue/composition-api";
-import {curUser, loadedRooms} from "@/views/home/home";
+import {computed, provide, ref} from "@vue/composition-api";
 import {mdiPlus} from "@mdi/js";
 import FloatMenu from "@/components/leftDrawer/FloatMenu";
 import AddChat from "@/components/leftDrawer/addChat/AddChat";
 import AddRoom from "@/components/leftDrawer/addRoom/AddRoom";
 import Setting from "@/components/leftDrawer/setting/Setting";
+import store from "@/store";
 
 export default {
   name: "LeftDrawer",
@@ -32,6 +32,7 @@ export default {
     DownloadHistory
   },
   setup(props, {emit}) {
+    const curUser = computed(() => store.state.curUser)
 
     const active = ref('')
     const visible = ref(false)
@@ -63,7 +64,6 @@ export default {
       open,
       close,
 
-      loadedRooms,
       visible,
       curUser,
       activeSub,

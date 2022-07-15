@@ -14,6 +14,10 @@ export const messageActions = ref([
         name: 'deleteMessage',
         title: '删除',
         onlyMe: true
+    },
+    {
+        name: 'selectMessages',
+        title: '转发'
     }
 ])
 

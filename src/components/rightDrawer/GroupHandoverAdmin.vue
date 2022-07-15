@@ -29,7 +29,7 @@ import DrawerTop from "@/components/drawer/DrawerTop";
 import {computed, inject, ref} from "@vue/composition-api";
 import {handoverUserGroup} from "@/net/send-message";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
-import {curUser} from "@/views/home/home";
+import store from "@/store";
 
 export default {
   name: "GroupHandoverAdmin",
@@ -41,6 +41,7 @@ export default {
     room: {type: Object}
   },
   setup(props) {
+    const curUser = computed(() => store.state.curUser)
     const searchName = ref('')
 
     // 操作动作

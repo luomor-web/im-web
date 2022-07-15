@@ -17,18 +17,19 @@
 
 <script>
 import {mdiChatOutline, mdiMagnify} from "@mdi/js";
-import {ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import {createGroup} from "@/net/send-message";
-import {changeRoom, loadedRooms, upRoom} from "@/views/home/home";
 import UserSelectColumn from "@/components/user/UserSelectColumn";
 import UserSearch from "@/components/user/UserSearch";
+import store from "@/store";
 
 export default {
   name: "AddChat",
   components: {UserSearch, UserSelectColumn, DrawerTop},
   props: {},
   setup(props, context) {
+    const loadedRooms = computed(() => store.state.loadedRooms)
     const userSelectModel = ref(false)
 
     const waitSelect = ref([])
@@ -44,8 +45,8 @@ export default {
         closeAddChat()
         return
       }
-      upRoom(room.roomId)
-      changeRoom(room.roomId)
+      store.commit('upRoom', room.roomId)
+      store.commit('changeRoom',room.roomId)
       closeAddChat()
     }
 

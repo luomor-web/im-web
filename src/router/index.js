@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import {getValue} from "@/utils/local-store.js";
+import sessionStoreUtil from "@/utils/session-store";
 
 Vue.use(VueRouter)
 
@@ -33,17 +33,15 @@ const router = new VueRouter({
 
 
 router.beforeEach((to, from, next) => {
-    if(to.path === '/login' || to.path === '/register'){
+    if (to.path === '/login' || to.path === '/register') {
         next()
-    }else {
-        const token = getValue('token')
-        if(token === undefined || token === null || token === ''){
+    } else {
+        const token = sessionStoreUtil.getValue('token')
+        if (token === undefined || token === null || token === '') {
             next('/login')
         }
         next()
     }
-
-
 })
 
 export default router

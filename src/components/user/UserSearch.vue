@@ -36,8 +36,8 @@
 </template>
 
 <script>
-import {computed, onMounted, ref} from "@vue/composition-api";
-import {waitSelectUser} from "@/views/home/home";
+import {computed, ref} from "@vue/composition-api";
+import store from "@/store";
 
 export default {
   name: "UserSearch",
@@ -52,6 +52,7 @@ export default {
   },
   setup(props, {emit}) {
 
+    const waitSelectUser = computed(()=> store.state.waitSelectUser)
     const searchName = ref('')
 
     const filteredItems = computed(() => {
@@ -59,8 +60,7 @@ export default {
       return waitSelectUser.value.filter(x => x.username.indexOf(searchName.value) !== -1 && props.filters.findIndex(r => r._id === x._id) === -1)
     })
 
-    const customFilter = (item, queryText, itemText) => {
-      console.log(itemText)
+    const customFilter = (item, queryText) => {
       const username = item.username.toLowerCase()
       const searchText = queryText.toLowerCase()
 
@@ -70,10 +70,6 @@ export default {
     const selectItem = (item) => {
       emit('click-content', item)
     }
-
-    onMounted(() => {
-
-    })
 
     return {
       selectItem,

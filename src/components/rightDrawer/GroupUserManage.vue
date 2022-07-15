@@ -68,8 +68,8 @@ import DrawerTop from "@/components/drawer/DrawerTop";
 import {computed, inject, ref} from "@vue/composition-api";
 import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
 import {removeUserGroup, setAdmin} from "@/net/send-message";
-import {curUser} from "@/views/home/home";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
+import store from "@/store";
 
 export default {
 
@@ -82,6 +82,7 @@ export default {
     room: {type: Object}
   },
   setup(props) {
+    const curUser = computed(() => store.state.curUser)
     const searchName = ref('')
 
     // 操作动作

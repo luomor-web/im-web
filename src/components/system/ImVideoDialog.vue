@@ -65,13 +65,13 @@
 
 <script>
 
-import {onMounted, ref} from "@vue/composition-api";
-import {currentUserId, loadedRooms} from "@/views/home/home";
+import {computed, onMounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {callVideo} from "@/net/send-message";
 import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo} from "@mdi/js";
 import UserVideo from "@/components/system/openvidu/UserVideo";
-import {du, mainStreamManager, session, subStreamManager,audioVolume} from "@/components/system/openvidu/OpenVidu";
+import {audioVolume, du, mainStreamManager, session, subStreamManager} from "@/components/system/openvidu/OpenVidu";
+import store from "@/store";
 
 export default {
   name: "ImVideoDialog",
@@ -101,7 +101,8 @@ export default {
   comments: {},
 
   setup(props, {emit}) {
-
+    const loadedRooms = computed(() => store.state.loadedRooms)
+    const currentUserId = computed(() => store.state.currentUserId)
     // 开启音频
     const audioEnabled = ref(true)
     // 开启视频

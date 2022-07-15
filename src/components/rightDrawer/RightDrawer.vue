@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import {ref, watch, provide} from "@vue/composition-api";
+import {ref, provide, computed} from "@vue/composition-api";
 import GroupInfo from "@/components/rightDrawer/GroupInfo";
 import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
@@ -37,31 +37,23 @@ import GroupHandoverAdmin from "@/components/rightDrawer/GroupHandoverAdmin";
 import GroupInviteUser from "@/components/rightDrawer/GroupInviteUser";
 import UserInfo from "@/components/rightDrawer/UserInfo";
 import MessageHistory from "@/components/rightDrawer/MessageHistory";
+import store from "@/store";
 
 export default {
   name: "RightDrawer",
   components: {MessageHistory, UserInfo, GroupInviteUser, GroupHandoverAdmin, GroupUserManage, GroupEdit, GroupInfo},
-  props: {
-    room: {type: Object},
-  },
-  setup(props) {
-    const visible = ref(false)
-    const active = ref('')
+  setup() {
 
-    watch(() => props.room, (room,old) => {
-      console.log('change', room,old)
-      // if (old === undefined) return
-      // console.log('change', room,old)
-      active.value = room.isFriend || room.isSystem ? 'USER_INFO' : 'GROUP_INFO'
-    })
+    const room = computed(() => store.getters.curRoom)
+    const visible = ref(false)
+    const active = ref(room.value?.isFriend || room.value?.isSystem ? 'USER_INFO' : 'GROUP_INFO')
 
     const roomInfo = () => {
-      console.log('roomInfo')
       if(visible.value) {
         close()
         return
       }
-      open(props.room.isFriend || props.room.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+      open(room.value.isFriend || room.value.isSystem ? 'USER_INFO' : 'GROUP_INFO')
     }
 
     const open = item => {
@@ -82,6 +74,7 @@ export default {
       open,
       close,
       roomInfo,
+      room,
       active,
       visible,
     }

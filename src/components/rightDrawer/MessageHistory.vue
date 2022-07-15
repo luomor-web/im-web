@@ -92,7 +92,7 @@ import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/send-message";
 import {buildDisplayTime} from "@/utils/date-util";
 import {scrollToView} from "@/utils/dom";
-import {startHistoryMessage} from "@/views/home/home";
+import store from "@/store";
 
 export default {
   name: "MessageHistory",
@@ -134,7 +134,16 @@ export default {
       // 否则的话刷掉
       const element = document.getElementById(item._id);
       if (!element) {
-        startHistoryMessage(item)
+        store.commit('setSearchMessage', true)
+        store.commit('clearMessages')
+        store.commit('pushMessage', item)
+
+        setTimeout(() => {
+          const element = document.getElementById(item._id);
+          if (element) {
+            scrollToView(element)
+          }
+        }, 1000)
         return
       }
       scrollToView(element)

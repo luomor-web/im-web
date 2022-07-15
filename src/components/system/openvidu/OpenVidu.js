@@ -1,7 +1,7 @@
-import {ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {OpenVidu} from "openvidu-browser";
-import {currentUserId} from "@/views/home/home";
 import {createSession, createToken} from "@/net/api";
+import store from "@/store";
 
 const OV = ref(undefined);
 // 推送者视频流
@@ -14,6 +14,7 @@ export const subStreamManager = ref(undefined)
 // 所有的子, 本界面不存在
 const subscribers = ref([])
 export const audioVolume = ref(0)
+const currentUserId = computed(() => store.state.currentUserId)
 
 const joinSession = (roomId,sessionId,enableVideo) => {
     console.log(enableVideo,'enableVideo')

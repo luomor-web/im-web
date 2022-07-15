@@ -107,6 +107,7 @@
       </v-alert>
 
     </div>
+    <im-user-select-dialog :action="userAction"></im-user-select-dialog>
     <im-warn-dialog :action="warnAction"></im-warn-dialog>
     <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
     <about :action="about"></about>
@@ -120,36 +121,39 @@ import {
   mdiChevronDown,
   mdiCloudDownloadOutline,
   mdiCog,
-  mdiExitToApp, mdiLaptop,
+  mdiExitToApp,
+  mdiLaptop,
   mdiPencilOutline
 } from "@mdi/js";
 import {getUserInfo, quitSystem} from "@/net/send-message";
-import {inject, onMounted, ref} from "@vue/composition-api";
+import {computed, inject, onMounted, ref} from "@vue/composition-api";
 import ImDownloadPath from "@/components/system/ImDownloadPath";
 import msg from "@/plugins/msg";
-import {currentUserId} from "@/views/home/home";
 import localStoreUtil from "@/utils/local-store";
+import localStore from "@/utils/local-store";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
 import ImTip from "@/components/system/ImTip";
 import {downloadDesktop} from "@/utils/desktop-util";
 import About from "@/components/update/About";
-import localStore from "@/utils/local-store";
+import ImUserSelectDialog from "@/components/system/ImUserSelectDialog";
+import store from "@/store";
 
 export default {
   name: "RoomsHeader",
-  props: {
-    curUser: Object,
-  },
+  props: {},
   components: {
+    ImUserSelectDialog,
     About,
     ImWarnDialog,
     ImDownloadPath,
     ImTip
   },
   setup() {
+    const currentUserId = computed(() => store.state.currentUserId)
+
+    const curUser = computed(() => store.state.curUser)
     const downloadPath = ref(null)
-    const openLeftDrawer = inject('openLeftDrawer', () => {
-    })
+    const openLeftDrawer = inject('openLeftDrawer', () => {})
     const reconnect = ref(false)
     const haveDownloadFile = ref(false)
     const isElectron = ref(process.env.IS_ELECTRON)
@@ -157,6 +161,17 @@ export default {
       visible: false,
       close: () => {
         about.value.visible = false
+      }
+    })
+
+    const userAction = ref({
+      model: false,
+      title: '用户选择',
+      sure: () => {
+
+      },
+      cancel: () => {
+       userAction.value.model = false
       }
     })
 
@@ -169,6 +184,7 @@ export default {
       },
       sure: () => {
         clearDownloadFileList();
+        store.commit('resetDate')
         quitSystem()
       }
     })
@@ -191,8 +207,10 @@ export default {
         warnAction.value.model = true
         return
       }
+      store.commit('resetDate')
       quitSystem()
     }
+
 
     const selectDownloadPath = (file) => {
       downloadPath.value.action(file)
@@ -295,16 +313,23 @@ export default {
       }
     }
 
-    return {
+    const selectUser = (cb) => {
+      userAction.value.sure = cb
+      userAction.value.model = true
+    }
 
+    return {
       downloadPath,
       openLeftDrawer,
       quit,
+      curUser,
       about,
+      userAction,
       snackbar,
       reconnect,
       warnAction,
       isElectron,
+      selectUser,
       downloadDesktop,
       selectDownloadPath,
       haveDownloadFile,
