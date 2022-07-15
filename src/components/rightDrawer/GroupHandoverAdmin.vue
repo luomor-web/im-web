@@ -6,9 +6,9 @@
       </v-text-field>
     </drawer-top>
 
-    <div class="mx-2 overflow-y-auto fill-height" >
+    <div class="mx-2 overflow-y-auto fill-height">
       <v-list nav>
-        <v-list-item v-ripple  v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
+        <v-list-item v-ripple v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
           <v-list-item-avatar>
             <v-img :src="item.avatar"></v-img>
           </v-list-item-avatar>
@@ -26,7 +26,7 @@
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {computed, inject, ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {handoverUserGroup} from "@/net/send-message";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
 import store from "@/store";
@@ -37,10 +37,8 @@ export default {
     ImWarnDialog,
     DrawerTop
   },
-  props: {
-    room: {type: Object}
-  },
-  setup(props) {
+  setup() {
+    const room = computed(() => store.getters.curRoom)
     const curUser = computed(() => store.state.curUser)
     const searchName = ref('')
 
@@ -65,7 +63,7 @@ export default {
     })
 
     const filteredItems = computed(() => {
-      return props.room.users.filter(x => curUser.value._id !== x._id && x.role !== 'ADMIN' && x.username.indexOf(searchName.value) !== -1)
+      return room.value.users.filter(x => curUser.value._id !== x._id && x.role !== 'ADMIN' && x.username.indexOf(searchName.value) !== -1)
     })
 
     const startHandoverRoom = item => {
@@ -77,11 +75,13 @@ export default {
     }
 
     const handoverRoom = (item) => {
-      handoverUserGroup({roomId: props.room.roomId, userId: item._id})
-      close()
+      handoverUserGroup({roomId: room.value.roomId, userId: item._id})
+      store.commit('setInformationPane','ROOM_INFO')
     }
 
-    const open = inject('open', () => {})
+    const open = (item) => {
+      store.commit('setInformationPane', item)
+    }
 
     return {
       curUser,

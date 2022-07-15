@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top :title="'编辑资料'" :sub="true" @close="open('GROUP_INFO')"></drawer-top>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('ROOM_INFO')"></drawer-top>
     <div class="pt-2 mx-2">
       <div class="d-table ma-auto">
         <v-hover>
@@ -109,7 +109,7 @@
 
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {computed, inject, onMounted, ref, watch} from "@vue/composition-api";
+import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/send-message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
 import ImUpload from "@/components/system/ImUpload";
@@ -123,12 +123,10 @@ export default {
     ImUpload,
     DrawerTop,
   },
-  props: {
-    room: {type: Object}
-  },
-  setup(props) {
+  setup() {
     // 当前用户ID
-    const curUserId = computed(()=> store.state.currentUserId)
+    const curUserId = computed(() => store.state.currentUserId)
+    const room = computed(() => store.getters.curRoom)
     // 当前用户
     const curUser = ref(null)
     // 当前房间名称
@@ -174,10 +172,10 @@ export default {
 
     // 是否展示确定按钮
     const showSure = computed(() => {
-      return roomName.value !== props.room.roomName && roomName.value !== ''
+      return roomName.value !== room.value.roomName && roomName.value !== ''
     })
 
-    watch(() => props.room, (room) => {
+    watch(room, (room) => {
       init(room)
     })
 
@@ -193,11 +191,11 @@ export default {
 
     const sure = (url) => {
       roomAvatar.value = url
-      editGroupProfile({roomId: props.room.roomId, avatar: picUrl.value + url, roomName: roomName.value})
+      editGroupProfile({roomId: room.value.roomId, avatar: picUrl.value + url, roomName: roomName.value})
     }
 
     const roomNameChange = () => {
-      editGroupProfile({roomId: props.room.roomId, roomName: roomName.value})
+      editGroupProfile({roomId: room.value.roomId, roomName: roomName.value})
     }
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -209,7 +207,7 @@ export default {
     }
 
     const outRoom = () => {
-      removeUserGroup({roomId: props.room.roomId, userId: curUser.value._id, type: 'OUT'})
+      removeUserGroup({roomId: room.value.roomId, userId: curUser.value._id, type: 'OUT'})
       close()
     }
 
@@ -222,18 +220,24 @@ export default {
     }
 
     const disbandRoom = () => {
-      disbandGroup({roomId: props.room.roomId})
+      disbandGroup({roomId: room.value.roomId})
       close()
     }
 
     onMounted(() => {
-      init(props.room)
+      init(room.value)
     })
 
-    const close = inject('close',() => {})
-    const open = inject('open',() => {})
+    const close = (item) => {
+      store.commit('setInformationPane', item)
+    }
+
+    const open = (item) => {
+      store.commit('setInformationPane', item)
+    }
 
     return {
+      room,
       img,
       action,
       upload,

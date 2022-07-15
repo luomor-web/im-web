@@ -35,7 +35,7 @@
           <left-drawer ref="leftDrawer"/>
         </template>
         <template #right-drawer="{}">
-          <right-drawer ref="rightDrawer"/>
+          <information-pane ref="rightDrawer"/>
         </template>
         <template #room-options="{}">
           <room-options />
@@ -66,7 +66,7 @@ import {messageActions} from "@/locales/message-action";
 import {messageSelectionActions} from "@/locales/message-selection-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
-import RightDrawer from "@/components/rightDrawer/RightDrawer";
+import InformationPane from "@/components/rightDrawer/InformationPane";
 import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
 import download from "@/utils/download";
 import store from "@/store";
@@ -78,7 +78,7 @@ export default {
   name: 'Home',
   components: {
     LeftDrawer,
-    RightDrawer,
+    InformationPane,
     RoomOptions,
     RoomsHeader,
     TopBar,

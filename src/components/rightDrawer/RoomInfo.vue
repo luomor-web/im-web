@@ -5,7 +5,7 @@
         @close="close">
       <template #right>
         <v-spacer></v-spacer>
-        <v-btn class="no-drag" icon @click="open('GROUP_EDIT')">
+        <v-btn class="no-drag" icon @click="open('GROUP_EDIT')" v-if="isGroup">
           <v-icon>
             {{ icons.mdiPencilOutline }}
           </v-icon>
@@ -44,47 +44,47 @@
     </div>
 
     <im-driver></im-driver>
-
-    <div class="mx-2 overflow-y-auto fill-height">
-      <v-list nav>
-        <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
-          <v-list-item-avatar>
-            <v-img :src="item.avatar"></v-img>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-badge
-                :color="item.status.state === 'online' ? 'green': 'grey'"
-                inline
-                left
-                dot
-            >
-              <v-list-item-title>{{ item.username }}</v-list-item-title>
-            </v-badge>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-btn :color="item.role ==='ADMIN' ? 'warning': item.role==='GENERAL' ? 'success': 'primary'" small>
-              {{ item.role === 'ADMIN' ? '群主' : item.role === 'GENERAL' ? '成员' : '管理员' }}
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
+    <div v-if="isGroup">
+      <div class="mx-2 overflow-y-auto fill-height">
+        <v-list nav>
+          <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
+            <v-list-item-avatar>
+              <v-img :src="item.avatar"></v-img>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-badge
+                  :color="item.status.state === 'online' ? 'green': 'grey'"
+                  inline
+                  left
+                  dot
+              >
+                <v-list-item-title>{{ item.username }}</v-list-item-title>
+              </v-badge>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn :color="item.role ==='ADMIN' ? 'warning': item.role==='GENERAL' ? 'success': 'primary'" small>
+                {{ item.role === 'ADMIN' ? '群主' : item.role === 'GENERAL' ? '成员' : '管理员' }}
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+      </div>
+      <div>
+        <v-btn
+            transition="scroll-x-reverse-transition"
+            class="mr-8 mb-16"
+            color="primary"
+            dark
+            absolute
+            bottom
+            right
+            fab
+            @click="open('GROUP_INVITE_USER')"
+        >
+          <v-icon>{{ icons.mdiPlus }}</v-icon>
+        </v-btn>
+      </div>
     </div>
-    <div>
-      <v-btn
-          transition="scroll-x-reverse-transition"
-          class="mr-8 mb-16"
-          color="primary"
-          dark
-          absolute
-          bottom
-          right
-          fab
-          @click="open('GROUP_INVITE_USER')"
-      >
-        <v-icon>{{ icons.mdiPlus }}</v-icon>
-      </v-btn>
-    </div>
-
   </div>
 </template>
 
@@ -93,11 +93,11 @@ import {joinUserGroup, userGroupConfig} from "@/net/send-message";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
-import {computed, inject, onMounted, ref, watch} from "@vue/composition-api";
+import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import store from "@/store";
 
 export default {
-  name: "GroupInfo",
+  name: "RoomInfo",
   components: {
     ImDriver,
     DrawerTop,
@@ -105,10 +105,14 @@ export default {
   setup(props, context) {
 
     const room = computed(() => store.getters.curRoom)
-    const close = inject('close', () => {
-    })
-    const open = inject('open', () => {
-    })
+    const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem )
+    const close = () => {
+      store.commit('setInformationPane', '')
+    }
+
+    const open = (item) => {
+      store.commit('setInformationPane', item)
+    }
 
     const notice = ref(true)
 
@@ -151,6 +155,7 @@ export default {
       notice,
       noticeChange,
       open,
+      isGroup,
       close,
       joinGroup,
       startChat,

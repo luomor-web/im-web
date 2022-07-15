@@ -3,8 +3,8 @@
       ref="selectUser"
       :icon="icons.mdiCheck"
       :room="room"
-      @to-go="inviteUser('GROUP_INFO',$event)"
-      @close="resetAndOpen('GROUP_INFO')"/>
+      @to-go="inviteUser('ROOM_INFO',$event)"
+      @close="resetAndOpen('ROOM_INFO')"/>
 </template>
 
 <script>

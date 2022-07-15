@@ -65,7 +65,7 @@
 </template>
 <script>
 import DrawerTop from "@/components/drawer/DrawerTop";
-import {computed, inject, ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
 import {removeUserGroup, setAdmin} from "@/net/send-message";
 import ImWarnDialog from "@/components/system/ImWarnDialog";
@@ -156,7 +156,9 @@ export default {
       setAdmin({roomId: props.room.roomId, userId: item._id, type: 'UN_SET'})
     }
 
-    const open = inject('open', () => {})
+    const open = (item) => {
+      store.commit('setInformationPane',item)
+    }
 
 
     return {
