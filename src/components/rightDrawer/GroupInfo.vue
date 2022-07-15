@@ -69,21 +69,21 @@
         </v-list-item>
       </v-list>
     </div>
-<div>
-  <v-btn
-      transition="scroll-x-reverse-transition"
-      class="mr-8 mb-16"
-      color="primary"
-      dark
-      absolute
-      bottom
-      right
-      fab
-      @click="open('GROUP_INVITE_USER')"
-  >
-    <v-icon>{{ icons.mdiPlus }}</v-icon>
-  </v-btn>
-</div>
+    <div>
+      <v-btn
+          transition="scroll-x-reverse-transition"
+          class="mr-8 mb-16"
+          color="primary"
+          dark
+          absolute
+          bottom
+          right
+          fab
+          @click="open('GROUP_INVITE_USER')"
+      >
+        <v-icon>{{ icons.mdiPlus }}</v-icon>
+      </v-btn>
+    </div>
 
   </div>
 </template>
@@ -93,35 +93,37 @@ import {joinUserGroup, userGroupConfig} from "@/net/send-message";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
 import DrawerTop from "@/components/drawer/DrawerTop";
 import ImDriver from "@/components/system/ImDriver";
-import {inject, onMounted, ref, watch} from "@vue/composition-api";
+import {computed, inject, onMounted, ref, watch} from "@vue/composition-api";
+import store from "@/store";
 
 export default {
   name: "GroupInfo",
-  props: {
-    room: Object
-  },
   components: {
     ImDriver,
     DrawerTop,
   },
   setup(props, context) {
-    const close = inject('close', ()=>{})
-    const open = inject('open', ()=>{})
+
+    const room = computed(() => store.getters.curRoom)
+    const close = inject('close', () => {
+    })
+    const open = inject('open', () => {
+    })
 
     const notice = ref(true)
 
-    watch(props.room , room => {
+    watch(room, room => {
+      console.log(room)
       notice.value = room.notice
     })
 
-    onMounted(()=>{
-      notice.value = props.room.notice
+    onMounted(() => {
+      notice.value = room.value.notice
     })
 
     const noticeChange = item => {
-      console.log(item)
       const param = {
-        roomId: props.room.roomId,
+        roomId: room.value.roomId,
         notice: item,
         type: 'NOTICE'
       }
@@ -139,14 +141,14 @@ export default {
         }
       })
       const group = {
-        roomId: props.room.roomId
+        roomId: room.value.roomId
       }
       joinUserGroup({group, users})
     }
 
 
-
     return {
+      room,
       notice,
       noticeChange,
       open,

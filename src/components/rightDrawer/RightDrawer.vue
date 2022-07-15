@@ -1,7 +1,7 @@
 <template>
   <v-expand-x-transition>
-    <div class="im-right-drawer" v-if="visible">
-      <v-window v-model="active" class="fill-height">
+    <div class="im-right-drawer" v-if="informationPane">
+      <v-window v-model="informationPane" class="fill-height">
         <v-window-item value="GROUP_INFO" class="fill-height">
           <group-info :room="room"/>
         </v-window-item>
@@ -21,7 +21,7 @@
           <user-info :room="room"></user-info>
         </v-window-item>
         <v-window-item value="MESSAGE_HISTORY">
-          <message-history :room="room" />
+          <message-history :room="room"/>
         </v-window-item>
       </v-window>
     </div>
@@ -45,15 +45,17 @@ export default {
   setup() {
 
     const room = computed(() => store.getters.curRoom)
+    const informationPane = computed(() => store.state.informationPane)
     const visible = ref(false)
     const active = ref(room.value?.isFriend || room.value?.isSystem ? 'USER_INFO' : 'GROUP_INFO')
 
     const roomInfo = () => {
-      if(visible.value) {
-        close()
+      if (informationPane.value) {
+        store.commit('setInformationPane', '')
         return
       }
-      open(room.value.isFriend || room.value.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+      store.commit('setInformationPane', room.value?.isFriend || room.value?.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+      // open(room.value.isFriend || room.value.isSystem ? 'USER_INFO' : 'GROUP_INFO')
     }
 
     const open = item => {
@@ -71,6 +73,7 @@ export default {
     provide('close', close)
 
     return {
+      informationPane,
       open,
       close,
       roomInfo,
