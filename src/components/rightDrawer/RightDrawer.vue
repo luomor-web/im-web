@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import {ref, provide, computed} from "@vue/composition-api";
+import {ref, provide, computed, watch} from "@vue/composition-api";
 import GroupInfo from "@/components/rightDrawer/GroupInfo";
 import GroupEdit from "@/components/rightDrawer/GroupEdit";
 import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
@@ -47,7 +47,11 @@ export default {
     const room = computed(() => store.getters.curRoom)
     const informationPane = computed(() => store.state.informationPane)
     const visible = ref(false)
-    const active = ref(room.value?.isFriend || room.value?.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+
+    watch(room, room => {
+      if(informationPane.value)
+        store.commit('setInformationPane', room.value?.isFriend || room.value?.isSystem ? 'USER_INFO' : 'GROUP_INFO')
+    })
 
     const roomInfo = () => {
       if (informationPane.value) {
@@ -58,15 +62,13 @@ export default {
       // open(room.value.isFriend || room.value.isSystem ? 'USER_INFO' : 'GROUP_INFO')
     }
 
-    const open = item => {
-      active.value = item
+    const open = () => {
       visible.value = true
     }
 
     provide('open', open)
 
     const close = () => {
-      active.value = ''
       visible.value = false
     }
 
@@ -78,7 +80,6 @@ export default {
       close,
       roomInfo,
       room,
-      active,
       visible,
     }
   }

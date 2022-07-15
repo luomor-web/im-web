@@ -113,7 +113,6 @@ export default {
     const notice = ref(true)
 
     watch(room, room => {
-      console.log(room)
       notice.value = room.notice
     })
 
