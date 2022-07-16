@@ -7,7 +7,7 @@ import Vue from "vue";
 
 export default {
 
-    resetDate: (state) => {
+    resetData: (state) => {
         state.loadedRooms = []
         state.curUser = {_id: ''}
         state.loadingRooms = false
@@ -21,7 +21,9 @@ export default {
         state.timers = new Map()
     },
 
-    setInformationPane:(state, active) => state.informationPane = active,
+    setInformationPane: (state, active) => state.informationPane = active,
+
+    setSettingPane: (state, active) => state.settingPane = active,
 
     setRoomId: (state, roomId) => state.roomId = roomId,
 
@@ -67,7 +69,7 @@ export default {
         state.messages = []
     },
 
-    remoteMessage: (state, messageId) => {
+    removeMessage: (state, messageId) => {
         const index = state.messages.findIndex(x => x._id === messageId);
         if (index !== -1) {
             state.messages.splice(index, 1)
@@ -154,7 +156,6 @@ export default {
     },
 
     putTimer: (state, {id, t}) => {
-        console.log(id, t, state.timers)
         Vue.set(state.timers, id, t)
     },
 
@@ -163,7 +164,40 @@ export default {
         if (t) {
             clearTimeout(t)
         }
-        Vue.delete(state.timers,id)
+        Vue.delete(state.timers, id)
     },
+
+    pushDownloadItem: (state, file) => {
+        state.downloadItemList.unshift(file)
+        state.downloadItemList = state.downloadItemList.slice(0,60)
+    },
+    updateDownloadItem: (state, {args, status}) => {
+        // 查找ID并设置值
+        const index = state.downloadItemList.findIndex(x => x.id === args.id);
+        if(index === -1) return
+        state.downloadItemList[index].state = status
+        if(args.receivedBytes){
+            state.downloadItemList[index].receivedBytes = args.receivedBytes
+        }
+        if(args.totalBytes){
+            state.downloadItemList[index].totalBytes = args.totalBytes
+        }
+        state.downloadItemList = [...state.downloadItemList]
+    },
+    removeDownloadItem: (state, args) => {
+        const index = state.downloadItemList.findIndex(x => x.id === args.id);
+        if (index === -1) return
+        state.downloadItemList.splice(index, 1)
+    },
+    clearDownloadingItem: (state) => {
+        const downloadFileListTemp = []
+        state.downloadItemList?.forEach(x => {
+            if (x.state === 'done' || x.state === 'not-found') {
+                downloadFileListTemp.push(x)
+            }
+        })
+        state.downloadItemList = [...downloadFileListTemp]
+    },
+
     ...responseMessage
 }

@@ -63,8 +63,8 @@
 import {mdiCamera, mdiCheck} from "@mdi/js";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import {editProfile} from "@/net/send-message";
-import DrawerTop from "@/components/drawer/DrawerTop";
-import ImUpload from "@/components/system/ImUpload";
+import DrawerTop from "@/components/basic/DrawerTop";
+import ImUpload from "@/components/basic/ImUpload";
 import store from "@/store";
 
 export default {

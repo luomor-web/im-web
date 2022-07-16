@@ -9,9 +9,6 @@
       <v-window-item value="DOWNLOAD_SETTING">
         <download-setting :user="curUser" @open="open"></download-setting>
       </v-window-item>
-      <v-window-item value="D">
-<!--        <download-setting :user="curUser" @open="open"></download-setting>-->
-      </v-window-item>
     </v-window>
 </template>
 

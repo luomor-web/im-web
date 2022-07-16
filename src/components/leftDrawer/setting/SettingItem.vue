@@ -27,7 +27,7 @@
         </v-list>
         <im-driver></im-driver>
         <v-list nav>
-          <v-list-item  v-if="isElectron" v-ripple class="im-list-item" @click="open('DOWNLOAD_SETTING')" >
+          <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('DOWNLOAD_SETTING')">
             <v-list-item-icon>
               <v-icon>{{ icons.mdiDownloadOutline }}</v-icon>
             </v-list-item-icon>
@@ -42,10 +42,11 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {mdiBellOutline, mdiDownloadOutline, mdiPencilOutline} from "@mdi/js";
-import ImDriver from "@/components/system/ImDriver";
-import {inject, ref} from "@vue/composition-api";
+import ImDriver from "@/components/basic/ImDriver";
+import {computed, ref} from "@vue/composition-api";
+import store from "@/store";
 
 export default {
   name: "SettingItem",
@@ -53,22 +54,22 @@ export default {
     ImDriver,
     DrawerTop
   },
-  props: {
-    curUser: Object
-  },
-  setup(props, {emit}) {
-
-    const close = inject('close',() => {})
-
+  setup() {
     const isElectron = ref(process.env.IS_ELECTRON)
+    const curUser = computed(() => store.state.curUser)
 
     const open = (item) => {
-      emit('open', item)
+      store.commit('setSettingPane', item)
+    }
+
+    const close = () => {
+      store.commit('setSettingPane', '')
     }
 
     return {
       open,
       close,
+      curUser,
       isElectron,
 
       icons: {

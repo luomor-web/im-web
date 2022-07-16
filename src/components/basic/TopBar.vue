@@ -29,7 +29,7 @@
 
 <script>
 import {mdiWindowClose, mdiWindowMaximize, mdiWindowMinimize} from "@mdi/js"
-import Update from "@/components/update/Update";
+import Update from "@/components/basic/Update";
 
 export default {
   name: "TopBar",

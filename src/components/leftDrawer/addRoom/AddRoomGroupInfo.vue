@@ -48,9 +48,9 @@
 <script>
 import {createGroup} from "@/net/send-message";
 import {ref} from "@vue/composition-api";
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {mdiCamera, mdiCheck} from "@mdi/js";
-import ImUpload from "@/components/system/ImUpload";
+import ImUpload from "@/components/basic/ImUpload";
 
 export default {
   name: "AddRoomGroupInfo",

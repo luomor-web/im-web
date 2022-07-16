@@ -35,10 +35,10 @@
 </template>
 
 <script>
-import UserSearch from "@/components/user/UserSearch";
-import ImDriver from "@/components/system/ImDriver";
-import UserSelectColumn from "@/components/user/UserSelectColumn";
-import DrawerTop from "@/components/drawer/DrawerTop";
+import UserSearch from "@/components/basic/UserSearch";
+import ImDriver from "@/components/basic/ImDriver";
+import UserSelectColumn from "@/components/basic/UserSelectColumn";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {ref} from "@vue/composition-api";
 import {mdiArrowRight} from "@mdi/js";
 

@@ -69,8 +69,8 @@ import {computed, onMounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {callVideo} from "@/net/send-message";
 import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo} from "@mdi/js";
-import UserVideo from "@/components/system/openvidu/UserVideo";
-import {audioVolume, du, mainStreamManager, session, subStreamManager} from "@/components/system/openvidu/OpenVidu";
+import UserVideo from "@/components/basic/openvidu/UserVideo";
+import {audioVolume, du, mainStreamManager, session, subStreamManager} from "@/components/basic/openvidu/OpenVidu";
 import store from "@/store";
 
 export default {

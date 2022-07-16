@@ -207,6 +207,7 @@ export const isInContainer = (el, container) => {
 };
 
 export const scrollToView = (el) => {
+    if (el) return
 
     // element.parentNode.scrollTop = element.offsetTop
     el.parentNode.scrollTop = el.offsetTop - 30;

@@ -9,21 +9,20 @@
 
 <script>
 import AddRoomSelectUser from "@/components/leftDrawer/addRoom/AddRoomSelectUser";
-import { inject, ref } from "@vue/composition-api";
-import { mdiCheck } from "@mdi/js";
-import { joinUserGroup } from "@/net/send-message";
+import {computed, ref} from "@vue/composition-api";
+import {mdiCheck} from "@mdi/js";
+import {joinUserGroup} from "@/net/send-message";
+import store from "@/store";
 
 export default {
   name: "GroupInviteUser",
-  props: {
-    room: Object,
-  },
   components: {
     AddRoomSelectUser
   },
-  setup(props) {
+  setup() {
 
-    const open = inject('open', () => {})
+    const room = computed(()=> store.getters.curRoom)
+    
     const selectUser = ref(null)
 
     const inviteUser = (item, userSelect) => {
@@ -34,12 +33,16 @@ export default {
         }
       })
       const group = {
-        roomId: props.room.roomId
+        roomId: room.value.roomId
       }
 
       joinUserGroup({group, users})
 
       resetAndOpen(item)
+    }
+
+    const open = (item) => {
+      store.commit('setInformationPane', item)
     }
 
     const resetAndOpen = (item) => {
@@ -48,6 +51,8 @@ export default {
     }
 
     return {
+
+      room,
       resetAndOpen,
       selectUser,
       close,

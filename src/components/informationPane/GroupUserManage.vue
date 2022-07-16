@@ -64,11 +64,11 @@
   </div>
 </template>
 <script>
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {computed, ref} from "@vue/composition-api";
 import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
 import {removeUserGroup, setAdmin} from "@/net/send-message";
-import ImWarnDialog from "@/components/system/ImWarnDialog";
+import ImWarnDialog from "@/components/basic/ImWarnDialog";
 import store from "@/store";
 
 export default {
@@ -78,10 +78,8 @@ export default {
     ImWarnDialog,
     DrawerTop
   },
-  props: {
-    room: {type: Object}
-  },
-  setup(props) {
+  setup() {
+    const room = computed(() => store.getters.curRoom)
     const curUser = computed(() => store.state.curUser)
     const searchName = ref('')
 
@@ -114,7 +112,7 @@ export default {
     })
 
     const filteredItems = computed(() => {
-      return props.room.users.filter(x => curUser.value._id !== x._id && x.role !== 'ADMIN' && x.username.indexOf(searchName.value) !== -1)
+      return room.value.users.filter(x => curUser.value._id !== x._id && x.role !== 'ADMIN' && x.username.indexOf(searchName.value) !== -1)
     })
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -127,7 +125,7 @@ export default {
     }
 
     const removeRoom = item => {
-      removeUserGroup({roomId: props.room.roomId, userId: item._id, type: 'REMOVE'})
+      removeUserGroup({roomId: room.value.roomId, userId: item._id, type: 'REMOVE'})
     }
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -140,7 +138,7 @@ export default {
     }
 
     const setRoomAdmin = (item) => {
-      setAdmin({roomId: props.room.roomId, userId: item._id, type: 'SET'})
+      setAdmin({roomId: room.value.roomId, userId: item._id, type: 'SET'})
     }
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -153,13 +151,12 @@ export default {
     }
 
     const unSetRoomAdmin = (item) => {
-      setAdmin({roomId: props.room.roomId, userId: item._id, type: 'UN_SET'})
+      setAdmin({roomId: room.value.roomId, userId: item._id, type: 'UN_SET'})
     }
 
     const open = (item) => {
       store.commit('setInformationPane',item)
     }
-
 
     return {
       curUser,

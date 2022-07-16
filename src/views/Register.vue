@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import TopBar from "../components/system/TopBar";
+import TopBar from "../components/basic/TopBar";
 import {mdiCheckCircleOutline, mdiCloseCircleOutline, mdiEyeOffOutline, mdiEyeOutline} from '@mdi/js'
 import {ref} from '@vue/composition-api'
 import {checkAccountAuth, registerUser} from "@/net/api";

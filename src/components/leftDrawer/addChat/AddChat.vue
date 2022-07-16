@@ -18,10 +18,10 @@
 <script>
 import {mdiChatOutline, mdiMagnify} from "@mdi/js";
 import {computed, ref} from "@vue/composition-api";
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {createGroup} from "@/net/send-message";
-import UserSelectColumn from "@/components/user/UserSelectColumn";
-import UserSearch from "@/components/user/UserSearch";
+import UserSelectColumn from "@/components/basic/UserSelectColumn";
+import UserSearch from "@/components/basic/UserSearch";
 import store from "@/store";
 
 export default {

@@ -86,8 +86,8 @@
 
 <script>
 import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
-import DrawerTop from "@/components/drawer/DrawerTop";
-import {inject, onMounted, onUnmounted, ref} from "@vue/composition-api";
+import DrawerTop from "@/components/basic/DrawerTop";
+import {computed, onMounted, onUnmounted, ref} from "@vue/composition-api";
 import msg from "@/plugins/msg";
 import {searchMessage} from "@/net/send-message";
 import {buildDisplayTime} from "@/utils/date-util";
@@ -96,27 +96,23 @@ import store from "@/store";
 
 export default {
   name: "MessageHistory",
-  props: {
-    room: Object,
-  },
   components: {
     DrawerTop
   },
 
   filters: {},
-  setup(props) {
+  setup() {
     const modal = ref(false)
     const startDate = ref(null)
     const endDate = ref(null)
     const picker = ref([])
     const searchName = ref('')
+    const room = computed(() => store.getters.curRoom)
 
     const messagesSearched = ref([])
 
-    const close = inject('close', () => {
-    })
-
-    const open = () => {
+    const close = () => {
+      store.commit('setInformationPane', '')
     }
 
     const search = item => {
@@ -125,7 +121,7 @@ export default {
         return
       }
 
-      searchMessage({content: item, roomId: props.room.roomId, startDate: startDate.value, endDate: endDate.value})
+      searchMessage({content: item, roomId: room.value.roomId, startDate: startDate.value, endDate: endDate.value})
     }
 
     const scroll = item => {
@@ -140,9 +136,7 @@ export default {
 
         setTimeout(() => {
           const element = document.getElementById(item._id);
-          if (element) {
-            scrollToView(element)
-          }
+          scrollToView(element)
         }, 1000)
         return
       }
@@ -180,7 +174,6 @@ export default {
       buildDisplayTime,
       search,
       resetPicker,
-      open,
       close,
       pickerDataChange,
 

@@ -24,5 +24,9 @@ export default {
     // 全局定时器
     timers: Object.create(null),
     // 信息窗格（右侧）
-    informationPane : ''
+    informationPane : '',
+    // 设置窗格（左侧）
+    settingPane : '',
+    // 下载列表
+    downloadItemList: []
 }

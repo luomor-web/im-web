@@ -29,20 +29,20 @@
       >
 
         <template #rooms-header="{}">
-          <rooms-header ref="roomHeader"/>
+          <rooms-header/>
         </template>
         <template #left-drawer="{}">
-          <left-drawer ref="leftDrawer"/>
+          <left-drawer />
         </template>
         <template #right-drawer="{}">
-          <information-pane ref="rightDrawer"/>
+          <information-pane />
         </template>
         <template #room-options="{}">
           <room-options />
         </template>
 
       </chat-window>
-
+      <im-component ref="imComponent"/>
     </div>
   </div>
 </template>
@@ -50,8 +50,8 @@
 <script>
 import ChatWindow from 'alispig-advanced-chat'
 import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
-import {computed, onMounted, provide, ref} from "@vue/composition-api";
-import TopBar from "../components/system/TopBar";
+import {computed, onMounted, ref} from "@vue/composition-api";
+import TopBar from "../components/basic/TopBar";
 import {
   getHistoryMessage,
   getUserInfo,
@@ -66,17 +66,19 @@ import {messageActions} from "@/locales/message-action";
 import {messageSelectionActions} from "@/locales/message-selection-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
-import InformationPane from "@/components/rightDrawer/InformationPane";
-import LeftDrawer from "@/components/leftDrawer/LeftDrawer";
+import InformationPane from "@/components/InformationPane";
+import LeftDrawer from "@/components/SettingPane";
 import download from "@/utils/download";
 import store from "@/store";
 import {uploadFiles} from "@/utils/upload";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
+import ImComponent from "@/components/ImComponent";
 
 export default {
   name: 'Home',
   components: {
+    ImComponent,
     LeftDrawer,
     InformationPane,
     RoomOptions,
@@ -86,13 +88,9 @@ export default {
   },
   setup() {
 
-    const roomHeader = ref(null)
-    const rightDrawer = ref(null)
-    const leftDrawer = ref(null)
-
     let isElectron = ref(process.env.IS_ELECTRON);
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
-
+    const imComponent = ref(null)
     const roomId = computed(() => store.state.roomId)
     const currentUserId = computed(() => store.state.currentUserId)
     const messageLoaded = computed(() => store.state.messageLoaded)
@@ -102,9 +100,7 @@ export default {
     const loadedRooms = computed(() => store.state.loadedRooms)
     const messages = computed(() => store.state.messages)
     const curUser = computed(() => store.state.curUser)
-
-    provide('openRightDrawer', openRightDrawer)
-    provide('openLeftDrawer', openLeftDrawer)
+    const informationPane = computed(() => store.state.informationPane)
 
     onMounted(() => {
       getUserInfo(currentUserId.value)
@@ -116,30 +112,23 @@ export default {
     }
 
     const roomInfo = () => {
-      rightDrawer.value.roomInfo()
-    }
-
-    const openRightDrawer = (item) => {
-      rightDrawer.value.open(item)
-    }
-
-    const openLeftDrawer = (item) => {
-      leftDrawer.value.open(item)
+      if (informationPane.value) {
+        store.commit('setInformationPane', '')
+        return
+      }
+      store.commit('setInformationPane', 'ROOM_INFO')
     }
 
     const messageSelectionActionHandler = ({roomId, action, messages}) => {
       console.log(roomId, action, messages)
-      if (action.name === "forwardMessages") {
-        roomHeader.value.selectUser(() => {
-
-        })
-      }
+      if (action.name === "forwardMessages") return
     }
 
     const openFile = ({file}) => {
       if (file.action !== 'download') return
       if (process.env.IS_ELECTRON) {
-        roomHeader.value.selectDownloadPath(file.file)
+
+        imComponent.value.selectDownloadPath(file.file)
         return
       }
       download.download(file.file)
@@ -241,16 +230,14 @@ export default {
       searchMessage,
       roomsLoaded,
       loadedRooms,
+      imComponent,
 
       textMessages,
       messageActions,
       messageSelectionActions,
 
-      roomHeader,
-      leftDrawer,
       isElectron,
       pageHeight,
-      rightDrawer,
 
       roomInfo,
       openFile,
@@ -258,7 +245,6 @@ export default {
       openFailedMessage,
       fetchMessage,
       deleteMessage,
-      openRightDrawer,
       clickScrollIcon,
       sendMessageReaction,
       messageSelectionActionHandler,

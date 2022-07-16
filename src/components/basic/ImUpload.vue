@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import ImCropper from "@/components/system/ImCropper";
+import ImCropper from "@/components/basic/ImCropper";
 import {ref} from "@vue/composition-api";
 
 export default {

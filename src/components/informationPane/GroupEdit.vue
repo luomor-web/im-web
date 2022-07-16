@@ -108,12 +108,12 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/send-message";
 import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
-import ImUpload from "@/components/system/ImUpload";
-import ImWarnDialog from "@/components/system/ImWarnDialog";
+import ImUpload from "@/components/basic/ImUpload";
+import ImWarnDialog from "@/components/basic/ImWarnDialog";
 import store from "@/store";
 
 export default {

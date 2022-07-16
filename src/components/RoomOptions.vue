@@ -2,17 +2,17 @@
   <div>
     <div class="d-flex">
       <div class="mr-2">
-        <v-btn icon @click="call('AUDIO')">
+        <v-btn icon @click="call('AUDIO')" v-show="!room.isSystem">
           <v-icon>{{ icons.mdiPhone }}</v-icon>
         </v-btn>
       </div>
       <div class="mr-2">
-        <v-btn icon @click="call('VIDEO')">
+        <v-btn icon @click="call('VIDEO')" v-show="!room.isSystem">
           <v-icon>{{ icons.mdiVideoOutline }}</v-icon>
         </v-btn>
       </div>
       <div class="mr-2" v-show="!room.isSystem">
-        <v-btn icon @click="openRightDrawer('MESSAGE_HISTORY')">
+        <v-btn icon @click="openInformationPane('MESSAGE_HISTORY')">
           <v-icon>{{ icons.mdiMagnify }}</v-icon>
         </v-btn>
       </div>
@@ -25,9 +25,9 @@
 
 <script>
 import {mdiDotsVertical, mdiMagnify, mdiPhone, mdiVideoOutline,} from "@mdi/js";
-import {computed, inject, ref} from "@vue/composition-api";
+import {computed, ref} from "@vue/composition-api";
 import {getUserList} from "@/net/send-message";
-import ImVideoDialog from "@/components/system/ImVideoDialog";
+import ImVideoDialog from "@/components/basic/ImVideoDialog";
 import store from "@/store";
 
 export default {
@@ -36,13 +36,8 @@ export default {
   setup() {
 
     const room = computed(() => store.getters.curRoom)
-    // 当前点击的用户,有可能时房间,有可能时用户
-    const clickRoom = ref({})
 
     const videoDialog = ref(null)
-
-    const openRightDrawer = inject('openRightDrawer', () => {
-    })
 
     const inviteUser = () => {
       getUserList()
@@ -52,11 +47,14 @@ export default {
       videoDialog.value.call(type)
     }
 
+    const openInformationPane = (item) => {
+      store.commit('setInformationPane', item)
+    }
+
     return {
       room,
-      clickRoom,
       videoDialog,
-      openRightDrawer,
+      openInformationPane,
 
       call,
       inviteUser,

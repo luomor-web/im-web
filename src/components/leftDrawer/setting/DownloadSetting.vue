@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {onMounted, ref} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
 import {mdiCheck, mdiFolderOutline, mdiHelp} from "@mdi/js";

@@ -61,12 +61,12 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/drawer/DrawerTop";
-import {inject, onMounted, ref} from "@vue/composition-api";
-import localStore from "@/utils/local-store";
+import DrawerTop from "@/components/basic/DrawerTop";
+import {computed} from "@vue/composition-api";
 import {
   mdiApplication,
-  mdiArrowDown, mdiArrowUp,
+  mdiArrowDown,
+  mdiArrowUp,
   mdiDotsHorizontal,
   mdiHeadphonesBox,
   mdiHelp,
@@ -76,8 +76,8 @@ import {
   mdiZipBox
 } from "@mdi/js";
 import {isApplicationFile, isAudioFile, isImageFile, isPackageFile, isVideoFile, suffix} from "@/utils/media-file";
-import msg from "@/plugins/msg";
 import {getFileSize} from "@/utils/util";
+import store from "@/store";
 
 export default {
   name: "DownloadHistory",
@@ -85,38 +85,8 @@ export default {
     DrawerTop
   },
   setup() {
-    const close = inject('close', () => {
-    })
-    const downloadFileList = ref([])
 
-    onMounted(() => {
-      window.require('electron').ipcRenderer.on('download-file-start', (event, args) => {
-        downloadFileList.value.unshift({...args, state: 'start', receivedBytes: 0, totalBytes: 0, type: 'download'})
-      })
-      window.require('electron').ipcRenderer.on('download-file-interrupted', (event, args) => {
-        updateDownloadFileState(args, 'interrupted')
-      })
-      window.require('electron').ipcRenderer.on('download-file-paused', (event, args) => {
-        updateDownloadFileState(args, 'paused')
-      })
-      window.require('electron').ipcRenderer.on('download-file-ing', (event, args) => {
-        updateDownloadFileState(args, 'ing')
-      })
-      window.require('electron').ipcRenderer.on('download-file-done', (event, args) => {
-        updateDownloadFileState(args, 'done')
-      })
-      window.require('electron').ipcRenderer.on('download-file-fail', (event, args) => {
-        delHistory(args)
-      })
-      downloadFileList.value = localStore.getJsonValue('download-file-list');
-    })
-
-    const updateDownloadFileState = (args, state) => {
-      const index = downloadFileList.value.findIndex(x => x.id === args.id);
-      downloadFileList.value[index].state = state
-      downloadFileList.value[index].receivedBytes = args.receivedBytes
-      downloadFileList.value[index].totalBytes = args.totalBytes
-    }
+    const downloadFileList = computed(() => store.state.downloadItemList)
 
     const getIcon = (item) => {
 
@@ -130,57 +100,54 @@ export default {
 
     }
 
-    const delHistory = (item) => {
-      const localIndex = downloadFileList.value.findIndex(x => x.id === item.id);
-      downloadFileList.value.splice(localIndex, 1);
-    }
-
     const stopDownload = (item) => {
       window.require('electron').ipcRenderer.invoke('download-file-stop', item).then(() => {
-        delHistory(item)
-        msg.$emit('SYSTEM_FLUSH_DOWNLOAD_STATE')
+        store.commit('removeDownloadItem', item)
       })
+    }
+
+    const delHistory = (item) => {
+      store.commit('removeDownloadItem', item)
     }
 
     const openFile = (item) => {
       window.require('electron').ipcRenderer.invoke('open-file-shell', item).then(result => {
         if (!result) {
-          updateDownloadFileState(item, 'not-found')
-          localStore.setJsonValue('download-file-list', downloadFileList.value)
+          store.commit('updateDownloadItem', {args: item, status: 'not-found'})
         }
       })
     }
 
     const openFileLocation = (item) => {
-      console.log('openFileLocation')
       window.require('electron').ipcRenderer.invoke('open-file-folder', item).then(result => {
-        console.log(result)
         if (!result) {
-          updateDownloadFileState(item, 'not-found')
-          localStore.setJsonValue('download-file-list', downloadFileList.value)
+          store.commit('updateDownloadItem', {args: item, status: 'not-found'})
         }
       })
     }
 
     const againDownload = (item) => {
-      delHistory(item)
+      store.commit('removeDownloadItem', item)
       window.require('electron').ipcRenderer.send("download-file", item, true)
     }
 
     const isDownloading = (item) => {
       return item.state === 'ing'
     }
+
     const isNotFound = (item) => {
       return item.state === 'not-found'
     }
 
+    const close = () => store.commit('setSettingPane', '')
+
     return {
       close,
+      delHistory,
       downloadFileList,
       getIcon,
       openFile,
       getFileSize,
-      delHistory,
       isDownloading,
       isNotFound,
       stopDownload,

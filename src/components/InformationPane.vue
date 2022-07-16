@@ -3,22 +3,22 @@
     <div class="im-right-drawer" v-if="informationPane">
       <v-window v-model="informationPane" class="fill-height">
         <v-window-item value="ROOM_INFO" class="fill-height">
-          <room-info />
+          <room-info/>
         </v-window-item>
         <v-window-item value="GROUP_EDIT">
-          <group-edit :room="room"/>
+          <group-edit/>
         </v-window-item>
         <v-window-item value="GROUP_USER_MANAGE">
-          <group-user-manage :room="room"></group-user-manage>
+          <group-user-manage/>
         </v-window-item>
         <v-window-item value="GROUP_HANDOVER_ADMIN">
           <group-handover-admin/>
         </v-window-item>
         <v-window-item value="GROUP_INVITE_USER">
-          <group-invite-user :room="room"></group-invite-user>
+          <group-invite-user/>
         </v-window-item>
         <v-window-item value="MESSAGE_HISTORY">
-          <message-history :room="room"/>
+          <message-history/>
         </v-window-item>
       </v-window>
     </div>
@@ -26,13 +26,13 @@
 </template>
 
 <script>
-import {computed} from "@vue/composition-api";
-import RoomInfo from "@/components/rightDrawer/RoomInfo";
-import GroupEdit from "@/components/rightDrawer/GroupEdit";
-import GroupUserManage from "@/components/rightDrawer/GroupUserManage";
-import GroupHandoverAdmin from "@/components/rightDrawer/GroupHandoverAdmin";
-import GroupInviteUser from "@/components/rightDrawer/GroupInviteUser";
-import MessageHistory from "@/components/rightDrawer/MessageHistory";
+import {computed, watch} from "@vue/composition-api";
+import RoomInfo from "@/components/informationPane/RoomInfo";
+import GroupEdit from "@/components/informationPane/GroupEdit";
+import GroupUserManage from "@/components/informationPane/GroupUserManage";
+import GroupHandoverAdmin from "@/components/informationPane/GroupHandoverAdmin";
+import GroupInviteUser from "@/components/informationPane/GroupInviteUser";
+import MessageHistory from "@/components/informationPane/MessageHistory";
 import store from "@/store";
 
 export default {
@@ -43,16 +43,13 @@ export default {
     const room = computed(() => store.getters.curRoom)
     const informationPane = computed(() => store.state.informationPane)
 
-    const roomInfo = () => {
+    watch(room, () => {
       if (informationPane.value) {
-        store.commit('setInformationPane', '')
-        return
+        store.commit('setInformationPane', 'ROOM_INFO')
       }
-      store.commit('setInformationPane', 'ROOM_INFO')
-    }
+    })
 
     return {
-      roomInfo,
       informationPane,
       room,
     }
@@ -62,7 +59,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import "src/styles/theme";
+@import "@/styles/theme.scss";
 
 .im-right-drawer {
   position: relative;

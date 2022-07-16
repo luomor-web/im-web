@@ -133,7 +133,7 @@
 </template>
 
 <script>
-import TopBar from "../components/system/TopBar";
+import TopBar from "../components/basic/TopBar";
 import {mdiEyeOffOutline, mdiEyeOutline, mdiLaptop} from '@mdi/js'
 import {onMounted, ref} from '@vue/composition-api'
 import {close, startWebSocket} from "@/net/socket";
@@ -142,7 +142,7 @@ import router from "@/router";
 import localStoreUtil from "@/utils/local-store";
 import sessionStoreUtil from "@/utils/session-store";
 import {userLogin} from "@/net/api";
-import ImTip from "@/components/system/ImTip";
+import ImTip from "@/components/basic/ImTip";
 import {downloadDesktop} from "@/utils/desktop-util";
 import store from "@/store";
 

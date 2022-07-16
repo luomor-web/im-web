@@ -91,8 +91,8 @@
 <script>
 import {joinUserGroup, userGroupConfig} from "@/net/send-message";
 import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
-import DrawerTop from "@/components/drawer/DrawerTop";
-import ImDriver from "@/components/system/ImDriver";
+import DrawerTop from "@/components/basic/DrawerTop";
+import ImDriver from "@/components/basic/ImDriver";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import store from "@/store";
 

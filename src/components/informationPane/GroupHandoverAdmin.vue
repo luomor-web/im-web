@@ -25,10 +25,10 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/drawer/DrawerTop";
+import DrawerTop from "@/components/basic/DrawerTop";
 import {computed, ref} from "@vue/composition-api";
 import {handoverUserGroup} from "@/net/send-message";
-import ImWarnDialog from "@/components/system/ImWarnDialog";
+import ImWarnDialog from "@/components/basic/ImWarnDialog";
 import store from "@/store";
 
 export default {
@@ -84,8 +84,8 @@ export default {
     }
 
     return {
-      curUser,
       open,
+      curUser,
       filteredItems,
       searchName,
       action,

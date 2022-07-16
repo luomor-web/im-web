@@ -1,5 +1,6 @@
 import {close, sendMsg} from "@/net/socket";
 import {buildDisplayTime} from "@/utils/date-util";
+import store from "@/store";
 
 const getUserInfo = (data) => {
     // 发送获取用户信息
@@ -182,6 +183,7 @@ const callVideo = (data) =>{
 }
 
 const quitSystem = () => {
+    store.commit('resetData')
     close()
 }
 
