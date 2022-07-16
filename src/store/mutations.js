@@ -4,6 +4,7 @@ import store from "@/store/index";
 import {clearUnReadMessage, getHistoryMessage, sendChatMessage} from "@/net/send-message";
 import {sortedUser} from "@/utils/system-util";
 import Vue from "vue";
+import state from "@/store/state";
 
 export default {
 
@@ -198,6 +199,10 @@ export default {
         })
         state.downloadItemList = [...downloadFileListTemp]
     },
+
+    setAutoDownload: (state, item) => state.autoDownloa = item,
+
+    setDownloadPath: (state, path) => state.downloadPath = path,
 
     ...responseMessage
 }

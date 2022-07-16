@@ -52,11 +52,12 @@ export default {
     }
 
     return {
-      tip,
       settingPane,
       userAction,
       snackbar,
       downloadPath,
+
+      tip,
       selectDownloadPath
     }
   }

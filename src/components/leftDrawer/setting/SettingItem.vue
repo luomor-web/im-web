@@ -1,7 +1,6 @@
 <template>
   <div>
     <drawer-top @close="close" title="设置"></drawer-top>
-
     <div class="pt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -16,7 +15,7 @@
         </div>
         <span class="d-table ma-auto text-h6">{{ curUser.username }}</span>
         <v-list nav>
-          <v-list-item v-ripple class="im-list-item" @click="open('USER_PROFILE')">
+          <v-list-item v-ripple class="im-list-item" @click="open('SETTING_USER_PROFILE')">
             <v-list-item-icon>
               <v-icon>{{ icons.mdiPencilOutline }}</v-icon>
             </v-list-item-icon>
@@ -27,7 +26,7 @@
         </v-list>
         <im-driver></im-driver>
         <v-list nav>
-          <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('DOWNLOAD_SETTING')">
+          <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('SETTING_DOWNLOAD')">
             <v-list-item-icon>
               <v-icon>{{ icons.mdiDownloadOutline }}</v-icon>
             </v-list-item-icon>

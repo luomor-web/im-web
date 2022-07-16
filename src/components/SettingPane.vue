@@ -5,14 +5,20 @@
         <v-window-item value="SETTING_ITEM">
           <setting-item />
         </v-window-item>
+        <v-window-item value="SETTING_USER_PROFILE">
+          <setting-user-profile />
+        </v-window-item>
+        <v-window-item value="SETTING_DOWNLOAD">
+          <setting-download />
+        </v-window-item>
         <v-window-item value="ADD_CHAT">
-          <add-chat/>
+          <add-chat />
         </v-window-item>
         <v-window-item value="CREATE_GROUP">
-          <add-room/>
+          <add-room />
         </v-window-item>
         <v-window-item value="DOWNLOAD_HISTORY">
-          <download-history/>
+          <download-history />
         </v-window-item>
       </v-window>
     </div>
@@ -27,14 +33,18 @@ import AddChat from "@/components/leftDrawer/addChat/AddChat";
 import AddRoom from "@/components/leftDrawer/addRoom/AddRoom";
 import store from "@/store";
 import SettingItem from "@/components/leftDrawer/setting/SettingItem";
+import SettingUserProfile from "@/components/leftDrawer/setting/SettingUserProfile";
+import SettingDownload from "@/components/leftDrawer/setting/SettingDownload";
 
 export default {
   name: "SettingPane",
   components: {
+    SettingDownload,
     AddRoom,
     AddChat,
     DownloadHistory,
-    SettingItem
+    SettingItem,
+    SettingUserProfile
   },
   setup() {
     const curUser = computed(() => store.state.curUser)

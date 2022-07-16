@@ -35,54 +35,59 @@
           </v-list-item-title>
         </v-list-item-content>
         <v-list-item-action>
-          <v-btn icon @click="selectFolder"><v-icon>{{icons.mdiFolderOutline}}</v-icon></v-btn>
+          <v-btn icon @click="selectFolder">
+            <v-icon>{{ icons.mdiFolderOutline }}</v-icon>
+          </v-btn>
         </v-list-item-action>
       </v-list-item>
     </v-list>
-
   </div>
 </template>
 
 <script>
 import DrawerTop from "@/components/basic/DrawerTop";
-import {onMounted, ref} from "@vue/composition-api";
+import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import localStoreUtil from "@/utils/local-store";
 import {mdiCheck, mdiFolderOutline, mdiHelp} from "@mdi/js";
+import store from "@/store";
+
 export default {
-  name: "DownloadSetting",
+  name: "SettingDownload",
   components: {
     DrawerTop
   },
-  setup(props,context){
-
+  setup() {
     const downloadPath = ref('')
     const autoDownload = ref(false)
-
-    const open = (item) => {
-      context.emit('open', item)
-    }
-
-    const autoDownloadChange = (item) => {
-      localStoreUtil.setValue('default-download', item)
-    }
+    const downloadPathStore = computed(() => store.state.downloadPath)
+    const autoDownloadStore = computed(() => store.state.loadingRooms)
 
     onMounted(() => {
-      autoDownload.value = localStoreUtil.getValue('default-download') !== 'false';
-      const value = localStoreUtil.getValue('download-path');
-      if (!value) {
-        window.require('electron').ipcRenderer.invoke('downloads-path').then(result => {
-          downloadPath.value = result
-          localStoreUtil.setValue('download-path', result);
-        })
-      }
-      downloadPath.value = value
+      autoDownload.value = autoDownloadStore.value
+      downloadPath.value = downloadPathStore.value
     })
+
+    watch(downloadPathStore, () => {
+      downloadPath.value = downloadPathStore.value
+    })
+
+    watch(autoDownloadStore, () => {
+      autoDownload.value = autoDownloadStore.value
+    })
+
+    const autoDownloadChange = (item) => {
+      store.commit('setAutoDownload', item)
+    }
 
     const selectFolder = () => {
       window.require('electron').ipcRenderer.invoke('open-file-dialog', downloadPath.value).then((result) => {
         downloadPath.value = result
-        localStoreUtil.setValue('download-path', result);
+        store.commit('setDownloadPath', result)
       })
+    }
+
+    const open = (item) => {
+      store.commit('setSettingPane', item)
     }
 
     return {

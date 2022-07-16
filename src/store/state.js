@@ -28,5 +28,9 @@ export default {
     // 设置窗格（左侧）
     settingPane : '',
     // 下载列表
-    downloadItemList: []
+    downloadItemList: [],
+    // 自动下载
+    autoDownload: false,
+    // 默认下载位置
+    downloadPath: ''
 }

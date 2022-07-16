@@ -68,39 +68,36 @@ import ImUpload from "@/components/basic/ImUpload";
 import store from "@/store";
 
 export default {
-  name: "UserProfile",
+  name: "SettingUserProfile",
   components: {
     ImUpload,
     DrawerTop,
   },
-  props: {
-    user: Object
-  },
-  setup(props, context) {
-    const curUser = computed(() => store.state.curUser)
+  setup() {
+    const user = computed(() => store.state.curUser)
+    const upload = ref(null)
+    const username = ref('')
 
-    watch(() => props.user, () => {
+    watch(user, () => {
       initData()
     })
 
     // 当前是否可以确认
     const showSure = computed(() => {
-      return username.value !== props.user.username && username.value !== ''
+      return username.value !== user.value.username && username.value !== ''
     })
 
-    const upload = ref(null)
-    const username = ref('')
 
     onMounted(() => {
         initData()
     })
 
     const initData = () => {
-      username.value = props.user.username
+      username.value = user.value.username
     }
 
     const changeUserProfile = (url) => {
-      editProfile({userId: curUser.value._id,  avatar: url, name: username.value})
+      editProfile({userId: user.value._id,  avatar: url, name: username.value})
     }
 
     const sure = (url) => {
@@ -113,7 +110,7 @@ export default {
 
     const open = (item) => {
       initData()
-      context.emit('open', item)
+      store.commit('setSettingPane', item)
     }
 
     return {
