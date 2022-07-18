@@ -4,7 +4,6 @@ import store from "@/store/index";
 import {clearUnReadMessage, getHistoryMessage, sendChatMessage} from "@/net/send-message";
 import {sortedUser} from "@/utils/system-util";
 import Vue from "vue";
-import state from "@/store/state";
 
 export default {
 
@@ -136,6 +135,7 @@ export default {
     },
 
     sendFileMessage: (state, {file, roomId, isLast}) => {
+      console.log(file, roomId, isLast)
         const index = state.waitSendMessage.findIndex(r => r.roomId === roomId)
         if (index === -1) return
 

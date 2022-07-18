@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top @close="close" title="设置"></drawer-top>
+    <drawer-top @close="close" title="设置"/>
     <div class="pt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -10,8 +10,7 @@
               width="120"
               class="header-img"
               :src="curUser.avatar"
-          >
-          </v-img>
+          />
         </div>
         <span class="d-table ma-auto text-h6">{{ curUser.username }}</span>
         <v-list nav>
@@ -24,7 +23,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <im-driver></im-driver>
+        <im-driver/>
         <v-list nav>
           <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('SETTING_DOWNLOAD')">
             <v-list-item-icon>

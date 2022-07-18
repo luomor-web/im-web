@@ -4,7 +4,7 @@
         :title="'资料'"
         @close="close">
       <template #right>
-        <v-spacer></v-spacer>
+        <v-spacer/>
         <v-btn class="no-drag" icon @click="open('GROUP_EDIT')" v-if="isGroup">
           <v-icon>
             {{ icons.mdiPencilOutline }}
@@ -22,8 +22,7 @@
               width="120"
               class="header-img"
               :src="room.avatar"
-          >
-          </v-img>
+          />
         </div>
         <span class="d-table ma-auto text-h6">{{ room.roomName }}</span>
         <v-list nav>
@@ -36,20 +35,20 @@
             </v-list-item-content>
             <v-list-item-action>
               <v-switch v-model="notice" @change="noticeChange"
-              ></v-switch>
+              />
             </v-list-item-action>
           </v-list-item>
         </v-list>
       </div>
     </div>
 
-    <im-driver></im-driver>
+    <im-driver/>
     <div v-if="isGroup">
       <div class="mx-2 overflow-y-auto fill-height">
         <v-list nav>
           <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
             <v-list-item-avatar>
-              <v-img :src="item.avatar"></v-img>
+              <v-img :src="item.avatar"/>
             </v-list-item-avatar>
             <v-list-item-content>
               <v-badge
@@ -85,6 +84,7 @@
         </v-btn>
       </div>
     </div>
+    <im-user-select-dialog :action="userAction"/>
   </div>
 </template>
 
@@ -95,17 +95,22 @@ import DrawerTop from "@/components/basic/DrawerTop";
 import ImDriver from "@/components/basic/ImDriver";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
 import store from "@/store";
+import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
 
 export default {
   name: "RoomInfo",
   components: {
     ImDriver,
     DrawerTop,
+    ImUserSelectDialog
   },
   setup(props, context) {
 
     const room = computed(() => store.getters.curRoom)
     const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem )
+    const userAction = ref({
+      visible: false
+    })
     const close = () => {
       store.commit('setInformationPane', '')
     }

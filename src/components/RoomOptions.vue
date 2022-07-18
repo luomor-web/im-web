@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <im-video-dialog ref="videoDialog" :room="room"></im-video-dialog>
+    <im-video-dialog ref="videoDialog" :room="room"/>
 
   </div>
 </template>
@@ -26,7 +26,6 @@
 <script>
 import {mdiDotsVertical, mdiMagnify, mdiPhone, mdiVideoOutline,} from "@mdi/js";
 import {computed, ref} from "@vue/composition-api";
-import {getUserList} from "@/net/send-message";
 import ImVideoDialog from "@/components/basic/ImVideoDialog";
 import store from "@/store";
 
@@ -38,10 +37,6 @@ export default {
     const room = computed(() => store.getters.curRoom)
 
     const videoDialog = ref(null)
-
-    const inviteUser = () => {
-      getUserList()
-    }
 
     const call = (type) => {
       videoDialog.value.call(type)
@@ -57,7 +52,6 @@ export default {
       openInformationPane,
 
       call,
-      inviteUser,
 
       icons: {
         mdiMagnify,

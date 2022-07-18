@@ -9,9 +9,8 @@
       >
         <v-toolbar-title>选择</v-toolbar-title>
 
-        <v-spacer></v-spacer>
-        <v-text-field  hide-details rounded dense filled placeholder="搜索" >
-        </v-text-field>
+        <v-spacer/>
+        <v-text-field  hide-details rounded dense filled placeholder="搜索" />
         <v-btn
             icon
             class="hidden-xs-only"
@@ -51,30 +50,25 @@
             <v-list nav>
               <v-list-item v-ripple v-for="(item,index) of loadedRooms" :key="index" >
                 <v-list-item-avatar>
-                  <v-img :src="item.avatar"></v-img>
+                  <v-img :src="item.avatar"/>
                 </v-list-item-avatar>
                 <v-list-item-content >
                   <v-list-item-title>{{ item.roomName }}</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <slot name="userAction" :item="item">
-                  </slot>
+                  <slot name="userAction" :item="item"/>
                 </v-list-item-action>
               </v-list-item>
             </v-list>
           </v-card>
         </v-tab-item>
         <v-tab-item>
-          <v-card flat>
-            <v-card-text>
-
-            </v-card-text>
-          </v-card>
+          {{'你好'}}
         </v-tab-item>
         <v-tab-item>
           <v-card flat>
             <v-card-text>
-
+              {{'你好'}}
             </v-card-text>
           </v-card>
         </v-tab-item>

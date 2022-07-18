@@ -1,7 +1,7 @@
 <template>
 <div>
   <input type="file" ref="file" class="d-none" accept="image/*"
-         @change="onFileChange($event.target.files)">
+         @change="onFileChange($event.target.files)"/>
 
   <v-dialog
       hide-overlay
@@ -9,7 +9,7 @@
       v-model="dialog"
       width="500"
   >
-    <im-cropper :img="img" @sure="sure" @cancel="closeDialog"></im-cropper>
+    <im-cropper :img="img" @sure="sure" @cancel="closeDialog"/>
   </v-dialog>
 
 </div>

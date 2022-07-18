@@ -3,14 +3,13 @@
     <v-list nav>
       <v-list-item v-ripple v-for="(item,index) of filteredItems" :key="index" >
         <v-list-item-avatar>
-          <v-img :src="item.avatar"></v-img>
+          <v-img :src="item.avatar"/>
         </v-list-item-avatar>
         <v-list-item-content @click="clickContent(item)">
           <v-list-item-title>{{ item.username }}</v-list-item-title>
         </v-list-item-content>
         <v-list-item-action>
-          <slot name="userAction" :item="item">
-          </slot>
+          <slot name="userAction" :item="item"/>
         </v-list-item-action>
       </v-list-item>
     </v-list>

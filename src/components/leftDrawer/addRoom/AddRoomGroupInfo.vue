@@ -2,7 +2,7 @@
   <div>
     <drawer-top :sub="true" @close="goTo" :title="'群组资料'">
       <template #right>
-        <v-spacer></v-spacer>
+        <v-spacer/>
         <v-btn color="primary" :disabled="roomName === ''" @click="createRoom">
           确定
         </v-btn>
@@ -38,10 +38,9 @@
           label="群组名称"
           hide-details="auto"
           outlined
-      >
-      </v-text-field>
+      />
     </div>
-    <im-upload ref="upload" @sure="sure" ></im-upload>
+    <im-upload ref="upload" @sure="sure" />
   </div>
 </template>
 

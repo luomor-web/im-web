@@ -10,7 +10,7 @@
             label="文件名"
             required
             :value="file.name"
-        ></v-text-field>
+        />
         <v-text-field
             hide-details="auto"
             label="文件路径"
@@ -18,16 +18,16 @@
             :value="downloadPath"
             append-outer-icon="mdi-folder-outline"
             @click:append-outer="selectFolder"
-        ></v-text-field>
+        />
         <v-checkbox
             hide-details="auto"
             v-model="checkbox"
             :label="`默认下载地址，不再提示`"
-        ></v-checkbox>
+        />
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer/>
 
         <v-btn
             color="green darken-1"
@@ -50,42 +50,54 @@
 </template>
 
 <script>
-import {onMounted, ref} from "@vue/composition-api";
-import localStoreUtil from "@/utils/local-store";
+import {computed, onMounted, ref} from "@vue/composition-api";
 import {uuid} from "@/utils/id-util";
+import store from "@/store";
 
 export default {
   name: "ImDownloadPath",
-  props: {},
   setup() {
     const file = ref(null)
     const downloadAction = ref(false)
     const checkbox = ref(false)
     const downloadPath = ref('')
+    const downloadPathStore = computed(() => store.state.downloadPath)
+    const autoDownloadStore = computed(() => store.state.loadingRooms)
 
-    const selectFolder = () => {
-      window.require('electron').ipcRenderer.invoke('open-file-dialog', downloadPath.value).then((result) => {
-        downloadPath.value = result
-        localStoreUtil.setValue('download-path', result);
-      })
-    }
+    onMounted(() => {
+      if (!process.env.IS_ELECTRON) {
+        return
+      }
+      if (!downloadPathStore.value) {
+        window.require('electron').ipcRenderer.invoke('downloads-path').then(result => {
+          downloadPath.value = result
+          store.commit('setDownloadPath', result)
+        })
+      }
+      store.commit('setAutoDownload', !!autoDownloadStore.value)
+    })
 
     // 上级组件直接调用
     const action = (downloadFile) => {
-      checkbox.value = localStoreUtil.getValue('default-download') !== 'false';
-      console.log('action', checkbox.value, localStoreUtil.getValue('default-download'))
+      checkbox.value = autoDownloadStore.value
+      downloadPath.value = downloadPathStore.value
       file.value = downloadFile
       if (checkbox.value) {
         sendDownload()
         return
       }
-
       downloadAction.value = true
+    }
+
+    const selectFolder = () => {
+      window.require('electron').ipcRenderer.invoke('open-file-dialog', downloadPath.value).then((result) => {
+        downloadPath.value = result
+        store.commit('setDownloadPath', result)
+      })
     }
 
     const resetDownload = () => {
       downloadAction.value = false
-      // downloadPath.value = localStoreUtil.getValue('download-path');
       checkbox.value = false
     }
 
@@ -99,26 +111,10 @@ export default {
     }
 
     const sureDownload = () => {
-      localStoreUtil.setValue('default-download', checkbox.value)
+      store.commit('setAutoDownload', checkbox.value)
       sendDownload()
       downloadAction.value = false
     }
-
-    onMounted(() => {
-      if (!process.env.IS_ELECTRON) {
-        return
-      }
-      const value = localStoreUtil.getValue('download-path');
-      if (!value) {
-        window.require('electron').ipcRenderer.invoke('downloads-path').then(result => {
-          downloadPath.value = result
-          localStoreUtil.setValue('download-path', result);
-        })
-      }
-      downloadPath.value = value
-
-      checkbox.value = localStoreUtil.getValue('default-download') !== 'false';
-    })
 
     return {
       file,
@@ -130,9 +126,7 @@ export default {
       resetDownload,
       sureDownload
     }
-
   }
-
 }
 </script>
 

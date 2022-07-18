@@ -2,7 +2,7 @@
   <div class="top">
     <v-toolbar height="32px" flat style="padding: 0">
       <span class="ml-3">信使</span>
-      <v-spacer></v-spacer>
+      <v-spacer/>
       <div class="no-drag">
         <v-btn icon @click="handler('min')" dense>
           <v-icon>
@@ -23,7 +23,7 @@
         </v-btn>
       </div>
     </v-toolbar>
-    <update></update>
+    <update/>
   </div>
 </template>
 

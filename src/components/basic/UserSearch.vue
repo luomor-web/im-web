@@ -1,82 +1,48 @@
 <template>
-  <div style="width: 100%">
-    <v-menu offset-y>
-      <template v-slot:activator="{ on, attrs }">
-        <v-text-field v-model="searchName"
-                      hide-details
-                      rounded
-                      dense
-                      filled
-                      v-bind="attrs"
-                      v-on="on"
-                      clearable
-                      placeholder="搜索">
-        </v-text-field>
-      </template>
-      <v-card max-height="400">
-        <v-list nav>
-          <v-list-item v-ripple v-for="(item,index) of filteredItems" :key="index" class="im-list-item"
-                       @click="selectItem(item)">
-            <v-list-item-avatar>
-              <v-img :src="item.avatar"></v-img>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title>{{ item.username }}</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <slot name="userAction" :item="item">
-              </slot>
-            </v-list-item-action>
-          </v-list-item>
-        </v-list>
-      </v-card>
-    </v-menu>
-
-  </div>
+  <v-text-field v-model="searchName"
+                hide-details
+                rounded
+                dense
+                filled
+                clearable
+                @change="change"
+                placeholder="搜索"/>
 </template>
 
 <script>
-import {computed, ref} from "@vue/composition-api";
-import store from "@/store";
+import {onMounted, onUnmounted, ref} from "@vue/composition-api";
+import msg from "@/plugins/msg";
+import {searchUser} from "@/net/send-message";
 
 export default {
   name: "UserSearch",
-  props: {
-    waitSelect: Array,
-    filters: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    }
-  },
+  props: {},
   setup(props, {emit}) {
 
-    const waitSelectUser = computed(()=> store.state.waitSelectUser)
     const searchName = ref('')
 
-    const filteredItems = computed(() => {
-      console.log('search', searchName)
-      return waitSelectUser.value.filter(x => x.username.indexOf(searchName.value) !== -1 && props.filters.findIndex(r => r._id === x._id) === -1)
+    onMounted(() => {
+      msg.$on("COMMAND_SEARCH_USER_RESP", onSearchUserResp)
     })
 
-    const customFilter = (item, queryText) => {
-      const username = item.username.toLowerCase()
-      const searchText = queryText.toLowerCase()
+    const onSearchUserResp = () => {
 
-      return username.indexOf(searchText) > -1
     }
 
-    const selectItem = (item) => {
-      emit('click-content', item)
+    const change = (item) => {
+      searchUser(item)
+      emit('close')
     }
+
+    onUnmounted(() => {
+      msg.$off("COMMAND_SEARCH_USER_RESP")
+    })
+
 
     return {
-      selectItem,
-      filteredItems,
-      customFilter,
       searchName,
-      waitSelectUser
+
+      change
     }
   }
 }

@@ -5,7 +5,7 @@
         <v-avatar color="#b7c1ca" size="30">
           <img
               :src="callUser.avatar"
-          >
+          />
         </v-avatar>
 
         <v-toolbar-title class="ml-1">{{ callUser.username }}</v-toolbar-title>
@@ -15,8 +15,8 @@
             absolute
             bottom
             color="deep-purple accent-4"
-        ></v-progress-linear>
-        <v-spacer></v-spacer>
+        />
+        <v-spacer/>
         <v-btn icon @click="changeAudio" v-if="videoed || role === 'HOST'">
           <v-icon>{{ audioEnabled ? icons.mdiMicrophone : icons.mdiMicrophoneOff }}</v-icon>
         </v-btn>

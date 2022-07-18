@@ -1,22 +1,22 @@
 <template>
-  <div class="fill-height">
-    <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')"></drawer-top>
+  <div>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')"/>
     <div class="mt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
           <v-hover>
             <template v-slot:default="{ hover }">
               <v-img
-                  aspect-ratio="1"
-                  height="120"
-                  width="120"
-                  class="header-img"
-                  :src="user.avatar"
+                aspect-ratio="1"
+                height="120"
+                width="120"
+                class="header-img"
+                :src="user.avatar"
               >
                 <v-fade-transition>
                   <v-overlay
-                      v-if="hover"
-                      absolute
+                    v-if="hover"
+                    absolute
                   >
                     <v-btn icon @click="openUpload" height="120" width="120">
                       <v-icon>{{ icons.mdiCamera }}</v-icon>
@@ -30,30 +30,29 @@
       </div>
     </div>
 
-    <im-upload ref="upload" @sure="sure"></im-upload>
+    <im-upload ref="upload" @sure="sure"/>
 
     <div class="mx-2 mb-2 mt-8">
       <v-text-field
-          v-model="username"
-          label="用户名称"
-          hide-details="auto"
-          outlined
-      >
-      </v-text-field>
+        v-model="username"
+        label="用户名称"
+        hide-details="auto"
+        outlined
+      />
     </div>
 
     <v-fab-transition>
       <v-btn
-          class="mb-16 mr-8"
-          v-show="showSure"
-          absolute
-          fab
-          right
-          bottom
-          color="success"
-          @click="changeUserProfile(null)"
+        class="mb-16 mr-8"
+        v-show="showSure"
+        absolute
+        fab
+        right
+        bottom
+        color="success"
+        @click="changeUserProfile(null)"
       >
-        <v-icon>{{icons.mdiCheck}}</v-icon>
+        <v-icon>{{ icons.mdiCheck }}</v-icon>
       </v-btn>
     </v-fab-transition>
   </div>
@@ -89,7 +88,7 @@ export default {
 
 
     onMounted(() => {
-        initData()
+      initData()
     })
 
     const initData = () => {
@@ -97,7 +96,7 @@ export default {
     }
 
     const changeUserProfile = (url) => {
-      editProfile({userId: user.value._id,  avatar: url, name: username.value})
+      editProfile({userId: user.value._id, avatar: url, name: username.value})
     }
 
     const sure = (url) => {
@@ -114,6 +113,7 @@ export default {
     }
 
     return {
+      user,
       upload,
       username,
       showSure,

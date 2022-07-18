@@ -61,7 +61,7 @@ const webSocket = (token) => {
                 break;
             // 当前用户列表
             case 27:
-                store.commit("COMMAND_USER_LIST_RESP", data)
+                msg.$emit("COMMAND_SEARCH_USER_RESP", data)
                 break;
             // 表情回复消息
             case 29:
@@ -135,7 +135,6 @@ const sendMsg = (data) => {
     } catch (e) {
         initWebSocket()
     }
-
 }
 
 const initWebSocket = () => {
@@ -155,9 +154,7 @@ const initWebSocket = () => {
         router.push('/login').then(() => {})
     }
 
-    console.log('初始化Token1')
     if (socket == null && token) {
-        console.log('初始化Token2')
         webSocket(token)
     }
 }

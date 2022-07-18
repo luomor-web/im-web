@@ -19,8 +19,6 @@ export default {
     messages: [],
     // 等待发送的消息
     waitSendMessage: [],
-    // 全部用户列表
-    waitSelectUser:[],
     // 全局定时器
     timers: Object.create(null),
     // 信息窗格（右侧）

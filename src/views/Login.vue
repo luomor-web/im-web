@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="isElectron">
-      <top-bar></top-bar>
+      <top-bar/>
     </div>
     <div class="download-client" v-if="!isElectron">
       <v-btn text @click="downloadDesktop">
@@ -25,7 +25,7 @@
                   alt="logo"
                   contain
                   class="me-3 "
-              ></v-img>
+              />
 
               <h2 class="text-2xl font-weight-semibold">
                 Courier
@@ -50,7 +50,7 @@
                   placeholder="用户名"
                   hide-details
                   class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                   v-model="password"
@@ -61,7 +61,7 @@
                   :append-icon="isPasswordVisible ? icons.mdiEyeOffOutline : icons.mdiEyeOutline"
                   hide-details
                   @click:append="isPasswordVisible = !isPasswordVisible"
-              ></v-text-field>
+              />
 
               <div class="d-flex align-center justify-space-between flex-wrap">
                 <v-checkbox
@@ -69,8 +69,7 @@
                     label="记住密码"
                     hide-details
                     class="me-3 mt-1"
-                >
-                </v-checkbox>
+                />
 
                 <!-- forgot link -->
                 <a
@@ -109,7 +108,7 @@
           class="auth-mask-bg"
           height="173"
           :src="require(`@/assets/images/misc/mask-${$vuetify.theme.dark ? 'dark':'light'}.png`)"
-      >
+      />
 
       <!-- tree -->
       <v-img
@@ -117,7 +116,7 @@
           width="247"
           height="185"
           src="@/assets/images/misc/tree.png"
-      ></v-img>
+      />
 
       <!-- tree  -->
       <v-img
@@ -125,10 +124,10 @@
           width="377"
           height="289"
           src="@/assets/images/misc/tree-3.png"
-      ></v-img>
+      />
     </div>
 
-    <im-tip :snackbar="snackbar" @close="snackbar.display = false"></im-tip>
+    <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
   </div>
 </template>
 

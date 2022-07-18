@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 12px;background-color: rgb(244 244 245)"></div>
+  <div style="height: 12px;background-color: rgb(244 244 245)" />
 </template>
 
 <script>

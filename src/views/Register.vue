@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="isElectron">
-      <top-bar></top-bar>
+      <top-bar/>
     </div>
     <div class="auth-wrapper auth-v1">
       <div class="auth-inner">
@@ -19,7 +19,7 @@
                   alt="logo"
                   contain
                   class="me-3 "
-              ></v-img>
+              />
 
               <h2 class="text-2xl font-weight-semibold">
                 Courier
@@ -70,7 +70,7 @@
                   :rules="rules.username"
                   hide-details="auto"
                   class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                   v-model="registerFrom.password"
@@ -81,7 +81,7 @@
                   :rules="rules.password"
                   hide-details="auto"
                   class="mb-3"
-              ></v-text-field>
+              />
 
               <v-text-field
                   v-model="registerFrom.repeatPassword"
@@ -91,7 +91,7 @@
                   placeholder="重复密码"
                   :rules="rules.repeatPassword"
                   hide-details="auto"
-              ></v-text-field>
+              />
 
               <v-btn
                   block
@@ -121,7 +121,7 @@
           class="auth-mask-bg"
           height="173"
           :src="require(`@/assets/images/misc/mask-${$vuetify.theme.dark ? 'dark':'light'}.png`)"
-      >
+      />
 
       <!-- tree -->
       <v-img
@@ -129,7 +129,7 @@
           width="247"
           height="185"
           src="@/assets/images/misc/tree.png"
-      ></v-img>
+      />
 
       <!-- tree  -->
       <v-img
@@ -137,7 +137,7 @@
           width="377"
           height="289"
           src="@/assets/images/misc/tree-3.png"
-      ></v-img>
+      />
     </div>
   </div>
 </template>

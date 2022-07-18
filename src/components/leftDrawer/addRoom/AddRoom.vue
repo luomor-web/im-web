@@ -2,22 +2,18 @@
   <div>
     <v-window v-model="active">
       <v-window-item value="SELECT_USER">
-
         <add-room-select-user
             :icon="icons.mdiArrowRight"
             @close="closeAddRoom"
             @to-go="toGo('GROUP_SETTING',$event)"
         />
-
       </v-window-item>
       <v-window-item value="GROUP_SETTING">
-
         <add-room-group-info
             @to-go="toGo"
             @close="closeAddRoom"
             :user-select="userSelect"
         />
-
       </v-window-item>
     </v-window>
   </div>

@@ -2,27 +2,28 @@
   <div>
     <drawer-top @close="closeAddRoom">
       <template #default>
-        <user-search :filters="room.users" @click-content="operationUser"></user-search>
+        <user-search :filters="room.users" @click-content="operationUser"/>
       </template>
       <template #right>
         <div v-if="userSelect.length > 0">
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <v-btn icon @click="toGo('GROUP_SETTING')">
             <v-icon>{{ icon }}</v-icon>
           </v-btn>
         </div>
       </template>
     </drawer-top>
+
     <div>
       <div class="ma-2">
         <v-chip v-for="(item,index) of userSelect" :key="index" @click="removeUser(item)" class="ma-1">
           {{ item.username }}
           <v-avatar right>
-            <v-img :src="item.avatar"></v-img>
+            <v-img :src="item.avatar"/>
           </v-avatar>
         </v-chip>
       </div>
-      <im-driver v-if="userSelect.length > 0"></im-driver>
+      <im-driver v-if="userSelect.length > 0"/>
       <user-select-column @click-content="operationUser" :filters="room.users" class="fill-height">
         <div slot="userAction" slot-scope="{item}">
           <v-btn @click="operationUser(item)" :color="isInclude(item) ? 'error':'primary'">
@@ -41,6 +42,7 @@ import UserSelectColumn from "@/components/basic/UserSelectColumn";
 import DrawerTop from "@/components/basic/DrawerTop";
 import {ref} from "@vue/composition-api";
 import {mdiArrowRight} from "@mdi/js";
+import store from "@/store";
 
 export default {
   name: "AddRoomSelectUser",
@@ -89,8 +91,8 @@ export default {
       userSelect.value = []
     }
 
-    const closeAddRoom = () => {
-      emit('close')
+    const close = () => {
+      store.commit('setSettingPane', '')
     }
 
     const toGo = () => {
@@ -104,7 +106,7 @@ export default {
       isInclude,
       removeUser,
       operationUser,
-      closeAddRoom,
+      closeAddRoom: close,
 
       icons: {
         mdiArrowRight

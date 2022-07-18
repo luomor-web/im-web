@@ -11,7 +11,7 @@
           {{ title  }}
         </v-toolbar-title>
       </slot>
-      <slot name="right"></slot>
+      <slot name="right" />
     </v-toolbar>
   </div>
 </template>

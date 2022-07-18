@@ -1,49 +1,49 @@
 <template>
   <div>
-    <top-bar v-if="isElectron"></top-bar>
-    <div>
-      <chat-window
-          :height="pageHeight"
-          :current-user-id="currentUserId"
-          :show-add-room="false"
-          :room-id="roomId"
-          :rooms="loadedRooms"
-          :loading-rooms="loadingRooms"
-          :messages="messages"
-          :messages-loaded="messageLoaded"
-          :rooms-loaded="roomsLoaded"
-          :text-messages="textMessages"
-          :message-actions="messageActions"
-          :message-selection-actions="messageSelectionActions"
-          :room-info-enabled="true"
-          :search-message="searchMessage"
-          @open-failed-message="openFailedMessage"
-          @room-info="roomInfo"
-          @send-message="sendMessage"
-          @fetch-messages="fetchMessage"
-          @send-message-reaction="sendMessageReaction"
-          @delete-message="deleteMessage"
-          @message-selection-action-handler="messageSelectionActionHandler"
-          @open-file="openFile"
-          @click-scroll-icon="clickScrollIcon"
-      >
+    <top-bar v-if="isElectron"/>
+    <chat-window
+      :height="pageHeight"
+      :current-user-id="currentUserId"
+      :show-add-room="false"
+      :room-id="roomId"
+      :rooms="loadedRooms"
+      :loading-rooms="loadingRooms"
+      :messages="messages"
+      :messages-loaded="messageLoaded"
+      :rooms-loaded="roomsLoaded"
+      :text-messages="textMessages"
+      :message-actions="messageActions"
+      :message-selection-actions="messageSelectionActions"
+      :room-info-enabled="true"
+      :search-message="searchMessage"
+      @open-failed-message="openFailedMessage"
+      @room-info="roomInfo"
+      @send-message="sendMessage"
+      @fetch-messages="fetchMessage"
+      @send-message-reaction="sendMessageReaction"
+      @delete-message="deleteMessage"
+      @message-selection-action-handler="messageSelectionActionHandler"
+      @open-file="openFile"
+      @click-scroll-icon="clickScrollIcon"
+    >
 
-        <template #rooms-header="{}">
-          <rooms-header/>
-        </template>
-        <template #left-drawer="{}">
-          <left-drawer />
-        </template>
-        <template #right-drawer="{}">
-          <information-pane />
-        </template>
-        <template #room-options="{}">
-          <room-options />
-        </template>
-
-      </chat-window>
-      <im-component ref="imComponent"/>
-    </div>
+      <template #rooms-header="{}">
+        <rooms-header/>
+      </template>
+      <template #setting-pane="{}">
+        <setting-pane />
+      </template>
+      <template #information-pane="{}">
+        <information-pane/>
+      </template>
+      <template #room-options="{}">
+        <room-options/>
+      </template>
+      <template #float-action="{}">
+        <float-menu />
+      </template>
+    </chat-window>
+    <im-component ref="imComponent"/>
   </div>
 </template>
 
@@ -55,40 +55,40 @@ import TopBar from "../components/basic/TopBar";
 import {
   getHistoryMessage,
   getUserInfo,
-  getUserList,
   messageDelete,
   messageReaction,
   sendChatMessage
 } from "@/net/send-message";
-import {mdiAccount, mdiWindowClose} from "@mdi/js";
 import {textMessages} from "@/locales/text-message";
 import {messageActions} from "@/locales/message-action";
 import {messageSelectionActions} from "@/locales/message-selection-action";
 import RoomsHeader from "@/components/RoomsHeader";
 import RoomOptions from "@/components/RoomOptions";
 import InformationPane from "@/components/InformationPane";
-import LeftDrawer from "@/components/SettingPane";
+import SettingPane from "@/components/SettingPane";
 import download from "@/utils/download";
 import store from "@/store";
 import {uploadFiles} from "@/utils/upload";
 import {uuid} from "@/utils/id-util";
 import moment from "moment";
 import ImComponent from "@/components/ImComponent";
+import FloatMenu from "@/components/basic/FloatMenu";
 
 export default {
   name: 'Home',
   components: {
     ImComponent,
-    LeftDrawer,
+    SettingPane,
     InformationPane,
     RoomOptions,
     RoomsHeader,
     TopBar,
     ChatWindow,
+    FloatMenu
   },
   setup() {
 
-    let isElectron = ref(process.env.IS_ELECTRON);
+    const isElectron = ref(process.env.IS_ELECTRON);
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
     const imComponent = ref(null)
     const roomId = computed(() => store.state.roomId)
@@ -104,7 +104,6 @@ export default {
 
     onMounted(() => {
       getUserInfo(currentUserId.value)
-      getUserList()
     })
 
     const deleteMessage = ({message}) => {
@@ -121,7 +120,9 @@ export default {
 
     const messageSelectionActionHandler = ({roomId, action, messages}) => {
       console.log(roomId, action, messages)
-      if (action.name === "forwardMessages") return
+      if (action.name === "forwardMessages") {
+        imComponent.value.selectUser()
+      }
     }
 
     const openFile = ({file}) => {
@@ -248,10 +249,7 @@ export default {
       clickScrollIcon,
       sendMessageReaction,
       messageSelectionActionHandler,
-      icons: {
-        mdiWindowClose,
-        mdiAccount,
-      }
+
     }
   },
 }

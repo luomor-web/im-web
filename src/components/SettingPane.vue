@@ -1,7 +1,7 @@
 <template>
   <v-expand-x-transition>
     <div class="im-left-drawer" v-if="settingPane">
-      <v-window v-model="settingPane">
+      <v-window v-model="settingPane"  class="fill-height">
         <v-window-item value="SETTING_ITEM">
           <setting-item />
         </v-window-item>
@@ -26,14 +26,14 @@
 </template>
 
 <script>
-import DownloadHistory from "@/components/leftDrawer/downloadHistory/DownloadHistory";
 import {computed} from "@vue/composition-api";
+import store from "@/store";
 import {mdiPlus} from "@mdi/js";
 import AddChat from "@/components/leftDrawer/addChat/AddChat";
 import AddRoom from "@/components/leftDrawer/addRoom/AddRoom";
-import store from "@/store";
 import SettingItem from "@/components/leftDrawer/setting/SettingItem";
 import SettingUserProfile from "@/components/leftDrawer/setting/SettingUserProfile";
+import DownloadHistory from "@/components/leftDrawer/downloadHistory/DownloadHistory";
 import SettingDownload from "@/components/leftDrawer/setting/SettingDownload";
 
 export default {

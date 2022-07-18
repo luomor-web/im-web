@@ -1,15 +1,14 @@
 <template>
   <div  class="fill-height">
     <drawer-top :sub="true" @close="open('GROUP_EDIT')">
-      <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName">
-      </v-text-field>
+      <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName"/>
     </drawer-top>
     <div class="mx-2 overflow-y-auto fill-height">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of filteredItems"
                      :key="index">
           <v-list-item-avatar>
-            <v-img :src="item.avatar"></v-img>
+            <v-img :src="item.avatar"/>
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{ item.username }}</v-list-item-title>
@@ -60,7 +59,7 @@
       </v-list>
     </div>
 
-    <im-warn-dialog :action="action"></im-warn-dialog>
+    <im-warn-dialog :action="action"/>
   </div>
 </template>
 <script>

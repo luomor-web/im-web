@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top :title="'编辑资料'" :sub="true" @close="open('ROOM_INFO')"></drawer-top>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('ROOM_INFO')"/>
     <div class="pt-2 mx-2">
       <div class="d-table ma-auto">
         <v-hover>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <im-upload ref="upload" @sure="sure"></im-upload>
+    <im-upload ref="upload" @sure="sure"/>
 
     <div class="mx-2 mb-2 mt-8">
       <v-text-field
@@ -36,8 +36,7 @@
           label="群组名称"
           hide-details="auto"
           outlined
-      >
-      </v-text-field>
+      />
     </div>
 
     <div class="mx-2">
@@ -63,8 +62,7 @@
       </v-list>
     </div>
 
-
-    <v-divider></v-divider>
+    <v-divider/>
 
     <div class="mx-2">
       <v-list nav>
@@ -103,7 +101,7 @@
       </v-btn>
     </v-fab-transition>
 
-    <im-warn-dialog :action="action"></im-warn-dialog>
+    <im-warn-dialog :action="action"/>
   </div>
 </template>
 

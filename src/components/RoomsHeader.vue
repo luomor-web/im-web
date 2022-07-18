@@ -2,31 +2,31 @@
   <div class="room-header">
     <div class="room-header-container">
       <v-menu
-          bottom
-          min-width="260px"
-          :rounded="'lg'"
-          offset-y
-          transition="scale-transition"
-          origin="left top"
+        bottom
+        min-width="260px"
+        :rounded="'lg'"
+        offset-y
+        transition="scale-transition"
+        origin="left top"
       >
         <template v-slot:activator="{ on }">
           <v-btn
-              v-on="on"
-              icon
-              x-large
+            v-on="on"
+            icon
+            x-large
           >
             <v-badge
-                color="pink"
-                dot
-                bottom
-                offset-x="10"
-                offset-y="10"
-                :value="haveDownloadFile">
+              color="pink"
+              dot
+              bottom
+              offset-x="10"
+              offset-y="10"
+              :value="haveDownloadFile">
               <v-avatar color="#b7c1ca">
                 <img
-                    :src="curUser.avatar"
-                    :alt="curUser.username"
-                >
+                  :src="curUser.avatar"
+                  :alt="curUser.username"
+                />
               </v-avatar>
             </v-badge>
           </v-btn>
@@ -45,12 +45,12 @@
             <v-list-item class="im-list-item" @click="openSettingPane('DOWNLOAD_HISTORY')" v-if="isElectron">
               <v-list-item-icon>
                 <v-badge
-                    color="pink"
-                    dot
-                    bottom
-                    offset-x="5"
-                    offset-y="5"
-                    :value="haveDownloadFile">
+                  color="pink"
+                  dot
+                  bottom
+                  offset-x="5"
+                  offset-y="5"
+                  :value="haveDownloadFile">
                   <v-icon>{{ icons.mdiCloudDownloadOutline }}</v-icon>
                 </v-badge>
               </v-list-item-icon>
@@ -82,7 +82,7 @@
       <h3 class="ml-3">
         {{ curUser.username }}
       </h3>
-      <v-spacer></v-spacer>
+      <v-spacer/>
       <v-tooltip bottom z-index="11" v-if="!isElectron">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon
@@ -97,49 +97,37 @@
     </div>
     <div class="error-container" v-if="reconnect">
       <v-alert
-          border="left"
-          type="warning"
-          class="mb-0"
-          dense
-          :icon="icons.mdiAlertOutline"
+        border="left"
+        type="warning"
+        class="mb-0"
+        dense
+        :icon="icons.mdiAlertOutline"
       >
         网络断线,正在重连...
       </v-alert>
-
     </div>
-
-    <im-warn-dialog :action="warnAction"></im-warn-dialog>
-    <about :action="about"></about>
+    <im-warn-dialog :action="warnAction"/>
+    <about :action="about"/>
   </div>
 </template>
 
 <script>
-import {
-  mdiAlertOutline,
-  mdiCloudDownloadOutline,
-  mdiCog,
-  mdiExitToApp,
-  mdiLaptop,
-} from "@mdi/js";
-import {getUserInfo, quitSystem} from "@/net/send-message";
 import {computed, onMounted, ref} from "@vue/composition-api";
+import {downloadDesktop} from "@/utils/desktop-util";
+import {getUserInfo, quitSystem} from "@/net/send-message";
+import store from "@/store";
+import {mdiAlertOutline, mdiCloudDownloadOutline, mdiCog, mdiExitToApp, mdiLaptop,} from "@mdi/js";
 import msg from "@/plugins/msg";
 import ImWarnDialog from "@/components/basic/ImWarnDialog";
-import {downloadDesktop} from "@/utils/desktop-util";
 import About from "@/components/basic/About";
-import store from "@/store";
 
 export default {
   name: "RoomsHeader",
-  props: {},
   components: {
     About,
     ImWarnDialog,
   },
   setup() {
-    const currentUserId = computed(() => store.state.currentUserId)
-    const curUser = computed(() => store.state.curUser)
-    const haveDownloadFile = computed(() => store.getters.haveFileDownloading)
     const reconnect = ref(false)
     const isElectron = ref(process.env.IS_ELECTRON)
     const about = ref({
@@ -148,7 +136,6 @@ export default {
         about.value.visible = false
       }
     })
-
     const warnAction = ref({
       model: false,
       title: '文件传输',
@@ -159,6 +146,21 @@ export default {
       sure: () => {
         quitSystem()
       }
+    })
+    const currentUserId = computed(() => store.state.currentUserId)
+    const curUser = computed(() => store.state.curUser)
+    const haveDownloadFile = computed(() => store.getters.haveFileDownloading)
+
+    onMounted(() => {
+      msg.$on("SOCKET_RECONNECTING", () => {
+        reconnect.value = true
+      })
+      msg.$on("SOCKET_CONNECTING", () => {
+        if (reconnect.value === true) {
+          getUserInfo(currentUserId.value)
+        }
+        reconnect.value = false
+      })
     })
 
     const quit = () => {
@@ -174,20 +176,6 @@ export default {
     const openSettingPane = (item) => {
       store.commit('setSettingPane', item)
     }
-
-    onMounted(() => {
-      msg.$on("SOCKET_RECONNECTING", () => {
-        reconnect.value = true
-      })
-      msg.$on("SOCKET_CONNECTING", () => {
-        if (reconnect.value === true) {
-          getUserInfo(currentUserId.value)
-        }
-        reconnect.value = false
-      })
-
-    })
-
 
     return {
       openSettingPane,

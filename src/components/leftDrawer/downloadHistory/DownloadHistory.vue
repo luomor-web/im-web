@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height">
-    <drawer-top @close="close" title="文件传输"></drawer-top>
+    <drawer-top @close="close" title="文件传输"/>
     <v-list dense class="overflow-y-auto" style="height: calc(100% - 60px)">
       <v-list-item v-ripple v-for="(item,index) of downloadFileList" :key="index" class="im-list-item"
       >
@@ -21,7 +21,7 @@
             <v-progress-linear
                 :buffer-value="item.receivedBytes / item.totalBytes * 100"
                 color="cyan"
-            ></v-progress-linear>
+            />
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>

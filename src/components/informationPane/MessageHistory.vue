@@ -2,8 +2,7 @@
   <div class="message-history">
     <drawer-top @close="close">
       <template #default>
-        <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search">
-        </v-text-field>
+        <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search"/>
       </template>
       <template #right>
         <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker" @input="pickerDataChange">
@@ -27,7 +26,7 @@
               locale="zh-cn"
               range
           >
-            <v-spacer></v-spacer>
+            <v-spacer/>
             <v-btn
                 text
                 color="primary"
@@ -59,7 +58,7 @@
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messagesSearched"
                      :key="index" two-line @click="scroll(item)">
           <v-list-item-avatar>
-            <v-img :src="item.avatar"></v-img>
+            <v-img :src="item.avatar"/>
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>
@@ -67,7 +66,7 @@
                 <div>
                   {{ item.username }}
                 </div>
-                <v-spacer></v-spacer>
+                <v-spacer/>
                 <div class="text-body-2">
                   {{ buildDisplayTime(item.date, item.timestamp) }}
                 </div>

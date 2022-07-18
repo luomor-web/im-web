@@ -1,13 +1,10 @@
 <template>
   <div class="fill-height">
-    <drawer-top :title="'下载设置'" :sub="true" @close="open('SETTING_ITEM')"></drawer-top>
+    <drawer-top :title="'下载设置'" :sub="true" @close="open('SETTING_ITEM')"/>
 
     <v-list nav>
       <v-subheader>下载设置</v-subheader>
       <v-list-item v-ripple class="im-list-item">
-        <v-list-item-icon>
-          <v-icon>{{ icons.mdiHelp }}</v-icon>
-        </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>下载时不询问</v-list-item-title>
         </v-list-item-content>
@@ -15,7 +12,7 @@
           <v-switch
               v-model="autoDownload"
               @change="autoDownloadChange"
-          ></v-switch>
+          />
         </v-list-item-action>
       </v-list-item>
     </v-list>
@@ -31,7 +28,7 @@
                 label=""
                 required
                 :value="downloadPath"
-            ></v-text-field>
+            />
           </v-list-item-title>
         </v-list-item-content>
         <v-list-item-action>
@@ -47,7 +44,6 @@
 <script>
 import DrawerTop from "@/components/basic/DrawerTop";
 import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import localStoreUtil from "@/utils/local-store";
 import {mdiCheck, mdiFolderOutline, mdiHelp} from "@mdi/js";
 import store from "@/store";
 
