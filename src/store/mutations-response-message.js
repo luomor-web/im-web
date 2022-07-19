@@ -98,7 +98,8 @@ export default {
         }
 
         // 设置最后一条消息
-        state.loadedRooms[roomIndex].lastMessage = buildLastMessage(message)
+        const lastMessage = buildLastMessage(message)
+        state.loadedRooms[roomIndex] = {...state.loadedRooms[roomIndex],lastMessage}
 
         // 将目标消息置顶
         store.commit('upRoom', message.roomId)

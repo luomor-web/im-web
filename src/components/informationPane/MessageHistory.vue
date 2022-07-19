@@ -132,6 +132,7 @@ export default {
 
       // 否则的话刷掉
       const element = document.getElementById(item._id);
+      console.log(element)
       if (!element) {
         store.commit('setSearchMessage', true)
         store.commit('clearMessages')

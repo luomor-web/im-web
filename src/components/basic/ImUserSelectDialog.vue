@@ -27,7 +27,7 @@
             </v-icon>
             用户
           </v-tab>
-          <v-tabs-items v-model="tab">
+          <v-tabs-items v-model="tab" class=" overflow-y-auto">
             <v-tab-item v-if="typesInclude('CHAT')">
               <v-card flat>
                 <v-list nav>
@@ -104,6 +104,7 @@ export default {
     const searchId = ref('')
     const userList = ref([])
     const searchName = ref('')
+    const observer = ref(null)
 
     onMounted(() => {
       msg.$on("COMMAND_SEARCH_USER_RESP", onSearchUserResp)
@@ -146,6 +147,31 @@ export default {
 
     const isFriend = (item) => {
       return loadedRooms.value.find(r => item._id === r.friendId)
+    }
+
+    const initIntersectionObserver = () => {
+      if (observer.value) {
+        this.showLoader = true
+        observer.value.disconnect()
+      }
+
+      const loader = document.getElementById('infinite-loader-rooms')
+
+      if (loader) {
+        const options = {
+          root: document.getElementById('rooms-list'),
+          rootMargin: '60px',
+          threshold: 0
+        }
+
+        observer.value = new IntersectionObserver(entries => {
+          if (entries[0].isIntersecting) {
+            this.loadMoreRooms()
+          }
+        }, options)
+
+        observer.value.observe(loader)
+      }
     }
 
     const typesInclude = type => props.types.includes(type)

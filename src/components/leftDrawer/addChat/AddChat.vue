@@ -10,7 +10,7 @@
                     @change="search"
                     placeholder="搜索"/>
     </drawer-top>
-    <div class="overflow-y-auto fill-height" v-scroll:#scroll-target="onScroll">
+    <div class="overflow-y-auto fill-height">
       <v-list nav>
         <v-list-item v-ripple v-for="(item,index) of waitSelect" :key="index" >
           <v-list-item-avatar>
@@ -79,9 +79,6 @@ export default {
       close()
     }
 
-    const onScroll = () => {
-
-    }
 
     const close = () => {
       store.commit('setSettingPane', '')
