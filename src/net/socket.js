@@ -93,7 +93,7 @@ const webSocket = (token) => {
                 break;
             // 删除信息响应
             case 49:
-                store.commit("COMMAND_SEARCH_MESSAGE_RESP", data)
+                msg.$emit("COMMAND_SEARCH_MESSAGE_RESP", data)
                 break;
             // 系统消息会话消息
             case 51:

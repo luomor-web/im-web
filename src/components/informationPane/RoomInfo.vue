@@ -34,8 +34,7 @@
               <v-list-item-title>通知</v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-switch v-model="notice" @change="noticeChange"
-              />
+              <v-switch v-model="notice" @change="noticeChange" />
             </v-list-item-action>
           </v-list-item>
         </v-list>
@@ -78,13 +77,13 @@
             bottom
             right
             fab
-            @click="open('GROUP_INVITE_USER')"
+            @click="userSelectModel = true"
         >
           <v-icon>{{ icons.mdiPlus }}</v-icon>
         </v-btn>
       </div>
     </div>
-    <im-user-select-dialog :action="userAction"/>
+    <im-user-select-dialog :model="userSelectModel" @cancel="userSelectModel = false"/>
   </div>
 </template>
 
@@ -108,9 +107,8 @@ export default {
 
     const room = computed(() => store.getters.curRoom)
     const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem )
-    const userAction = ref({
-      visible: false
-    })
+    const userSelectModel = ref(false)
+
     const close = () => {
       store.commit('setInformationPane', '')
     }
@@ -156,6 +154,7 @@ export default {
 
 
     return {
+      userSelectModel,
       room,
       notice,
       noticeChange,

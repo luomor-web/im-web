@@ -107,19 +107,23 @@ export default {
     const picker = ref([])
     const searchName = ref('')
     const room = computed(() => store.getters.curRoom)
-
     const messagesSearched = ref([])
 
-    const close = () => {
-      store.commit('setInformationPane', '')
-    }
+    onMounted(() => {
+      msg.$on('COMMAND_SEARCH_MESSAGE_RESP', data => {
+        messagesSearched.value = [...data.data]
+      })
+    })
+
+    onUnmounted(() => {
+      msg.$off('COMMAND_SEARCH_MESSAGE_RESP')
+    })
 
     const search = item => {
       if (!item) {
         messagesSearched.value = []
         return
       }
-
       searchMessage({content: item, roomId: room.value.roomId, startDate: startDate.value, endDate: endDate.value})
     }
 
@@ -142,16 +146,6 @@ export default {
       scrollToView(element)
     }
 
-    onMounted(() => {
-      msg.$on('COMMAND_SEARCH_MESSAGE_RESP', data => {
-        messagesSearched.value = [...data.data]
-      })
-    })
-
-    onUnmounted(() => {
-      msg.$off('COMMAND_SEARCH_MESSAGE_RESP')
-    })
-
     const resetPicker = () => {
       picker.value = []
     }
@@ -162,6 +156,10 @@ export default {
         endDate.value = picker.value[1]
         search(searchName.value)
       }
+    }
+
+    const close = () => {
+      store.commit('setInformationPane', '')
     }
 
     return {
