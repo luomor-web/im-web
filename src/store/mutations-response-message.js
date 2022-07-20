@@ -176,7 +176,6 @@ export default {
                 store.commit('changeRoom',room.roomId)
             }
         }
-
     },
 
     // 表情回复
@@ -279,6 +278,21 @@ export default {
         }
     },
 
+    // 系统会话创建响应
+    COMMAND_SYSTEM_MESSAGE_RESP: (state, data) => {
+      let room = data.data.group
+      let users = data.data.users
+      const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId);
+      if (index === -1) {
+        room.users = users
+        state.loadedRooms[state.loadedRooms.length] = room
+        state.loadedRooms = [...state.loadedRooms]
+      }
+      if (state.loadedRooms.length === 1) {
+        store.commit('changeRoom',room.roomId)
+      }
+    },
+
     // 已读消息响应
     COMMAND_MESSAGE_READ_RESP: (state,data) => {
         const {roomId: messageRoomId, messageId} = data.data
@@ -297,11 +311,7 @@ export default {
             state.loadedRooms = [...state.loadedRooms]
         }
 
-    },
 
-    // 全部人员列表
-    COMMAND_USER_LIST_RESP: (state,data) => {
-        state.waitSelectUser = data.data
     }
 
 }

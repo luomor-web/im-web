@@ -41,24 +41,7 @@
             :class=" {'other-video':!isMainStream }"
             @click.native="updateMainVideoStreamManager"/>
       </div>
-
-      <v-snackbar
-          v-model="snackbar.display"
-          :timeout="1000"
-      >
-        {{ snackbar.text }}
-
-        <template v-slot:action="{ attrs }">
-          <v-btn
-              color="pink"
-              text
-              v-bind="attrs"
-              @click="snackbar.display = false"
-          >
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
+      <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
     </v-card>
   </v-expand-transition>
 </template>
@@ -72,10 +55,11 @@ import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup
 import UserVideo from "@/components/basic/openvidu/UserVideo";
 import {audioVolume, du, mainStreamManager, session, subStreamManager} from "@/components/basic/openvidu/OpenVidu";
 import store from "@/store";
+import ImTip from "@/components/basic/ImTip";
 
 export default {
   name: "ImVideoDialog",
-  components: {UserVideo},
+  components: {ImTip, UserVideo},
   props: {
     room: {type: Object}
   },
@@ -115,7 +99,8 @@ export default {
     // 提示框
     const snackbar = ref({
       display: false,
-      text: ''
+      text: '',
+      timeout: 1000
     })
     // 是否显示弹窗
     const display = ref(false)

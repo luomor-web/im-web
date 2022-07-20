@@ -14,7 +14,7 @@
         </v-btn>
       </v-toolbar>
       <div style="height: calc(100% - 64px)" class="d-flex">
-        <v-tabs v-model="tab" vertical>
+        <v-tabs :value="tab" vertical>
           <v-tab v-if="typesInclude('CHAT')">
             <v-icon left>
               mdi-account
@@ -27,8 +27,8 @@
             </v-icon>
             用户
           </v-tab>
-          <v-tabs-items v-model="tab" class=" overflow-y-auto">
-            <v-tab-item v-if="typesInclude('CHAT')">
+          <v-tabs-items v-model="tab" class="overflow-y-auto">
+            <v-tab-item v-if="typesInclude('CHAT')" value="CHAT">
               <v-card flat>
                 <v-list nav>
                   <v-list-item v-ripple v-for="(item,index) of loadedRooms" :key="index"
@@ -43,7 +43,7 @@
                 </v-list>
               </v-card>
             </v-tab-item>
-            <v-tab-item v-if="typesInclude('PERSON')">
+            <v-tab-item v-if="typesInclude('PERSON')" value="PERSON">
               <v-card flat>
                 <v-list nav>
                   <v-list-item v-ripple v-for="(item,index) of userList" :key="index"
@@ -83,7 +83,8 @@
               <v-img :src="item.avatar"/>
             </v-avatar>
           </v-chip>
-          <v-chip v-for="(item,index) of selectData.users" :key="index" @click="remove('users',item)" class="ma-1">
+          <v-chip v-for="(item,index) of selectData.users" :key="index+'-user'" @click="remove('users',item)"
+                  class="ma-1">
             {{ item.username }}
             <v-avatar right>
               <v-img :src="item.avatar"/>
@@ -149,7 +150,9 @@ export default {
 
     const onSearchUserResp = (data) => {
       const {searchId: requestId, userList: returnList} = data.data
+      console.log(returnList)
       if (requestId !== searchId.value) return
+      console.log(returnList)
       for (let user of returnList) {
         const index = userList.value.findIndex(r => r._id === user._id);
         if (index === -1) {
@@ -169,7 +172,9 @@ export default {
     }
 
     const searchNameChange = (name) => {
-      if(tab === 'PERSON'){
+      console.log(tab.value, props.types)
+      if (tab.value === 'PERSON') {
+        console.log('change')
         userList.value = []
         searchUserReq(name)
         return

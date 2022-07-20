@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top  @close="close" :title="'创建群组'">
+    <drawer-top  @close="closeAddRoom" :title="'创建群组'">
       <template #right>
         <v-spacer/>
         <v-btn color="primary" :disabled="roomName === ''" @click="createRoom">

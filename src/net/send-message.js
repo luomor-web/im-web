@@ -182,6 +182,15 @@ const callVideo = (data) => {
   sendMsg(param)
 }
 
+// 转发消息
+const forwardMessage = (data) => {
+  const param = {
+    cmd: 34,
+    ...data
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
   store.commit('resetData')
   close()
@@ -233,6 +242,7 @@ export {
   createGroup,
   quitSystem,
   messageReaction,
+  forwardMessage,
   editProfile,
   joinUserGroup,
   removeUserGroup,

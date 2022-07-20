@@ -86,7 +86,6 @@ export default {
 
     const sureAddChat = (item) => {
       addChat.value = false
-      console.log(item)
       const room = loadedRooms.value.find(r => item._id === r.friendId)
       if (!room) {
         createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})

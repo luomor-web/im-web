@@ -3,7 +3,8 @@
     <im-download-path ref="downloadPath"/>
     <download-state @tip="tip"/>
     <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
-    <im-user-select-dialog :model="forwardModel" :types="['CHAT','PERSON']" @sure="forwardSure" @cancel="forwardCancel" multiple/>
+    <im-user-select-dialog :model="forwardModel" :types="['CHAT','PERSON']" @sure="forwardSure" @cancel="forwardCancel"
+                           multiple/>
   </div>
 </template>
 
@@ -14,41 +15,39 @@ import ImTip from "@/components/basic/ImTip";
 import DownloadState from "@/components/basic/DownloadState";
 import ImDownloadPath from "@/components/basic/ImDownloadPath";
 import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
+import {forwardMessage} from "@/net/send-message";
 
 export default {
   name: "ImComponent",
-  components:{
+  components: {
     ImUserSelectDialog,
     ImTip,
     DownloadState,
     ImDownloadPath
   },
-  setup(){
+  setup() {
 
     const settingPane = computed(() => store.state.settingPane)
     const downloadPath = ref(null)
     const snackbar = ref({})
-    const userAction = ref({
-      model: false,
-      title: '用户选择',
-      sure: () => {
-
-      },
-      cancel: () => {
-        userAction.value.model = false
-      }
-    })
     const forwardModel = ref(false)
+    const forwardMessages = ref([])
 
     const selectDownloadPath = (file) => {
       downloadPath.value.action(file)
     }
 
-    const forward = () => {
+    const forward = (messages) => {
+      forwardMessages.value = messages
       forwardModel.value = true
     }
 
     const forwardSure = (data) => {
+      const {chats, users} = data
+      console.log(chats, users, forwardMessages.value)
+      const filter = chats.filter(r => users.findIndex(x => x._id === r.friendId) === -1).map(x => x.roomId);
+      const userIds = users.map(x => x._id);
+      forwardMessage({chats: filter,users: userIds,messages:forwardMessages.value})
       forwardModel.value = false
     }
 
@@ -64,7 +63,6 @@ export default {
     return {
       forward,
       settingPane,
-      userAction,
       snackbar,
       downloadPath,
       forwardModel,

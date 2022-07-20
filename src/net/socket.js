@@ -105,7 +105,7 @@ const webSocket = (token) => {
                 break;
             // 音视频通话消息
             case 56:
-                store.commit("COMMAND_VIDEO_RESP", data)
+                msg.$emit("COMMAND_VIDEO_RESP", data)
                 break;
             default:
                 break

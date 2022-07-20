@@ -179,6 +179,7 @@ export default {
 
     const init = (room) => {
       curUser.value = room?.users.find(r => r._id === curUserId.value)
+      console.log(curUser.value)
       // isAdmin.value = curUser.value?.role === 'ADMIN'
       roomName.value = room?.roomName
     }
@@ -189,7 +190,7 @@ export default {
 
     const sure = (url) => {
       roomAvatar.value = url
-      editGroupProfile({roomId: room.value.roomId, avatar: picUrl.value + url, roomName: roomName.value})
+      editGroupProfile({roomId: room.value.roomId, avatar: url, roomName: roomName.value})
     }
 
     const roomNameChange = () => {
