@@ -9,7 +9,7 @@
         <v-btn icon @click="cancel">
           <v-icon>mdi-backup-restore</v-icon>
         </v-btn>
-        <v-btn icon  v-if="multiple">
+        <v-btn icon v-if="multiple">
           <v-icon>mdi-check</v-icon>
         </v-btn>
       </v-toolbar>
@@ -66,6 +66,12 @@
                     </v-list-item-action>
                   </v-list-item>
                 </v-list>
+                <div style="height: 40px" class="text-center" v-intersect="onIntersect" v-if="!userLoaded">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  />
+                </div>
               </v-card>
             </v-tab-item>
           </v-tabs-items>
@@ -104,7 +110,7 @@ export default {
     const searchId = ref('')
     const userList = ref([])
     const searchName = ref('')
-    const observer = ref(null)
+    const userLoaded = ref(true)
 
     onMounted(() => {
       msg.$on("COMMAND_SEARCH_USER_RESP", onSearchUserResp)
@@ -124,18 +130,29 @@ export default {
       }
     })
 
-    const onSearchUserResp = (data) => {
+    const onIntersect = (entries) => {
+      if (entries[0].isIntersecting) {
+        searchUserReq(searchName.value)
+      }
+    }
 
+    const onSearchUserResp = (data) => {
       const {searchId: requestId, userList: returnList} = data.data
       if (requestId !== searchId.value) return
-      userList.value.push(...returnList)
+      for (let user of returnList) {
+        const index = userList.value.findIndex(r => r._id === user._id);
+        if (index === -1) {
+          userList.value.push(user)
+        }
+      }
       userList.value = [...userList.value]
       searchId.value = ''
+      userLoaded.value = returnList.length === 0;
     }
 
     const searchUserReq = (name) => {
       if (searchId.value) return
-      const userId = userList.value.length > 0 ? userList.value[0]._id : ''
+      const userId = userList.value.length > 0 ? userList.value[userList.value.length - 1]._id : ''
       searchId.value = uuid()
       searchUser(name, userId, searchId.value)
     }
@@ -147,31 +164,6 @@ export default {
 
     const isFriend = (item) => {
       return loadedRooms.value.find(r => item._id === r.friendId)
-    }
-
-    const initIntersectionObserver = () => {
-      if (observer.value) {
-        this.showLoader = true
-        observer.value.disconnect()
-      }
-
-      const loader = document.getElementById('infinite-loader-rooms')
-
-      if (loader) {
-        const options = {
-          root: document.getElementById('rooms-list'),
-          rootMargin: '60px',
-          threshold: 0
-        }
-
-        observer.value = new IntersectionObserver(entries => {
-          if (entries[0].isIntersecting) {
-            this.loadMoreRooms()
-          }
-        }, options)
-
-        observer.value.observe(loader)
-      }
     }
 
     const typesInclude = type => props.types.includes(type)
@@ -202,6 +194,8 @@ export default {
       userList,
       searchName,
       loadedRooms,
+      userLoaded,
+      onIntersect,
       isFriend,
       searchNameChange,
       searchUserReq,
