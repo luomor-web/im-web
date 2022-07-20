@@ -9,7 +9,7 @@
         <v-btn icon @click="cancel">
           <v-icon>mdi-backup-restore</v-icon>
         </v-btn>
-        <v-btn icon v-if="multiple">
+        <v-btn icon v-if="multiple" @click="sure">
           <v-icon>mdi-check</v-icon>
         </v-btn>
       </v-toolbar>
@@ -76,8 +76,19 @@
             </v-tab-item>
           </v-tabs-items>
         </v-tabs>
-        <div style="width: 230px" v-if="multiple">
-          你好
+        <div style="width: 300px" class="overflow-y-auto" v-if="multiple && !selectDataIsEmpty">
+          <v-chip v-for="(item,index) of selectData.chats" :key="index" @click="remove('chats',item)" class="ma-1">
+            {{ item.roomName }}
+            <v-avatar right>
+              <v-img :src="item.avatar"/>
+            </v-avatar>
+          </v-chip>
+          <v-chip v-for="(item,index) of selectData.users" :key="index" @click="remove('users',item)" class="ma-1">
+            {{ item.username }}
+            <v-avatar right>
+              <v-img :src="item.avatar"/>
+            </v-avatar>
+          </v-chip>
         </div>
       </div>
     </v-card>
@@ -97,11 +108,12 @@ export default {
     multiple: {type: Boolean, default: false},
     model: {type: Boolean, default: false},
     types: {type: Array, default: () => ['PERSON']},
-    action: Object,
+    users: {type: Array, default: () => []}
   },
   emits: ['sure', 'cancel'],
   setup(props, {emit}) {
     const loadedRooms = computed(() => store.state.loadedRooms)
+    const selectDataIsEmpty = computed(() => (selectData.value.chats.length === 0 && selectData.value.users.length === 0))
     const selectData = ref({
       chats: [],
       users: []
@@ -119,14 +131,13 @@ export default {
     watch(() => props.model, model => {
       if (model) {
         searchUserReq()
+        if (props.users) selectData.value.users = [...props.users]
       } else {
         userList.value = []
-        selectData.value = {
-          groups: [],
-          chats: [],
-          users: []
-        }
+        selectData.value.chats = []
+        selectData.value.users = []
         searchId.value = ''
+        searchName.value = ''
       }
     })
 
@@ -147,7 +158,7 @@ export default {
       }
       userList.value = [...userList.value]
       searchId.value = ''
-      userLoaded.value = returnList.length === 0;
+      userLoaded.value = returnList.length < 20;
     }
 
     const searchUserReq = (name) => {
@@ -158,8 +169,16 @@ export default {
     }
 
     const searchNameChange = (name) => {
-      userList.value = []
-      searchUserReq(name)
+      if(tab === 'PERSON'){
+        userList.value = []
+        searchUserReq(name)
+        return
+      }
+      filterLoadedRoom(name)
+    }
+
+    const filterLoadedRoom = (name) => {
+
     }
 
     const isFriend = (item) => {
@@ -171,17 +190,31 @@ export default {
     const operationSelect = (type, item) => {
       // 不是多选 直接返回
       if (!props.multiple) {
-        sure(item, type)
+        sure(null, item, type)
         return
       }
-      selectData.value[type].push(item)
+      const key = type === 'users' ? '_id' : 'roomId'
+      const index = selectData.value[type].findIndex(r => r[key] === item[key]);
+      if (index === -1) {
+        selectData.value[type].push(item)
+      } else {
+        selectData.value[type].splice(index, 1)
+      }
+    }
+
+    const remove = (type, item) => {
+      const key = type === 'users' ? '_id' : 'roomId'
+      const index = selectData.value[type].findIndex(r => r[key] === item[key]);
+      if (index !== -1) {
+        selectData.value[type].splice(index, 1)
+      }
     }
 
     const cancel = () => {
       emit('cancel')
     }
 
-    const sure = (item, type) => {
+    const sure = (event, item, type) => {
       if (item) {
         emit('sure', item, type)
         return
@@ -190,19 +223,22 @@ export default {
     }
 
     return {
+      selectData,
       tab,
       userList,
       searchName,
       loadedRooms,
       userLoaded,
+      remove,
       onIntersect,
       isFriend,
       searchNameChange,
+      selectDataIsEmpty,
       searchUserReq,
       operationSelect,
       typesInclude,
       sure,
-      cancel
+      cancel,
     }
   }
 }

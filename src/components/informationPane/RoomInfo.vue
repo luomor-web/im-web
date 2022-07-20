@@ -1,8 +1,8 @@
 <template>
   <div class="fill-height">
     <drawer-top
-        :title="'资料'"
-        @close="close">
+      :title="'资料'"
+      @close="close">
       <template #right>
         <v-spacer/>
         <v-btn class="no-drag" icon @click="open('GROUP_EDIT')" v-if="isGroup">
@@ -17,11 +17,11 @@
       <div class="mx-2">
         <div class="d-table ma-auto">
           <v-img
-              aspect-ratio="1"
-              height="120"
-              width="120"
-              class="header-img"
-              :src="room.avatar"
+            aspect-ratio="1"
+            height="120"
+            width="120"
+            class="header-img"
+            :src="room.avatar"
           />
         </div>
         <span class="d-table ma-auto text-h6">{{ room.roomName }}</span>
@@ -34,7 +34,7 @@
               <v-list-item-title>通知</v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-switch v-model="notice" @change="noticeChange" />
+              <v-switch v-model="notice" @change="noticeChange"/>
             </v-list-item-action>
           </v-list-item>
         </v-list>
@@ -42,8 +42,8 @@
     </div>
 
     <im-driver/>
-    <div v-if="isGroup">
-      <div class="mx-2 overflow-y-auto fill-height">
+    <div v-if="isGroup" style="height: calc(100% - 308px)" class="overflow-y-auto">
+      <div class="mx-2">
         <v-list nav>
           <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
             <v-list-item-avatar>
@@ -51,10 +51,10 @@
             </v-list-item-avatar>
             <v-list-item-content>
               <v-badge
-                  :color="item.status.state === 'online' ? 'green': 'grey'"
-                  inline
-                  left
-                  dot
+                :color="item.status.state === 'online' ? 'green': 'grey'"
+                inline
+                left
+                dot
               >
                 <v-list-item-title>{{ item.username }}</v-list-item-title>
               </v-badge>
@@ -69,21 +69,21 @@
       </div>
       <div>
         <v-btn
-            transition="scroll-x-reverse-transition"
-            class="mr-8 mb-16"
-            color="primary"
-            dark
-            absolute
-            bottom
-            right
-            fab
-            @click="userSelectModel = true"
+          transition="scroll-x-reverse-transition"
+          class="mr-8 mb-16"
+          color="primary"
+          dark
+          absolute
+          bottom
+          right
+          fab
+          @click="userSelectModel = true"
         >
           <v-icon>{{ icons.mdiPlus }}</v-icon>
         </v-btn>
       </div>
     </div>
-    <im-user-select-dialog :model="userSelectModel" @cancel="userSelectModel = false"/>
+    <im-user-select-dialog :model="userSelectModel" @sure="sureInviteUser" @cancel="userSelectModel = false" multiple/>
   </div>
 </template>
 
@@ -106,7 +106,7 @@ export default {
   setup(props, context) {
 
     const room = computed(() => store.getters.curRoom)
-    const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem )
+    const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem)
     const userSelectModel = ref(false)
 
     const close = () => {
@@ -152,15 +152,24 @@ export default {
       joinUserGroup({group, users})
     }
 
+    const sureInviteUser = (data) => {
+      const {users} = data
+      if (!users) return
+
+      const filter = users.filter(r => room.value.users.findIndex(x => x._id === r._id) === -1);
+      joinGroup(filter)
+      userSelectModel.value = false
+    }
 
     return {
       userSelectModel,
       room,
       notice,
-      noticeChange,
-      open,
       isGroup,
+      open,
       close,
+      noticeChange,
+      sureInviteUser,
       joinGroup,
       startChat,
 

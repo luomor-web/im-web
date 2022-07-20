@@ -3,6 +3,7 @@
     <im-download-path ref="downloadPath"/>
     <download-state @tip="tip"/>
     <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
+    <im-user-select-dialog :model="forwardModel" :types="['CHAT','PERSON']" @sure="forwardSure" @cancel="forwardCancel" multiple/>
   </div>
 </template>
 
@@ -12,10 +13,12 @@ import store from "@/store";
 import ImTip from "@/components/basic/ImTip";
 import DownloadState from "@/components/basic/DownloadState";
 import ImDownloadPath from "@/components/basic/ImDownloadPath";
+import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
 
 export default {
   name: "ImComponent",
   components:{
+    ImUserSelectDialog,
     ImTip,
     DownloadState,
     ImDownloadPath
@@ -35,9 +38,22 @@ export default {
         userAction.value.model = false
       }
     })
+    const forwardModel = ref(false)
 
     const selectDownloadPath = (file) => {
       downloadPath.value.action(file)
+    }
+
+    const forward = () => {
+      forwardModel.value = true
+    }
+
+    const forwardSure = (data) => {
+      forwardModel.value = false
+    }
+
+    const forwardCancel = () => {
+      forwardModel.value = false
     }
 
     const tip = (item) => {
@@ -46,11 +62,14 @@ export default {
     }
 
     return {
+      forward,
       settingPane,
       userAction,
       snackbar,
       downloadPath,
-
+      forwardModel,
+      forwardSure,
+      forwardCancel,
       tip,
       selectDownloadPath
     }

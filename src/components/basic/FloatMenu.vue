@@ -43,7 +43,7 @@
               添加会话
             </v-list-item-content>
           </v-list-item>
-          <v-list-item class="im-list-item" @click="open('CREATE_GROUP')">
+          <v-list-item class="im-list-item" @click="openCreateGroup">
             <v-list-item-icon>
               <v-icon>
                 {{ icons.mdiAccountSupervisorOutline }}
@@ -96,12 +96,17 @@ export default {
       store.commit('changeRoom', room.roomId)
     }
 
+    const openCreateGroup = () => {
+      store.commit('setSettingPane','CREATE_GROUP')
+    }
+
     return {
       fab,
       addChat,
       openAddChat,
       closeAddChat,
       sureAddChat,
+      openCreateGroup,
 
       icons: {
         mdiAccountSupervisorOutline,

@@ -3,7 +3,7 @@
     <drawer-top :sub="true" @close="open('GROUP_EDIT')">
       <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName"/>
     </drawer-top>
-    <div class="mx-2 overflow-y-auto fill-height">
+    <div class="mx-2 overflow-y-auto " style="height: calc(100% - 64px)">
       <v-list nav>
         <v-list-item v-ripple class="im-list-item" v-for="(item,index) of filteredItems"
                      :key="index">

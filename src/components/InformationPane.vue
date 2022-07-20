@@ -2,7 +2,7 @@
   <v-expand-x-transition>
     <div class="im-right-drawer" v-if="informationPane">
       <v-window v-model="informationPane" class="fill-height">
-        <v-window-item value="ROOM_INFO" class="fill-height">
+        <v-window-item value="ROOM_INFO">
           <room-info/>
         </v-window-item>
         <v-window-item value="GROUP_EDIT">
@@ -13,9 +13,6 @@
         </v-window-item>
         <v-window-item value="GROUP_HANDOVER_ADMIN">
           <group-handover-admin/>
-        </v-window-item>
-        <v-window-item value="GROUP_INVITE_USER">
-          <group-invite-user/>
         </v-window-item>
         <v-window-item value="MESSAGE_HISTORY">
           <message-history/>
@@ -31,13 +28,12 @@ import RoomInfo from "@/components/informationPane/RoomInfo";
 import GroupEdit from "@/components/informationPane/GroupEdit";
 import GroupUserManage from "@/components/informationPane/GroupUserManage";
 import GroupHandoverAdmin from "@/components/informationPane/GroupHandoverAdmin";
-import GroupInviteUser from "@/components/informationPane/GroupInviteUser";
 import MessageHistory from "@/components/informationPane/MessageHistory";
 import store from "@/store";
 
 export default {
   name: "InformationPane",
-  components: {MessageHistory, GroupInviteUser, GroupHandoverAdmin, GroupUserManage, GroupEdit, RoomInfo},
+  components: {MessageHistory,  GroupHandoverAdmin, GroupUserManage, GroupEdit, RoomInfo},
   setup() {
 
     const room = computed(() => store.getters.curRoom)
@@ -59,12 +55,14 @@ export default {
 
 <style lang="scss" scoped>
 
-@import "@/styles/theme.scss";
-
 .im-right-drawer {
   position: relative;
   width: 400px;
   background-color: #ffffff;
+}
+
+.v-window-item {
+  height: inherit;
 }
 
 </style>

@@ -5,7 +5,7 @@
       <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索"/>
     </drawer-top>
 
-    <div class="mx-2 overflow-y-auto fill-height">
+    <div class="mx-2 overflow-y-auto" style="height: calc(100% - 64px)">
       <v-list nav>
         <v-list-item v-ripple v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
           <v-list-item-avatar>

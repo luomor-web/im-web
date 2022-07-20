@@ -19,6 +19,8 @@ export default {
         state.roomId = ''
         state.waitSendMessage = []
         state.timers = new Map()
+        state.informationPane = ''
+        state.settingPane = ''
     },
 
     setInformationPane: (state, active) => state.informationPane = active,
@@ -53,6 +55,7 @@ export default {
     },
 
     changeRoom: (state, item) => {
+      console.log('change Room')
         if (!item) return
         store.commit('clearMessages')
         store.commit('pushWaitSendMessageToMessages', item)

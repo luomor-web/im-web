@@ -73,6 +73,7 @@ import {uuid} from "@/utils/id-util";
 import moment from "moment";
 import ImComponent from "@/components/ImComponent";
 import FloatMenu from "@/components/basic/FloatMenu";
+import {scrollToTop} from "@/utils/dom";
 
 export default {
   name: 'Home',
@@ -121,7 +122,7 @@ export default {
     const messageSelectionActionHandler = ({roomId, action, messages}) => {
       console.log(roomId, action, messages)
       if (action.name === "forwardMessages") {
-        imComponent.value.selectUser()
+        imComponent.value.forward()
       }
     }
 
@@ -147,10 +148,12 @@ export default {
     }
 
     const fetchMessage = ({room, options = {}}) => {
-      if (options.reset && room.roomId !== roomId.value) {
+      if ( room.roomId !== roomId.value) {
         store.commit('changeRoom', room.roomId)
         return
       }
+      if(options.reset) return
+      console.log('来活了',options)
       // 向下刷
       const messageId = options.type === 'down' ? messages.value[messages.value.length - 1]?._id : messages.value[0]?._id
       getHistoryMessage({roomId: roomId.value, type: options.type, messageId})
@@ -185,6 +188,7 @@ export default {
       message.timestamp = '...'
 
       store.commit('upRoom', roomId)
+      scrollToTop(document.getElementById('rooms-list'))
 
       await operationMessage(message)
     }

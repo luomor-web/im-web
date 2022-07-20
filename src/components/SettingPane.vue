@@ -11,9 +11,6 @@
         <v-window-item value="SETTING_DOWNLOAD">
           <setting-download />
         </v-window-item>
-        <v-window-item value="ADD_CHAT">
-          <add-chat />
-        </v-window-item>
         <v-window-item value="CREATE_GROUP">
           <add-room />
         </v-window-item>
@@ -29,19 +26,17 @@
 import {computed} from "@vue/composition-api";
 import store from "@/store";
 import {mdiPlus} from "@mdi/js";
-import AddChat from "@/components/leftDrawer/addChat/AddChat";
-import AddRoom from "@/components/leftDrawer/addRoom/AddRoom";
-import SettingItem from "@/components/leftDrawer/setting/SettingItem";
-import SettingUserProfile from "@/components/leftDrawer/setting/SettingUserProfile";
-import DownloadHistory from "@/components/leftDrawer/downloadHistory/DownloadHistory";
-import SettingDownload from "@/components/leftDrawer/setting/SettingDownload";
+import AddRoom from "@/components/settingPane/addRoom/AddRoom";
+import SettingItem from "@/components/settingPane/setting/SettingItem";
+import SettingUserProfile from "@/components/settingPane/setting/SettingUserProfile";
+import DownloadHistory from "@/components/settingPane/downloadHistory/DownloadHistory";
+import SettingDownload from "@/components/settingPane/setting/SettingDownload";
 
 export default {
   name: "SettingPane",
   components: {
     SettingDownload,
     AddRoom,
-    AddChat,
     DownloadHistory,
     SettingItem,
     SettingUserProfile
