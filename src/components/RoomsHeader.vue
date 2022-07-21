@@ -11,9 +11,9 @@
       >
         <template v-slot:activator="{ on }">
           <v-btn
-            v-on="on"
             icon
             x-large
+            v-on="on"
           >
             <v-badge
               color="pink"
@@ -21,7 +21,8 @@
               bottom
               offset-x="10"
               offset-y="10"
-              :value="haveDownloadFile">
+              :value="haveDownloadFile"
+>
               <v-avatar color="#b7c1ca">
                 <img
                   :src="curUser.avatar"
@@ -42,7 +43,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item class="im-list-item" @click="openSettingPane('DOWNLOAD_HISTORY')" v-if="isElectron">
+            <v-list-item v-if="isElectron" class="im-list-item" @click="openSettingPane('DOWNLOAD_HISTORY')">
               <v-list-item-icon>
                 <v-badge
                   color="pink"
@@ -50,7 +51,8 @@
                   bottom
                   offset-x="5"
                   offset-y="5"
-                  :value="haveDownloadFile">
+                  :value="haveDownloadFile"
+>
                   <v-icon>{{ icons.mdiCloudDownloadOutline }}</v-icon>
                 </v-badge>
               </v-list-item-icon>
@@ -82,20 +84,21 @@
       <h3 class="ml-3">
         {{ curUser.username }}
       </h3>
-      <v-spacer/>
-      <v-tooltip bottom z-index="11" v-if="!isElectron">
+      <v-spacer />
+      <v-tooltip v-if="!isElectron" bottom z-index="11">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon
-                 @click="downloadDesktop"
                  v-bind="attrs"
-                 v-on="on">
+                 @click="downloadDesktop"
+                 v-on="on"
+>
             <v-icon>{{ icons.mdiLaptop }}</v-icon>
           </v-btn>
         </template>
         <span>客户端下载</span>
       </v-tooltip>
     </div>
-    <div class="error-container" v-if="reconnect">
+    <div v-if="reconnect" class="error-container">
       <v-alert
         border="left"
         type="warning"
@@ -106,26 +109,26 @@
         网络断线,正在重连...
       </v-alert>
     </div>
-    <im-warn-dialog :action="warnAction"/>
-    <about :action="about"/>
+    <im-warn-dialog :action="warnAction" />
+    <about :action="about" />
   </div>
 </template>
 
 <script>
-import {computed, onMounted, ref} from "@vue/composition-api";
-import {downloadDesktop} from "@/utils/desktop-util";
-import {getUserInfo, quitSystem} from "@/net/send-message";
-import store from "@/store";
-import {mdiAlertOutline, mdiCloudDownloadOutline, mdiCog, mdiExitToApp, mdiLaptop,} from "@mdi/js";
-import msg from "@/plugins/msg";
-import ImWarnDialog from "@/components/basic/ImWarnDialog";
-import About from "@/components/basic/About";
+import store from '@/store'
+import { computed, onMounted, ref } from '@vue/composition-api'
+import { downloadDesktop } from '@/utils/desktop-util'
+import { getUserInfo, quitSystem } from '@/net/send-message'
+import { mdiAlertOutline, mdiCloudDownloadOutline, mdiCog, mdiExitToApp, mdiLaptop } from '@mdi/js'
+import msg from '@/plugins/msg'
+import ImWarnDialog from '@/components/basic/ImWarnDialog'
+import About from '@/components/basic/About'
 
 export default {
-  name: "RoomsHeader",
+  name: 'RoomsHeader',
   components: {
     About,
-    ImWarnDialog,
+    ImWarnDialog
   },
   setup() {
     const reconnect = ref(false)
@@ -152,10 +155,10 @@ export default {
     const haveDownloadFile = computed(() => store.getters.haveFileDownloading)
 
     onMounted(() => {
-      msg.$on("SOCKET_RECONNECTING", () => {
+      msg.$on('SOCKET_RECONNECTING', () => {
         reconnect.value = true
       })
-      msg.$on("SOCKET_CONNECTING", () => {
+      msg.$on('SOCKET_CONNECTING', () => {
         if (reconnect.value === true) {
           getUserInfo(currentUserId.value)
         }

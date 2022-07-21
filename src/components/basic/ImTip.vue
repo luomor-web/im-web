@@ -19,10 +19,17 @@
 </template>
 
 <script>
+import { watch } from '@vue/composition-api'
+
 export default {
-  name: "ImTip",
+  name: 'ImTip',
   props: {
-    snackbar: {type: Object}
+    snackbar: { type: Object, default: () => { } }
+  },
+  setup (props) {
+    watch(() => props.snackbar, (value) => {
+
+    })
   }
 }
 </script>

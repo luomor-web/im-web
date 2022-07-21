@@ -1,15 +1,15 @@
 import responseMessage from './mutations-response-message'
 
-import store from "@/store/index";
-import {clearUnReadMessage, getHistoryMessage, sendChatMessage} from "@/net/send-message";
-import {sortedUser} from "@/utils/system-util";
-import Vue from "vue";
+import store from '@/store/index'
+import { clearUnReadMessage, getHistoryMessage, sendChatMessage } from '@/net/send-message'
+import { sortedUser } from '@/utils/system-util'
+import Vue from 'vue'
 
 export default {
 
     resetData: (state) => {
         state.loadedRooms = []
-        state.curUser = {_id: ''}
+        state.curUser = { _id: '' }
         state.loadingRooms = false
         state.roomsLoaded = true
         state.messages = []
@@ -23,39 +23,38 @@ export default {
         state.settingPane = ''
     },
 
-    setInformationPane: (state, active) => state.informationPane = active,
+    setInformationPane: (state, active) => { state.informationPane = active },
 
-    setSettingPane: (state, active) => state.settingPane = active,
+    setSettingPane: (state, active) => { state.settingPane = active },
 
-    setRoomId: (state, roomId) => state.roomId = roomId,
+    setRoomId: (state, roomId) => { state.roomId = roomId },
 
-    setCurUser: (state, user) => state.curUser = {...user},
+    setCurUser: (state, user) => { state.curUser = { ...user } },
 
-    setCurrentUserId: (state, userId) => state.currentUserId = userId,
+    setCurrentUserId: (state, userId) => { state.currentUserId = userId },
 
     pushMessage: (state, message) => {
         state.messages.push(message)
         state.messages = [...state.messages]
     },
 
-    setMessageLoaded: (state, messageLoaded) => state.messageLoaded = messageLoaded,
+    setMessageLoaded: (state, messageLoaded) => { state.messageLoaded = messageLoaded },
 
-    setSearchMessage: (state, searchMessage) => state.searchMessage = searchMessage,
+    setSearchMessage: (state, searchMessage) => { state.searchMessage = searchMessage },
 
-    setRoomsLoaded: (state, roomsLoaded) => state.roomsLoaded = roomsLoaded,
+    setRoomsLoaded: (state, roomsLoaded) => { state.roomsLoaded = roomsLoaded },
 
-    setLoadingRooms: (state, loadingRooms) => state.loadingRooms = loadingRooms,
+    setLoadingRooms: (state, loadingRooms) => { state.loadingRooms = loadingRooms },
 
     sortRoomUsers: (state, roomId) => {
         const roomIndex = state.loadedRooms.findIndex(r => roomId === r.roomId)
         state.loadedRooms[roomIndex].users = sortedUser(state.loadedRooms[roomIndex].users)
         state.loadedRooms[roomIndex].users = [...state.loadedRooms[roomIndex].users]
-        state.loadedRooms[roomIndex].unreadCount = 0;
+        state.loadedRooms[roomIndex].unreadCount = 0
         state.loadedRooms = [...state.loadedRooms]
     },
 
     changeRoom: (state, item) => {
-      console.log('change Room')
         if (!item) return
         store.commit('clearMessages')
         store.commit('pushWaitSendMessageToMessages', item)
@@ -63,7 +62,7 @@ export default {
         store.commit('setSearchMessage', false)
         store.commit('setRoomId', item)
         store.commit('sortRoomUsers', item)
-        getHistoryMessage({roomId: item})
+        getHistoryMessage({ roomId: item })
         clearUnReadMessage(item)
     },
 
@@ -73,15 +72,15 @@ export default {
     },
 
     removeMessage: (state, messageId) => {
-        const index = state.messages.findIndex(x => x._id === messageId);
+        const index = state.messages.findIndex(x => x._id === messageId)
         if (index !== -1) {
             state.messages.splice(index, 1)
             state.messages = [...state.messages]
         }
     },
 
-    updateMessageFileProgress: (state, {file, messageId}) => {
-        const message = state.messages.find(r => r._id === messageId);
+    updateMessageFileProgress: (state, { file, messageId }) => {
+        const message = state.messages.find(r => r._id === messageId)
         if (!message || !message.files) return
 
         message.files.find(r => r.id === file.id).progress = file.progress
@@ -89,7 +88,7 @@ export default {
     },
 
     pushWaitSendMessageToMessages: (state, roomId) => {
-        const filter = state.waitSendMessage.filter(x => x.roomId === roomId);
+        const filter = state.waitSendMessage.filter(x => x.roomId === roomId)
         filter.forEach(x => {
             state.messages.push(x)
         })
@@ -103,7 +102,7 @@ export default {
         state.loadedRooms[roomIndex].index = new Date().getTime()
         state.loadedRooms = [...state.loadedRooms]
     },
-    addWaitSendMessage: (state, {message, haveFile}) => {
+    addWaitSendMessage: (state, { message, haveFile }) => {
         state.waitSendMessage.push(message)
         if (!haveFile) {
             store.commit('setCheckTimer', message)
@@ -127,22 +126,21 @@ export default {
     },
 
     handleFailMessage: (state, messageId) => {
-        const message = state.messages.find(r => r._id === messageId);
+        const message = state.messages.find(r => r._id === messageId)
         if (!message) return
         message.failure = true
-        message.files?.forEach(x => x.progress = -1)
+        message.files?.forEach(x => { x.progress = -1 })
         state.messages = [...state.messages]
 
         store.commit('setWaitSendMessageFail', messageId)
         store.commit('deleteTimer', messageId)
     },
 
-    sendFileMessage: (state, {file, roomId, isLast}) => {
-      console.log(file, roomId, isLast)
+    sendFileMessage: (state, { file, roomId, isLast }) => {
         const index = state.waitSendMessage.findIndex(r => r.roomId === roomId)
         if (index === -1) return
 
-        const fileIndex = state.waitSendMessage[index].files.findIndex(f => f.id === file.id);
+        const fileIndex = state.waitSendMessage[index].files.findIndex(f => f.id === file.id)
         if (fileIndex === -1) return
 
         state.waitSendMessage[index].files[fileIndex] = file
@@ -155,16 +153,16 @@ export default {
     setCheckTimer: (state, message) => {
         const t = setTimeout(() => {
             store.commit('handleFailMessage', message._id)
-        }, 12000);
-        store.commit('putTimer', {id: message._id, t})
+        }, 12000)
+        store.commit('putTimer', { id: message._id, t })
     },
 
-    putTimer: (state, {id, t}) => {
+    putTimer: (state, { id, t }) => {
         Vue.set(state.timers, id, t)
     },
 
     deleteTimer: (state, id) => {
-        const t = state.timers[id];
+        const t = state.timers[id]
         if (t) {
             clearTimeout(t)
         }
@@ -173,23 +171,23 @@ export default {
 
     pushDownloadItem: (state, file) => {
         state.downloadItemList.unshift(file)
-        state.downloadItemList = state.downloadItemList.slice(0,60)
+        state.downloadItemList = state.downloadItemList.slice(0, 60)
     },
-    updateDownloadItem: (state, {args, status}) => {
+    updateDownloadItem: (state, { args, status }) => {
         // 查找ID并设置值
-        const index = state.downloadItemList.findIndex(x => x.id === args.id);
-        if(index === -1) return
+        const index = state.downloadItemList.findIndex(x => x.id === args.id)
+        if (index === -1) return
         state.downloadItemList[index].state = status
-        if(args.receivedBytes){
+        if (args.receivedBytes) {
             state.downloadItemList[index].receivedBytes = args.receivedBytes
         }
-        if(args.totalBytes){
+        if (args.totalBytes) {
             state.downloadItemList[index].totalBytes = args.totalBytes
         }
         state.downloadItemList = [...state.downloadItemList]
     },
     removeDownloadItem: (state, args) => {
-        const index = state.downloadItemList.findIndex(x => x.id === args.id);
+        const index = state.downloadItemList.findIndex(x => x.id === args.id)
         if (index === -1) return
         state.downloadItemList.splice(index, 1)
     },
@@ -203,9 +201,9 @@ export default {
         state.downloadItemList = [...downloadFileListTemp]
     },
 
-    setAutoDownload: (state, item) => state.autoDownloa = item,
+    setAutoDownload: (state, item) => { state.autoDownloa = item },
 
-    setDownloadPath: (state, path) => state.downloadPath = path,
+    setDownloadPath: (state, path) => { state.downloadPath = path },
 
     ...responseMessage
 }

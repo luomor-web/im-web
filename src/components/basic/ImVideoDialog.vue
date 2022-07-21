@@ -1,77 +1,75 @@
 <template>
   <v-expand-transition>
-    <v-card v-drag class="video-content" v-show="display">
+    <v-card v-show="display" v-drag class="video-content">
       <v-app-bar dense class="px-3" elevation="0">
         <v-avatar color="#b7c1ca" size="30">
           <img
-              :src="callUser.avatar"
+            :src="callUser.avatar"
           />
         </v-avatar>
 
-        <v-toolbar-title class="ml-1">{{ callUser.username }}</v-toolbar-title>
+        <v-toolbar-title class="ml-1">
+          {{ callUser.username }}
+        </v-toolbar-title>
         <v-progress-linear
-            :active="!!session"
-            :value="audioVolume"
-            absolute
-            bottom
-            color="deep-purple accent-4"
+          :active="!!session"
+          :value="audioVolume"
+          absolute
+          bottom
+          color="deep-purple accent-4"
         />
-        <v-spacer/>
-        <v-btn icon @click="changeAudio" v-if="videoed || role === 'HOST'">
+        <v-spacer />
+        <v-btn v-if="videoed || role === 'HOST'" icon @click="changeAudio">
           <v-icon>{{ audioEnabled ? icons.mdiMicrophone : icons.mdiMicrophoneOff }}</v-icon>
         </v-btn>
-        <v-btn icon @click="changeVideo" v-if="(videoed || role === 'HOST') && calledConfig.type === 'VIDEO'">
+        <v-btn v-if="(videoed || role === 'HOST') && calledConfig.type === 'VIDEO'" icon @click="changeVideo">
           <v-icon>{{ videoEnabled ? icons.mdiCamera : icons.mdiCameraOff }}</v-icon>
         </v-btn>
-        <v-btn icon color="red" @click="refuse" elevation="0">
+        <v-btn icon color="red" elevation="0" @click="refuse">
           <v-icon>{{ icons.mdiPhoneHangup }}</v-icon>
         </v-btn>
-        <v-btn icon color="green" @click="agree" elevation="0" v-if="!videoed && role === 'PARTNER'">
+        <v-btn v-if="!videoed && role === 'PARTNER'" icon color="green" elevation="0" @click="agree">
           <v-icon>{{ icons.mdiVideo }}</v-icon>
         </v-btn>
       </v-app-bar>
 
-      <div class="content-center" v-if="session && calledConfig.type === 'VIDEO'">
+      <div v-if="session && calledConfig.type === 'VIDEO'" class="content-center">
         <user-video
-            :stream-manager="subStreamManager"
-            :class=" {'other-video': isMainStream}"
-            @click.native="updateMainVideoStreamManager"/>
+          :stream-manager="subStreamManager"
+          :class=" {'other-video': isMainStream}"
+          @click.native="updateMainVideoStreamManager"
+        />
         <user-video
-            :stream-manager="mainStreamManager"
-            :class=" {'other-video':!isMainStream }"
-            @click.native="updateMainVideoStreamManager"/>
+          :stream-manager="mainStreamManager"
+          :class=" {'other-video':!isMainStream }"
+          @click.native="updateMainVideoStreamManager"
+        />
       </div>
-      <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
     </v-card>
   </v-expand-transition>
 </template>
 
 <script>
 
-import {computed, onMounted, ref} from "@vue/composition-api";
-import msg from "@/plugins/msg";
-import {callVideo} from "@/net/send-message";
-import {mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo} from "@mdi/js";
-import UserVideo from "@/components/basic/openvidu/UserVideo";
-import {audioVolume, du, mainStreamManager, session, subStreamManager} from "@/components/basic/openvidu/OpenVidu";
-import store from "@/store";
-import ImTip from "@/components/basic/ImTip";
+import { computed, onMounted, ref, inject, onUnmounted } from '@vue/composition-api'
+import msg from '@/plugins/msg'
+import { callVideo } from '@/net/send-message'
+import { mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo } from '@mdi/js'
+import UserVideo from '@/components/basic/openvidu/UserVideo'
+import { audioVolume, du, mainStreamManager, session, subStreamManager } from '@/components/basic/openvidu/OpenVidu'
+import store from '@/store'
 
 export default {
-  name: "ImVideoDialog",
-  components: {ImTip, UserVideo},
-  props: {
-    room: {type: Object}
-  },
+  name: 'ImVideoDialog',
+  comments: {},
+  components: { UserVideo },
   // 自定义指令 实现可拖动
   directives: {
-    drag(el) {
+    drag (el) {
       el.onmousedown = function (e) {
+        const disX = e.pageX - el.offsetLeft
+        const disY = e.pageY - el.offsetTop
 
-        const disX = e.pageX - el.offsetLeft;
-        const disY = e.pageY - el.offsetTop;
-
-        console.log(disX, disY, e.pageX, e.pageY)
         document.onmousemove = function (e) {
           el.style.left = e.pageX - disX + 'px'
           el.style.top = e.pageY - disY + 'px'
@@ -82,9 +80,9 @@ export default {
       }
     }
   },
-  comments: {},
 
-  setup(props, {emit}) {
+  setup (props, { emit }) {
+    const room = computed(() => store.getters.curRoom)
     const loadedRooms = computed(() => store.state.loadedRooms)
     const currentUserId = computed(() => store.state.currentUserId)
     // 开启音频
@@ -93,6 +91,7 @@ export default {
     const videoEnabled = ref(true)
     // 放大的视频是不是自己
     const isMainStream = ref(true)
+    const imComponent = inject('imComponent', () => {})
 
     // 当前
     const role = ref('')
@@ -130,23 +129,22 @@ export default {
       }
       callVideo(param)
       videoed.value = true
-      du.joinSession(props.room.roomId,currentUserId.value,calledConfig.value.type === 'VIDEO')
+      du.joinSession(room.value.roomId, currentUserId.value, calledConfig.value.type === 'VIDEO')
       clearTimeout(selfTimer.value)
     }
 
     const call = (type) => {
-      console.log(type,'type')
-      display.value = true
-      role.value = 'HOST'
-      if (props.room.isFriend) {
-        const find = props.room.users.find(x => x._id !== currentUserId.value);
+      if (room.value.isFriend) {
+        display.value = true
+        role.value = 'HOST'
+        const find = room.value.users.find(x => x._id !== currentUserId.value)
         callUser.value = find
         calledConfig.value = {
           userId: find._id,
           fromId: currentUserId.value,
-          roomId: props.room.roomId,
+          roomId: room.value.roomId,
           command: 'CALL',
-          type: type
+          type
         }
         callVideo(calledConfig.value)
       } else {
@@ -154,54 +152,59 @@ export default {
       }
     }
 
-
     onMounted(() => {
       msg.$on('COMMAND_VIDEO_RESP', COMMAND_VIDEO_RESP)
     })
 
+    onUnmounted(() => {
+      msg.$off('COMMAND_VIDEO_RESP')
+    })
+
     const COMMAND_VIDEO_RESP = async (data) => {
-      console.log(data)
       switch (data.data.command) {
-          // 接听者指令
+        // 接听者指令
         case 'CALL': {
           display.value = true
           role.value = 'PARTNER'
-          calledConfig.value = data.data;
-          const room = loadedRooms.value.find(x => x.roomId === calledConfig.value.roomId);
+          calledConfig.value = data.data
+          const room = loadedRooms.value.find(x => x.roomId === calledConfig.value.roomId)
           callUser.value = room.users.find(x => x._id === calledConfig.value.fromId)
           selfTimer.value = setTimeout(() => {
             overVideo('已超时')
           }, 20000)
-          break;
+          break
         }
         case 'AGREE':
           clearTimeout(selfTimer.value)
           snackbar.value.display = true
           snackbar.value.text = '已接通'
-          break;
+          imComponent.value.tip(snackbar.value)
+          break
         case 'BE_CALLED_REFUSE':
           overVideo('接听者对方已挂断')
-          break;
-
-          // 发起者接收指令
+          imComponent.value.tip(snackbar)
+          break
+        // 发起者接收指令
         case 'NOT_ONLINE':
           snackbar.value.display = true
           snackbar.value.text = '对方不在线'
+          imComponent.value.tip(snackbar.value)
           setTimeout(() => {
             display.value = false
           }, 1000)
-          break;
+
+          break
         case 'REQ_SUCCESS':
           selfTimer.value = setTimeout(() => {
             overVideo('对方无响应')
           }, 20000)
-          du.joinSession(props.room.roomId,currentUserId.value, calledConfig.value.type === 'VIDEO')
-          break;
+          du.joinSession(room.value.roomId, currentUserId.value, calledConfig.value.type === 'VIDEO')
+          break
         case 'CALLED_REFUSE':
           overVideo('发起者已挂断')
-          break;
+          break
         default:
-          break;
+          break
       }
     }
 
@@ -210,9 +213,9 @@ export default {
     }
 
     const overVideo = (text) => {
-      console.log(videoed.value, text)
       snackbar.value.display = true
       snackbar.value.text = text
+      imComponent.value.tip(snackbar.value)
       setTimeout(() => {
         display.value = false
       }, 1000)
@@ -234,6 +237,7 @@ export default {
     }
 
     return {
+      room,
       isMainStream,
       display,
       snackbar,
@@ -293,6 +297,5 @@ export default {
   }
 
 }
-
 
 </style>

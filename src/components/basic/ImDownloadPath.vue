@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="downloadAction" width="450" v-if="downloadAction">
+  <v-dialog v-if="downloadAction" v-model="downloadAction" width="450">
     <v-card>
       <v-card-title class="text-h5">
         文件下载
@@ -7,40 +7,40 @@
 
       <v-card-text>
         <v-text-field
-            label="文件名"
-            required
-            :value="file.name"
+          v-model="file.name"
+          label="文件名"
+          required
         />
         <v-text-field
-            hide-details="auto"
-            label="文件路径"
-            required
-            :value="downloadPath"
-            append-outer-icon="mdi-folder-outline"
-            @click:append-outer="selectFolder"
+          hide-details="auto"
+          label="文件路径"
+          required
+          :value="downloadPath"
+          append-outer-icon="mdi-folder-outline"
+          @click:append-outer="selectFolder"
         />
         <v-checkbox
-            hide-details="auto"
-            v-model="checkbox"
-            :label="`默认下载地址，不再提示`"
+          v-model="checkbox"
+          hide-details="auto"
+          :label="`默认下载地址，不再提示`"
         />
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
 
         <v-btn
-            color="green darken-1"
-            text
-            @click="resetDownload"
+          color="green darken-1"
+          text
+          @click="resetDownload"
         >
           取消
         </v-btn>
 
         <v-btn
-            color="green darken-1"
-            text
-            @click="sureDownload"
+          color="green darken-1"
+          text
+          @click="sureDownload"
         >
           确定
         </v-btn>
@@ -50,13 +50,13 @@
 </template>
 
 <script>
-import {computed, onMounted, ref} from "@vue/composition-api";
-import {uuid} from "@/utils/id-util";
-import store from "@/store";
+import { computed, onMounted, ref } from '@vue/composition-api'
+import { uuid } from '@/utils/id-util'
+import store from '@/store'
 
 export default {
-  name: "ImDownloadPath",
-  setup() {
+  name: 'ImDownloadPath',
+  setup () {
     const file = ref(null)
     const downloadAction = ref(false)
     const checkbox = ref(false)
@@ -102,7 +102,7 @@ export default {
     }
 
     const sendDownload = () => {
-      window.require('electron').ipcRenderer.send("download-file", {
+      window.require('electron').ipcRenderer.send('download-file', {
         id: uuid(),
         name: file.value.name,
         url: file.value.url,

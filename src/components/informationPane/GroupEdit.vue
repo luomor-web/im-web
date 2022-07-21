@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top :title="'编辑资料'" :sub="true" @close="open('ROOM_INFO')"/>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('ROOM_INFO')" />
     <div class="pt-2 mx-2">
       <div class="d-table ma-auto">
         <v-hover>
@@ -10,14 +10,14 @@
                 height="120"
                 width="120"
                 class="header-img"
-                :src="roomAvatar ?  roomAvatar : room.avatar"
+                :src="roomAvatar ? roomAvatar : room.avatar"
             >
               <v-fade-transition>
                 <v-overlay
                     v-if="hover"
                     absolute
                 >
-                  <v-btn icon @click="openUpload" height="120" width="120">
+                  <v-btn icon height="120" width="120" @click="openUpload">
                     <v-icon>{{ icons.mdiCamera }}</v-icon>
                   </v-btn>
                 </v-overlay>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <im-upload ref="upload" @sure="sure"/>
+    <im-upload ref="upload" @sure="sure" />
 
     <div class="mx-2 mb-2 mt-8">
       <v-text-field
@@ -41,7 +41,7 @@
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" @click="open('GROUP_USER_MANAGE')" v-if="isAdminOrSubAdmin">
+        <v-list-item v-if="isAdminOrSubAdmin" v-ripple class="im-list-item" @click="open('GROUP_USER_MANAGE')">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiLockOutline }}</v-icon>
           </v-list-item-icon>
@@ -50,7 +50,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-ripple class="im-list-item" @click="open('GROUP_HANDOVER_ADMIN')" v-if="isAdmin">
+        <v-list-item v-if="isAdmin" v-ripple class="im-list-item" @click="open('GROUP_HANDOVER_ADMIN')">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiPoliceBadgeOutline }}</v-icon>
           </v-list-item-icon>
@@ -58,26 +58,29 @@
             <v-list-item-title>移交群组</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-
-      </v-list>
+</v-list>
     </div>
 
-    <v-divider/>
+    <v-divider />
 
     <div class="mx-2">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item error--text" v-if="isAdmin" @click="startDisbandRoom">
+        <v-list-item v-if="isAdmin" v-ripple class="im-list-item error--text" @click="startDisbandRoom">
           <v-list-item-icon>
-            <v-icon color="red">{{ icons.mdiDeleteOutline }}</v-icon>
+            <v-icon color="red">
+{{ icons.mdiDeleteOutline }}
+</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>删除并解散群聊</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-ripple class="im-list-item error--text" v-if="!isAdmin" @click="startOutRoom">
+        <v-list-item v-if="!isAdmin" v-ripple class="im-list-item error--text" @click="startOutRoom">
           <v-list-item-icon>
-            <v-icon color="red">{{ icons.mdiDeleteOutline }}</v-icon>
+            <v-icon color="red">
+{{ icons.mdiDeleteOutline }}
+</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>删除并退出群聊</v-list-item-title>
@@ -88,8 +91,8 @@
 
     <v-fab-transition>
       <v-btn
-          class="mb-16 mr-8"
           v-show="showSure"
+          class="mb-16 mr-8"
           absolute
           fab
           right
@@ -101,25 +104,25 @@
       </v-btn>
     </v-fab-transition>
 
-    <im-warn-dialog :action="action"/>
+    <im-warn-dialog :action="action" />
   </div>
 </template>
 
 <script>
-import DrawerTop from "@/components/basic/DrawerTop";
-import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import {disbandGroup, editGroupProfile, removeUserGroup} from "@/net/send-message";
-import {mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline} from "@mdi/js";
-import ImUpload from "@/components/basic/ImUpload";
-import ImWarnDialog from "@/components/basic/ImWarnDialog";
-import store from "@/store";
+import DrawerTop from '@/components/basic/DrawerTop'
+import { computed, onMounted, ref, watch } from '@vue/composition-api'
+import { disbandGroup, editGroupProfile, removeUserGroup } from '@/net/send-message'
+import { mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline } from '@mdi/js'
+import ImUpload from '@/components/basic/ImUpload'
+import ImWarnDialog from '@/components/basic/ImWarnDialog'
+import store from '@/store'
 
 export default {
-  name: "GroupEdit",
+  name: 'GroupEdit',
   components: {
     ImWarnDialog,
     ImUpload,
-    DrawerTop,
+    DrawerTop
   },
   setup() {
     // 当前用户ID
@@ -145,11 +148,11 @@ export default {
       content: '',
       sure: () => {
         switch (action.value.type) {
-          case "OUT_ROOM":
+          case 'OUT_ROOM':
             outRoom()
             action.value.model = false
             break
-          case "DISBAND_ROOM":
+          case 'DISBAND_ROOM':
             disbandRoom()
             action.value.model = false
             break
@@ -179,7 +182,6 @@ export default {
 
     const init = (room) => {
       curUser.value = room?.users.find(r => r._id === curUserId.value)
-      console.log(curUser.value)
       // isAdmin.value = curUser.value?.role === 'ADMIN'
       roomName.value = room?.roomName
     }
@@ -190,11 +192,11 @@ export default {
 
     const sure = (url) => {
       roomAvatar.value = url
-      editGroupProfile({roomId: room.value.roomId, avatar: url, roomName: roomName.value})
+      editGroupProfile({ roomId: room.value.roomId, avatar: url, roomName: roomName.value })
     }
 
     const roomNameChange = () => {
-      editGroupProfile({roomId: room.value.roomId, roomName: roomName.value})
+      editGroupProfile({ roomId: room.value.roomId, roomName: roomName.value })
     }
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -206,7 +208,7 @@ export default {
     }
 
     const outRoom = () => {
-      removeUserGroup({roomId: room.value.roomId, userId: curUser.value._id, type: 'OUT'})
+      removeUserGroup({ roomId: room.value.roomId, userId: curUser.value._id, type: 'OUT' })
       close()
     }
 
@@ -219,7 +221,7 @@ export default {
     }
 
     const disbandRoom = () => {
-      disbandGroup({roomId: room.value.roomId})
+      disbandGroup({ roomId: room.value.roomId })
       close()
     }
 
@@ -276,6 +278,5 @@ export default {
   border-radius: 120px;
   background-color: $v-grey-lighten1;
 }
-
 
 </style>

@@ -1,16 +1,16 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
 export function init(data) {
     return request({
         url: '/file/multipart/init',
         method: 'post',
-        data: data
+        data
     })
 }
 
 export function upload(url, data, cb) {
     return request({
-        url: url,
+        url,
         method: 'put',
         retry: 3,
         timeout: 500000,
@@ -21,7 +21,7 @@ export function upload(url, data, cb) {
         headers: {
             'Content-Type': 'application/octet-stream'
         },
-        data: data
+        data
     })
 }
 
@@ -29,7 +29,7 @@ export function mergeMultipartUpload(data) {
     return request({
         url: '/file/multipart/complete',
         method: 'put',
-        data: data
+        data
     })
 }
 
@@ -37,7 +37,7 @@ export function registerUser(data) {
     return request({
         url: '/account/register',
         method: 'put',
-        data: data
+        data
     })
 }
 
@@ -53,7 +53,7 @@ export function pushVideoStream(data, userId) {
     return request({
         url: '/webrtc/publish?streamPath=live/' + userId,
         method: 'post',
-        data: data
+        data
     })
 }
 
@@ -61,21 +61,20 @@ export function pullVideoStream(data, userId) {
     return request({
         url: '/webrtc/play?streamPath=live/' + userId,
         method: 'post',
-        data: data
+        data
     })
 }
 
 export function createSession(sessionId) {
-
     return request({
-        url: `/openvidu/api/sessions`,
+        url: '/openvidu/api/sessions',
         method: 'post',
         data: {
             customSessionId: sessionId
         },
         auth: {
             username: 'OPENVIDUAPP',
-            password: 'MY_SECRET',
+            password: 'MY_SECRET'
         },
         headers: {
             'Content-Type': 'application/json'
@@ -90,7 +89,7 @@ export function createToken(sessionId) {
         data: {},
         auth: {
             username: 'OPENVIDUAPP',
-            password: 'MY_SECRET',
+            password: 'MY_SECRET'
         },
         headers: {
             'Content-Type': 'application/json;charset=UTF-8'
@@ -98,10 +97,10 @@ export function createToken(sessionId) {
     })
 }
 
-function downloadClient(){
+function downloadClient() {
     return request({
         method: 'get',
-        url: process.env.VUE_APP_UPDATE_URL+'latest.yml'
+        url: process.env.VUE_APP_UPDATE_URL + 'latest.yml'
     })
 }
 
@@ -109,7 +108,7 @@ export function userLogin(data) {
     return request({
         url: '/user/login',
         method: 'post',
-        data: data
+        data
     })
 }
 
@@ -117,4 +116,3 @@ export default {
     upload,
     downloadClient
 }
-

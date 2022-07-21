@@ -1,8 +1,8 @@
 <template>
   <div>
-    <drawer-top  @close="closeAddRoom" :title="'创建群组'">
+    <drawer-top :title="'创建群组'" @close="closeAddRoom">
       <template #right>
-        <v-spacer/>
+        <v-spacer />
         <v-btn color="primary" :disabled="roomName === ''" @click="createRoom">
           确定
         </v-btn>
@@ -23,7 +23,7 @@
                 v-if="hover"
                 absolute
               >
-                <v-btn icon @click="openUpload" height="150" width="150">
+                <v-btn icon height="150" width="150" @click="openUpload">
                   <v-icon>{{ icons.mdiCamera }}</v-icon>
                 </v-btn>
               </v-overlay>
@@ -40,54 +40,60 @@
         outlined
       />
     </div>
-    <im-driver/>
+    <im-driver />
     <v-toolbar elevation="0" dense class="mx-2">
-      <v-toolbar-title class="subtitle-1 font-weight-black">成员</v-toolbar-title>
+      <v-toolbar-title class="subtitle-1 font-weight-black">
+        成员
+      </v-toolbar-title>
       <v-spacer />
       <v-btn icon>
-        <v-icon @click="startChoseUser">mdi-plus</v-icon>
+        <v-icon @click="startChoseUser">
+          mdi-plus
+        </v-icon>
       </v-btn>
     </v-toolbar>
     <div class="ma-2">
-      <v-chip v-for="(item,index) of userSelect" :key="index" @click="removeUser(item)" class="ma-1">
+      <v-chip v-for="(item,index) of userSelect" :key="index" class="ma-1" @click="removeUser(item)">
         {{ item.username }}
         <v-avatar right>
-          <v-img :src="item.avatar"/>
+          <v-img :src="item.avatar" />
         </v-avatar>
       </v-chip>
     </div>
-    <im-user-select-dialog :model="addUser" @cancel="closeChoseUser" @sure="sureChoseUser" :users="userSelect" multiple />
-    <im-upload ref="upload" @sure="sure"/>
-<!--    <v-window v-model="active">-->
-<!--      <v-window-item value="GROUP_SETTING">-->
-<!--        <add-room-group-info-->
-<!--            @close="closeAddRoom"-->
-<!--            :user-select="userSelect"-->
-<!--        />-->
-<!--      </v-window-item>-->
-<!--    </v-window>-->
+    <im-user-select-dialog :model="addUser" :users="userSelect" multiple @cancel="closeChoseUser"
+                           @sure="sureChoseUser"
+    />
+    <im-upload ref="upload" @sure="sure" />
+    <!--    <v-window v-model="active">-->
+    <!--      <v-window-item value="GROUP_SETTING">-->
+    <!--        <add-room-group-info-->
+    <!--            @close="closeAddRoom"-->
+    <!--            :user-select="userSelect"-->
+    <!--        />-->
+    <!--      </v-window-item>-->
+    <!--    </v-window>-->
   </div>
 </template>
 
 <script>
-import store from "@/store";
-import {ref} from "@vue/composition-api";
-import {createGroup} from "@/net/send-message";
-import DrawerTop from "@/components/basic/DrawerTop";
-import ImUpload from "@/components/basic/ImUpload";
-import ImDriver from "@/components/basic/ImDriver";
-import {mdiCamera} from "@mdi/js";
-import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
+import store from '@/store'
+import { ref } from '@vue/composition-api'
+import { createGroup } from '@/net/send-message'
+import DrawerTop from '@/components/basic/DrawerTop'
+import ImUpload from '@/components/basic/ImUpload'
+import ImDriver from '@/components/basic/ImDriver'
+import { mdiCamera } from '@mdi/js'
+import ImUserSelectDialog from '@/components/basic/ImUserSelectDialog'
 
 export default {
-  name: "AddRoom",
+  name: 'AddRoom',
   components: {
     ImUserSelectDialog,
     DrawerTop,
     ImUpload,
     ImDriver
   },
-  setup() {
+  setup () {
     const roomName = ref('')
     const userSelect = ref([])
     const roomAvatar = ref('')
@@ -98,7 +104,7 @@ export default {
       const users = userSelect.value.map(x => {
         return { _id: x._id }
       })
-      createGroup({isFriend: false, roomName: roomName.value, avatar: roomAvatar.value, users: users})
+      createGroup({ isFriend: false, roomName: roomName.value, avatar: roomAvatar.value, users })
       closeAddRoom()
     }
 
@@ -109,19 +115,18 @@ export default {
       store.commit('setSettingPane', '')
     }
 
-
     const closeChoseUser = () => {
       addUser.value = false
     }
 
     const sureChoseUser = (data) => {
-      const {users} = data
+      const { users } = data
       userSelect.value = [...users]
       addUser.value = false
     }
 
     const removeUser = (item) => {
-      const index = userSelect.value.findIndex(r => r._id === item._id);
+      const index = userSelect.value.findIndex(r => r._id === item._id)
       if (index !== -1) {
         userSelect.value.splice(index, 1)
       }

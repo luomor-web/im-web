@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top @close="close" title="设置"/>
+    <drawer-top title="设置" @close="close" />
     <div class="pt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -23,7 +23,7 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <im-driver/>
+        <im-driver />
         <v-list nav>
           <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('SETTING_DOWNLOAD')">
             <v-list-item-icon>
@@ -40,14 +40,14 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/basic/DrawerTop";
-import {mdiBellOutline, mdiDownloadOutline, mdiPencilOutline} from "@mdi/js";
-import ImDriver from "@/components/basic/ImDriver";
-import {computed, ref} from "@vue/composition-api";
-import store from "@/store";
+import DrawerTop from '@/components/basic/DrawerTop'
+import { mdiBellOutline, mdiDownloadOutline, mdiPencilOutline } from '@mdi/js'
+import ImDriver from '@/components/basic/ImDriver'
+import { computed, ref } from '@vue/composition-api'
+import store from '@/store'
 
 export default {
-  name: "SettingItem",
+  name: 'SettingItem',
   components: {
     ImDriver,
     DrawerTop
@@ -73,7 +73,7 @@ export default {
       icons: {
         mdiPencilOutline,
         mdiBellOutline,
-        mdiDownloadOutline,
+        mdiDownloadOutline
       }
     }
   }

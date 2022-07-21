@@ -1,6 +1,6 @@
-import {ref} from "@vue/composition-api";
+import { ref } from '@vue/composition-api'
 
-export const textMessages =  ref({
+export const textMessages = ref({
     ROOMS_EMPTY: '去创建一些聊天吧',
     ROOM_EMPTY: '暂无会话被选择',
     NEW_MESSAGES: 'New Messages',

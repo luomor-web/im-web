@@ -1,19 +1,19 @@
-import {close, sendMsg} from "@/net/socket";
-import {buildDisplayTime} from "@/utils/date-util";
-import store from "@/store";
+import { close, sendMsg } from '@/net/socket'
+import { buildDisplayTime } from '@/utils/date-util'
+import store from '@/store'
 
 const getUserInfo = (data) => {
   // 发送获取用户信息
-  let param = {
+  const param = {
     cmd: 17,
-    userId: data,
+    userId: data
   }
   sendMsg(param)
 }
 
 // 获取历史消息
 const getHistoryMessage = (data) => {
-  let param = {
+  const param = {
     cmd: 19,
     ...data
   }
@@ -22,7 +22,7 @@ const getHistoryMessage = (data) => {
 
 // 清空未读消息
 const clearUnReadMessage = (data) => {
-  let param = {
+  const param = {
     cmd: 24,
     roomId: data
   }
@@ -31,7 +31,7 @@ const clearUnReadMessage = (data) => {
 
 // 发送聊天消息
 const sendChatMessage = (data) => {
-  let param = {
+  const param = {
     cmd: 11,
     ...data
   }
@@ -39,17 +39,19 @@ const sendChatMessage = (data) => {
 }
 
 // 获取所有用户
-const searchUser = (name, userId,searchId) => {
-  let param = {
+const searchUser = (name, userId, searchId) => {
+  const param = {
     cmd: 26,
-    name, userId,searchId
+    name,
+userId,
+searchId
   }
   sendMsg(param)
 }
 
 // 创建一个好友会话群
 const createGroup = (data) => {
-  let param = {
+  const param = {
     cmd: 22,
     isFriend: data.isFriend,
     avatar: data.avatar,
@@ -60,7 +62,7 @@ const createGroup = (data) => {
 }
 
 // 发送表情回复
-const messageReaction = ({reaction, remove, messageId, roomId}) => {
+const messageReaction = ({ reaction, remove, messageId, roomId }) => {
   const param = {
     cmd: 28,
     reaction,
@@ -72,7 +74,7 @@ const messageReaction = ({reaction, remove, messageId, roomId}) => {
 }
 
 // 修改用户资料
-const editProfile = ({userId, avatar, name}) => {
+const editProfile = ({ userId, avatar, name }) => {
   const param = {
     cmd: 30,
     avatar,
@@ -83,7 +85,7 @@ const editProfile = ({userId, avatar, name}) => {
 }
 
 // 邀请加入群聊
-const joinUserGroup = ({group, users}) => {
+const joinUserGroup = ({ group, users }) => {
   const param = {
     cmd: 7,
     group,
@@ -93,7 +95,7 @@ const joinUserGroup = ({group, users}) => {
 }
 
 // 移出群聊 和 退出群聊
-const removeUserGroup = ({roomId, userId, type}) => {
+const removeUserGroup = ({ roomId, userId, type }) => {
   const param = {
     cmd: 32,
     roomId,
@@ -104,7 +106,7 @@ const removeUserGroup = ({roomId, userId, type}) => {
 }
 
 // 移出群聊 和 退出群聊
-const setAdmin = ({roomId, userId, type}) => {
+const setAdmin = ({ roomId, userId, type }) => {
   const param = {
     cmd: 46,
     roomId,
@@ -114,9 +116,8 @@ const setAdmin = ({roomId, userId, type}) => {
   sendMsg(param)
 }
 
-
 // 移交群主
-const handoverUserGroup = ({roomId, userId}) => {
+const handoverUserGroup = ({ roomId, userId }) => {
   const param = {
     cmd: 40,
     roomId,
@@ -126,7 +127,7 @@ const handoverUserGroup = ({roomId, userId}) => {
 }
 
 // 解散群聊
-const disbandGroup = ({roomId}) => {
+const disbandGroup = ({ roomId }) => {
   const param = {
     cmd: 38,
     roomId
@@ -135,7 +136,7 @@ const disbandGroup = ({roomId}) => {
 }
 
 // 修改群组信息
-const editGroupProfile = ({roomId, roomName, avatar}) => {
+const editGroupProfile = ({ roomId, roomName, avatar }) => {
   const param = {
     cmd: 42,
     roomId,
@@ -146,7 +147,7 @@ const editGroupProfile = ({roomId, roomName, avatar}) => {
 }
 
 // 撤回消息
-const messageDelete = ({messageId}) => {
+const messageDelete = ({ messageId }) => {
   const param = {
     cmd: 44,
     messageId
@@ -162,7 +163,6 @@ const searchMessage = (data) => {
   }
   sendMsg(param)
 }
-
 
 // 群组配置
 const userGroupConfig = (data) => {
@@ -200,13 +200,13 @@ const quitSystem = () => {
 const buildLastMessage = (data) => {
   let content = data.deleted ? '删除了一条消息' : data.content
   if (!data.content && data.files.length > 0 && !data.deleted) {
-    content += ("[文件] - " + data.files[0].name)
+    content += ('[文件] - ' + data.files[0].name)
     content += (data.files.length === 1 ? '' : '等多个文件')
   }
 
   return buildLastMessageTime({
     messageId: data._id,
-    content: content,
+    content,
     senderId: data.senderId,
     username: data.system ? '' : data.username,
     timestamp: data.timestamp,

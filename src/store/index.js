@@ -5,15 +5,15 @@ import state from './state'
 import getters from './getters'
 import createPersistedState from 'vuex-persistedstate'
 
-//1.安装插件
+// 1.安装插件
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-    state: state,
+    state,
     mutations: mutation,
-    getters: getters,
+    getters,
     modules: {},
-    plugins:[createPersistedState()]
+    plugins: [createPersistedState()]
 })
 
 export default store

@@ -4,7 +4,7 @@ import './plugins/compositionApi'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
-import {initWebSocket} from './net/socket'
+import { initWebSocket } from './net/socket'
 
 import moment from 'moment'
 Vue.prototype.$moment = moment

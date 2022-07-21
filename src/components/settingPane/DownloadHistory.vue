@@ -1,16 +1,17 @@
 <template>
   <div class="fill-height">
-    <drawer-top @close="close" title="文件传输"/>
-    <v-list dense class="overflow-y-auto" style="height: calc(100% - 60px)">
-      <v-list-item v-ripple v-for="(item,index) of downloadFileList" :key="index" class="im-list-item"
-      >
+    <drawer-top title="文件传输" @close="close" />
+    <v-list dense class="overflow-y-auto" style="height: calc(100% - 64px)">
+      <v-list-item v-for="(item,index) of downloadFileList" :key="index" v-ripple class="im-list-item">
         <v-list-item-avatar tile @click="openFile(item)">
           <v-icon>{{ getIcon(item) }}</v-icon>
         </v-list-item-avatar>
         <v-list-item-content @click="openFile(item)">
           <v-list-item-title>{{ item.name }}</v-list-item-title>
           <v-list-item-subtitle>
-            <v-icon :size="20">{{ item.type === 'upload' ? icons.mdiArrowUp : icons.mdiArrowDown }}</v-icon>
+            <v-icon :size="20">
+              {{ item.type === 'upload' ? icons.mdiArrowUp : icons.mdiArrowDown }}
+            </v-icon>
 
             <span v-if="isDownloading(item)">{{ getFileSize(item.receivedBytes) }} / </span>
 
@@ -19,38 +20,46 @@
           </v-list-item-subtitle>
           <v-list-item-subtitle v-if="isDownloading(item)">
             <v-progress-linear
-                :buffer-value="item.receivedBytes / item.totalBytes * 100"
-                color="cyan"
+              :buffer-value="item.receivedBytes / item.totalBytes * 100"
+              color="cyan"
             />
           </v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
-          <v-btn icon v-if="item.state === 'ing'" @click="stopDownload(item)">
+          <v-btn v-if="item.state === 'ing'" icon @click="stopDownload(item)">
             <v-icon>{{ icons.mdiStop }}</v-icon>
           </v-btn>
           <v-menu
-              nudge-top="10"
-              offset-y
-              left
-              v-else>
+            v-else
+            nudge-top="10"
+            offset-y
+            left
+          >
             <template v-slot:activator="{ attrs, on }">
               <v-btn icon
                      v-bind="attrs"
-                     v-on="on">
+                     v-on="on"
+              >
                 <v-icon>
                   {{ icons.mdiDotsHorizontal }}
                 </v-icon>
               </v-btn>
             </template>
             <v-list dense>
-              <v-list-item class="im-list-item" v-if="item.state === 'not-found'">
-                <v-list-item-subtitle @click="againDownload(item)">重新下载</v-list-item-subtitle>
+              <v-list-item v-if="item.state === 'not-found'" class="im-list-item">
+                <v-list-item-subtitle @click="againDownload(item)">
+                  重新下载
+                </v-list-item-subtitle>
               </v-list-item>
-              <v-list-item class="im-list-item" v-if="item.state !== 'not-found'">
-                <v-list-item-subtitle @click="openFileLocation(item)">打开文件所在位置</v-list-item-subtitle>
+              <v-list-item v-if="item.state !== 'not-found'" class="im-list-item">
+                <v-list-item-subtitle @click="openFileLocation(item)">
+                  打开文件所在位置
+                </v-list-item-subtitle>
               </v-list-item>
               <v-list-item class="im-list-item">
-                <v-list-item-subtitle @click="delHistory(item)">删除记录</v-list-item-subtitle>
+                <v-list-item-subtitle @click="delHistory(item)">
+                  删除记录
+                </v-list-item-subtitle>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -61,8 +70,8 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/basic/DrawerTop";
-import {computed} from "@vue/composition-api";
+import DrawerTop from '@/components/basic/DrawerTop'
+import { computed } from '@vue/composition-api'
 import {
   mdiApplication,
   mdiArrowDown,
@@ -74,30 +83,27 @@ import {
   mdiStop,
   mdiVideoBox,
   mdiZipBox
-} from "@mdi/js";
-import {isApplicationFile, isAudioFile, isImageFile, isPackageFile, isVideoFile, suffix} from "@/utils/media-file";
-import {getFileSize} from "@/utils/util";
-import store from "@/store";
+} from '@mdi/js'
+import { isApplicationFile, isAudioFile, isImageFile, isPackageFile, isVideoFile, suffix } from '@/utils/media-file'
+import { getFileSize } from '@/utils/util'
+import store from '@/store'
 
 export default {
-  name: "DownloadHistory",
+  name: 'DownloadHistory',
   components: {
     DrawerTop
   },
-  setup() {
-
+  setup () {
     const downloadFileList = computed(() => store.state.downloadItemList)
 
     const getIcon = (item) => {
-
-      const suf = suffix(item.name);
+      const suf = suffix(item.name)
       if (isAudioFile(suf)) return mdiHeadphonesBox
       if (isImageFile(suf)) return mdiImage
       if (isVideoFile(suf)) return mdiVideoBox
       if (isApplicationFile(suf)) return mdiApplication
       if (isPackageFile(suf)) return mdiZipBox
       return mdiHelp
-
     }
 
     const stopDownload = (item) => {
@@ -113,7 +119,7 @@ export default {
     const openFile = (item) => {
       window.require('electron').ipcRenderer.invoke('open-file-shell', item).then(result => {
         if (!result) {
-          store.commit('updateDownloadItem', {args: item, status: 'not-found'})
+          store.commit('updateDownloadItem', { args: item, status: 'not-found' })
         }
       })
     }
@@ -121,14 +127,14 @@ export default {
     const openFileLocation = (item) => {
       window.require('electron').ipcRenderer.invoke('open-file-folder', item).then(result => {
         if (!result) {
-          store.commit('updateDownloadItem', {args: item, status: 'not-found'})
+          store.commit('updateDownloadItem', { args: item, status: 'not-found' })
         }
       })
     }
 
     const againDownload = (item) => {
       store.commit('removeDownloadItem', item)
-      window.require('electron').ipcRenderer.send("download-file", item, true)
+      window.require('electron').ipcRenderer.send('download-file', item, true)
     }
 
     const isDownloading = (item) => {
@@ -142,9 +148,9 @@ export default {
     const close = () => store.commit('setSettingPane', '')
 
     return {
+      downloadFileList,
       close,
       delHistory,
-      downloadFileList,
       getIcon,
       openFile,
       getFileSize,
@@ -158,7 +164,7 @@ export default {
         mdiStop,
         mdiDotsHorizontal,
         mdiArrowDown,
-        mdiArrowUp,
+        mdiArrowUp
       }
     }
   }

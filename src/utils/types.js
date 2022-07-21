@@ -1,15 +1,15 @@
-import Vue from 'vue';
+import Vue from 'vue'
 
 export function isString(obj) {
-  return Object.prototype.toString.call(obj) === '[object String]';
+  return Object.prototype.toString.call(obj) === '[object String]'
 }
 
 export function isObject(obj) {
-  return Object.prototype.toString.call(obj) === '[object Object]';
+  return Object.prototype.toString.call(obj) === '[object Object]'
 }
 
 export function isHtmlElement(node) {
-  return node && node.nodeType === Node.ELEMENT_NODE;
+  return node && node.nodeType === Node.ELEMENT_NODE
 }
 
 /**
@@ -17,24 +17,24 @@ export function isHtmlElement(node) {
  *    https://github.com/jashkenas/underscore/blob/master/modules/isFunction.js
  */
 let isFunction = (functionToCheck) => {
-  const getType = {};
-  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-};
+  const getType = {}
+  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]'
+}
 
 if (typeof /./ !== 'function' && typeof Int8Array !== 'object' && (Vue.prototype.$isServer || typeof document.childNodes !== 'function')) {
   isFunction = function(obj) {
-    return typeof obj === 'function' || false;
-  };
+    return typeof obj === 'function' || false
+  }
 }
 
 export {
   isFunction
-};
+}
 
-export const isUndefined = (val)=> {
-  return val === void 0;
-};
+export const isUndefined = (val) => {
+  return val === undefined
+}
 
 export const isDefined = (val) => {
-  return val !== undefined && val !== null;
-};
+  return val !== undefined && val !== null
+}

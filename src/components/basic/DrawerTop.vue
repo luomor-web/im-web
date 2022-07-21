@@ -8,7 +8,7 @@
       </v-btn>
       <slot>
         <v-toolbar-title class="font-weight-bold ">
-          {{ title  }}
+          {{ title }}
         </v-toolbar-title>
       </slot>
       <slot name="right" />
@@ -17,18 +17,17 @@
 </template>
 
 <script>
-import { mdiArrowLeft, mdiPencilOutline, mdiWindowClose } from "@mdi/js";
+import { mdiArrowLeft, mdiPencilOutline, mdiWindowClose } from '@mdi/js'
 
 export default {
-  name: "DrawerTop",
+  name: 'DrawerTop',
 
   props: {
-    title: {type: String, default: ''},
-    sub: {type: Boolean, default: false}
+    title: { type: String, default: '' },
+    sub: { type: Boolean, default: false }
   },
 
-  setup(props, {emit}) {
-
+  setup(props, { emit }) {
     const close = () => {
       emit('close')
     }
@@ -40,7 +39,7 @@ export default {
       icons: {
         mdiWindowClose,
         mdiPencilOutline,
-        mdiArrowLeft,
+        mdiArrowLeft
       }
     }
   }
@@ -50,6 +49,5 @@ export default {
 <style lang="scss" scoped>
 
 @import "../../styles/theme";
-
 
 </style>

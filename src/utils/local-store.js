@@ -12,8 +12,8 @@ export const setJsonValue = (key, value) => {
 export const getJsonValue = (key) => {
     // sessionStorage.setItem(key,JSON.stringify(value))
 
-    const value = getValue(key);
-    if(!value) return
+    const value = getValue(key)
+    if (!value) return
 
     return JSON.parse(value)
 
@@ -36,7 +36,6 @@ export const getValue = (key) => {
     // }
     // return sessionStorage.getItem(key)
     return localStorage.getItem(key)
-
 }
 
 export const clear = () => {
@@ -55,4 +54,4 @@ export const removeKey = (key) => {
     localStorage.removeItem(key)
 }
 
-export default {setValue, setJsonValue,getJsonValue, getValue, clear,removeKey}
+export default { setValue, setJsonValue, getJsonValue, getValue, clear, removeKey }

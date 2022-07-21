@@ -1,24 +1,25 @@
 <template>
   <div>
-    <im-download-path ref="downloadPath"/>
-    <download-state @tip="tip"/>
-    <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
-    <im-user-select-dialog :model="forwardModel" :types="['CHAT','PERSON']" @sure="forwardSure" @cancel="forwardCancel"
-                           multiple/>
+    <im-download-path ref="downloadPath" />
+    <download-state @tip="tip" />
+    <im-tip :snackbar="snackbar" @close="snackbar.display = false" />
+    <im-user-select-dialog :model="forwardModel" :types="['CHAT','PERSON']" multiple @sure="forwardSure"
+                           @cancel="forwardCancel"
+/>
   </div>
 </template>
 
 <script>
-import {computed, ref} from "@vue/composition-api/dist/vue-composition-api";
-import store from "@/store";
-import ImTip from "@/components/basic/ImTip";
-import DownloadState from "@/components/basic/DownloadState";
-import ImDownloadPath from "@/components/basic/ImDownloadPath";
-import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
-import {forwardMessage} from "@/net/send-message";
+import { computed, ref } from '@vue/composition-api/dist/vue-composition-api'
+import store from '@/store'
+import ImTip from '@/components/basic/ImTip'
+import DownloadState from '@/components/basic/DownloadState'
+import ImDownloadPath from '@/components/basic/ImDownloadPath'
+import ImUserSelectDialog from '@/components/basic/ImUserSelectDialog'
+import { forwardMessage } from '@/net/send-message'
 
 export default {
-  name: "ImComponent",
+  name: 'ImComponent',
   components: {
     ImUserSelectDialog,
     ImTip,
@@ -26,7 +27,6 @@ export default {
     ImDownloadPath
   },
   setup() {
-
     const settingPane = computed(() => store.state.settingPane)
     const downloadPath = ref(null)
     const snackbar = ref({})
@@ -43,11 +43,10 @@ export default {
     }
 
     const forwardSure = (data) => {
-      const {chats, users} = data
-      console.log(chats, users, forwardMessages.value)
-      const filter = chats.filter(r => users.findIndex(x => x._id === r.friendId) === -1).map(x => x.roomId);
-      const userIds = users.map(x => x._id);
-      forwardMessage({chats: filter,users: userIds,messages:forwardMessages.value})
+      const { chats, users } = data
+      const filter = chats.filter(r => users.findIndex(x => x._id === r.friendId) === -1).map(x => x.roomId)
+      const userIds = users.map(x => x._id)
+      forwardMessage({ chats: filter, users: userIds, messages: forwardMessages.value })
       forwardModel.value = false
     }
 
@@ -56,8 +55,7 @@ export default {
     }
 
     const tip = (item) => {
-      snackbar.value = {...item}
-      console.log(snackbar)
+      snackbar.value = { ...item }
     }
 
     return {

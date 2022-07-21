@@ -1,5 +1,5 @@
 export default {
-    curRoom : state => {
+    curRoom: state => {
         return state.loadedRooms.find(r => r.roomId === state.roomId)
     },
     haveFileDownloading: state => {

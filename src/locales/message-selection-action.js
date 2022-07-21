@@ -1,4 +1,4 @@
-import {ref} from "@vue/composition-api";
+import { ref } from '@vue/composition-api'
 
 export const messageSelectionActions = ref([
     // {
@@ -10,4 +10,3 @@ export const messageSelectionActions = ref([
         title: '转发'
     }
 ])
-

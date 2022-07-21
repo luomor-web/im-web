@@ -1,7 +1,7 @@
 <template>
   <v-expand-x-transition>
-    <div class="im-left-drawer" v-if="settingPane">
-      <v-window v-model="settingPane"  class="fill-height">
+    <div v-if="settingPane" class="im-left-drawer">
+      <v-window v-model="settingPane" class="fill-height">
         <v-window-item value="SETTING_ITEM">
           <setting-item />
         </v-window-item>
@@ -23,17 +23,17 @@
 </template>
 
 <script>
-import {computed} from "@vue/composition-api";
-import store from "@/store";
-import {mdiPlus} from "@mdi/js";
-import AddRoom from "@/components/settingPane/addRoom/AddRoom";
-import SettingItem from "@/components/settingPane/setting/SettingItem";
-import SettingUserProfile from "@/components/settingPane/setting/SettingUserProfile";
-import DownloadHistory from "@/components/settingPane/downloadHistory/DownloadHistory";
-import SettingDownload from "@/components/settingPane/setting/SettingDownload";
+import { computed } from '@vue/composition-api'
+import store from '@/store'
+import { mdiPlus } from '@mdi/js'
+import AddRoom from '@/components/settingPane/AddRoom'
+import SettingItem from '@/components/settingPane/SettingItem'
+import SettingUserProfile from '@/components/settingPane/SettingUserProfile'
+import DownloadHistory from '@/components/settingPane/DownloadHistory'
+import SettingDownload from '@/components/settingPane/SettingDownload'
 
 export default {
-  name: "SettingPane",
+  name: 'SettingPane',
   components: {
     SettingDownload,
     AddRoom,
@@ -45,7 +45,6 @@ export default {
     const curUser = computed(() => store.state.curUser)
     const settingPane = computed(() => store.state.settingPane)
 
-
     return {
       settingPane,
       curUser,
@@ -54,7 +53,6 @@ export default {
         mdiPlus
       }
     }
-
   }
 }
 </script>

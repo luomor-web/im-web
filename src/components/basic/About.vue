@@ -6,16 +6,16 @@
       </v-card-title>
       <v-card-text>
         <p class="font-weight-regular">
-          版本： {{nowVersion}}
+          版本： {{ nowVersion }}
         </p>
         <p class="font-weight-regular">
           版权公告： Copyright © 2022 Courier
         </p>
-        <v-btn color="primary"
-               @click="checkUpdate"
-               v-if="isElectron"
+        <v-btn v-if="isElectron"
+               color="primary"
                :loading="loading"
                :disabled="loading"
+               @click="checkUpdate"
         >
           检查更新
           <template v-slot:loader>
@@ -23,7 +23,7 @@
           </template>
         </v-btn>
         <span>
-            {{returnText}}
+            {{ returnText }}
         </span>
       </v-card-text>
     </v-card>
@@ -31,16 +31,16 @@
 </template>
 
 <script>
-import {onMounted, ref} from "@vue/composition-api";
-import log from "electron-log";
+import { onMounted, ref } from '@vue/composition-api'
+import log from 'electron-log'
 import config from '../../../package.json'
 
 export default {
-  name: "About",
+  name: 'About',
   props: {
-    action: {type: Object}
+    action: { type: Object, default: () => {} }
   },
-  setup(props){
+  setup (props) {
     const loading = ref(false)
     const isElectron = ref(process.env.IS_ELECTRON)
 
@@ -78,7 +78,7 @@ export default {
       returnText,
       isElectron,
       nowVersion,
-      checkUpdate,
+      checkUpdate
     }
   }
 }

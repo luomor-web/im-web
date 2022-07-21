@@ -1,20 +1,20 @@
-import {buildLastMessage, buildLastMessageTime, clearUnReadMessage} from "@/net/send-message";
+import { buildLastMessage, buildLastMessageTime, clearUnReadMessage } from '@/net/send-message'
 
-import {nextTick} from "@vue/composition-api";
-import store from "@/store/index";
-import {ding, sortedUser} from "@/utils/system-util";
+import { nextTick } from '@vue/composition-api'
+import store from '@/store/index'
+import { ding, sortedUser } from '@/utils/system-util'
 
 export default {
 
     // 编辑用户信息返回
     COMMAND_EDIT_PROFILE_REST: (state, data) => {
-        const {user} = data.data
-        store.commit("setCurUser", user)
+        const { user } = data.data
+        store.commit('setCurUser', user)
     },
     // 获取用户信息响应
     COMMAND_GET_USER_RESP: (state, data) => {
-        const {groups} = data.data
-        store.commit("setCurUser", data.data)
+        const { groups } = data.data
+        store.commit('setCurUser', data.data)
         groups.forEach(x => {
             x.lastMessage = buildLastMessageTime(x.lastMessage)
         })
@@ -25,33 +25,31 @@ export default {
         })
         // 获取历史消息
         if (state.loadedRooms.length > 0) {
-            store.commit('changeRoom',state.loadedRooms[0].roomId)
+            store.commit('changeRoom', state.loadedRooms[0].roomId)
         }
     },
 
     // 用户配置响应
-    COMMAND_USER_GROUP_CONFIG_RESP: (state,data) => {
-        const {data: config} = data
+    COMMAND_USER_GROUP_CONFIG_RESP: (state, data) => {
+        const { data: config } = data
 
-        const index = state.loadedRooms.findIndex(r => r.roomId === config.roomId);
+        const index = state.loadedRooms.findIndex(r => r.roomId === config.roomId)
         if (index === -1) {
             return
         }
         switch (config.type) {
             case 'NOTICE':
                 state.loadedRooms[index].notice = config.notice
-                break;
+                break
         }
 
         state.loadedRooms = [...state.loadedRooms]
-
     },
 
     // 获取历史消息响应
-    COMMAND_GET_MESSAGE_RESP: (state,data) => {
-        const {type, messages: loadMessages, returnDefault} = data.data
+    COMMAND_GET_MESSAGE_RESP: (state, data) => {
+        const { type, messages: loadMessages, returnDefault } = data.data
         if (loadMessages.length === 0) {
-            console.log('消息加载完成')
             nextTick(() => {
                 if (type === 'DOWN') {
                     store.commit('setSearchMessage', false)
@@ -66,7 +64,7 @@ export default {
             store.commit('setSearchMessage', false)
         }
         loadMessages.forEach(x => {
-            const index = state.messages.findIndex(r => r._id === x._id);
+            const index = state.messages.findIndex(r => r._id === x._id)
             if (index === -1 && type === 'TOP') {
                 state.messages.unshift(x)
             } else if (index === -1 && type === 'DOWN') {
@@ -86,7 +84,7 @@ export default {
     },
 
     // 聊天请求
-    COMMAND_CHAT_RESP: (state,data) => {
+    COMMAND_CHAT_RESP: (state, data) => {
         const message = data.data
 
         const roomIndex = state.loadedRooms.findIndex(
@@ -99,7 +97,7 @@ export default {
 
         // 设置最后一条消息
         const lastMessage = buildLastMessage(message)
-        state.loadedRooms[roomIndex] = {...state.loadedRooms[roomIndex],lastMessage}
+        state.loadedRooms[roomIndex] = { ...state.loadedRooms[roomIndex], lastMessage }
 
         // 将目标消息置顶
         store.commit('upRoom', message.roomId)
@@ -125,8 +123,8 @@ export default {
     },
 
     // 用户状态变化消息
-    COMMAND_USER_STATUS_RESP: (state,data) => {
-        const {group, user} = data.data
+    COMMAND_USER_STATUS_RESP: (state, data) => {
+        const { group, user } = data.data
 
         const roomIndex = state.loadedRooms.findIndex(r => r.roomId === group.roomId)
         if (roomIndex === -1) return
@@ -143,14 +141,13 @@ export default {
             state.loadedRooms[roomIndex].users = sortedUser(state.loadedRooms[roomIndex].users)
         }
         state.loadedRooms = [...state.loadedRooms]
-
     },
 
     // 加入群组返回
-    COMMAND_JOIN_GROUP_NOTIFY_RESP: (state,data) => {
-        let room = data.data.group
-        let users = data.data.users
-        const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId);
+    COMMAND_JOIN_GROUP_NOTIFY_RESP: (state, data) => {
+        const room = data.data.group
+        const users = data.data.users
+        const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId)
         if (index === -1) {
             room.users = users
             state.loadedRooms[state.loadedRooms.length] = room
@@ -165,94 +162,90 @@ export default {
             store.commit('setRoomsLoaded', true)
         })
         if (state.loadedRooms.length === 1) {
-            store.commit('changeRoom',room.roomId)
+            store.commit('changeRoom', room.roomId)
         }
 
         // 如果加入的用户里包含创建者，那么切换位置
-        const userIndex = users.findIndex(r => r._id === state.currentUserId);
+        const userIndex = users.findIndex(r => r._id === state.currentUserId)
         if (userIndex !== -1) {
-            const user = users[userIndex];
+            const user = users[userIndex]
             if (user.role === 'ADMIN') {
-                store.commit('changeRoom',room.roomId)
+                store.commit('changeRoom', room.roomId)
             }
         }
     },
 
     // 表情回复
-    COMMAND_SEND_MESSAGE_REACTION_RESP: (state,data) => {
+    COMMAND_SEND_MESSAGE_REACTION_RESP: (state, data) => {
         const reaction = data.data
         if (state.roomId !== reaction.roomId) {
             return
         }
         const messageIndex = state.messages.findIndex(r => reaction.messageId === r._id)
         if (messageIndex === -1) {
-            return;
+            return
         }
 
         if (state.messages[messageIndex].reactions) {
             state.messages[messageIndex].reactions = reaction.reactions
         } else {
-            state.messages[messageIndex] = {...state.messages[messageIndex], reactions: reaction.reactions}
+            state.messages[messageIndex] = { ...state.messages[messageIndex], reactions: reaction.reactions }
         }
         state.messages = [...state.messages]
     },
 
-
     // 群组用户移除返回
-    COMMAND_REMOVE_GROUP_USER_RESP: (state,data) => {
-        const {userId} = data.data
-        const room_id = data.data.roomId
-        const index = state.loadedRooms.findIndex(r => r.roomId === room_id);
+    COMMAND_REMOVE_GROUP_USER_RESP: (state, data) => {
+        const { userId, roomId: serveRoomId } = data.data
+        const index = state.loadedRooms.findIndex(r => r.roomId === serveRoomId)
         if (userId === state.currentUserId) {
             state.loadedRooms.splice(index, 1)
             state.loadedRooms = [...state.loadedRooms]
-            if (room_id === state.roomId) {
+            if (serveRoomId === state.roomId) {
                 if (state.loadedRooms.length > 0) {
-                    store.commit('changeRoom',state.loadedRooms[0].roomId)
+                    store.commit('changeRoom', state.loadedRooms[0].roomId)
                 }
             }
 
             return
         }
-        const userIndex = state.loadedRooms[index].users.findIndex(r => r._id === userId);
+        const userIndex = state.loadedRooms[index].users.findIndex(r => r._id === userId)
         state.loadedRooms[index].users.splice(userIndex, 1)
 
         state.loadedRooms = [...state.loadedRooms]
-
     },
 
     // 解散群聊响应
-    COMMAND_DISBAND_GROUP_RESP: (state,data) => {
-        const {roomId: disbandRoomId} = data.data
-        const index = state.loadedRooms.findIndex(r => r.roomId === disbandRoomId);
+    COMMAND_DISBAND_GROUP_RESP: (state, data) => {
+        const { roomId: disbandRoomId } = data.data
+        const index = state.loadedRooms.findIndex(r => r.roomId === disbandRoomId)
         state.loadedRooms.splice(index, 1)
         state.loadedRooms = [...state.loadedRooms]
 
         if (disbandRoomId === state.roomId) {
-            store.commit('changeRoom',state.loadedRooms[0]?.roomId)
+            store.commit('changeRoom', state.loadedRooms[0]?.roomId)
         }
     },
 
     // 移交群主响应
-    COMMAND_HANDOVER_GROUP_RESP: (state,data) => {
-        const {roomId, oldAdmin, newAdmin} = data.data
-        const index = state.loadedRooms.findIndex(r => r.roomId === roomId);
+    COMMAND_HANDOVER_GROUP_RESP: (state, data) => {
+        const { roomId, oldAdmin, newAdmin } = data.data
+        const index = state.loadedRooms.findIndex(r => r.roomId === roomId)
 
-        const oldAdminIndex = state.loadedRooms[index].users.findIndex(r => r._id === oldAdmin);
+        const oldAdminIndex = state.loadedRooms[index].users.findIndex(r => r._id === oldAdmin)
         state.loadedRooms[index].users[oldAdminIndex].role = 'GENERAL'
 
-        const newAdminIndex = state.loadedRooms[index].users.findIndex(r => r._id === newAdmin);
+        const newAdminIndex = state.loadedRooms[index].users.findIndex(r => r._id === newAdmin)
         state.loadedRooms[index].users[newAdminIndex].role = 'ADMIN'
 
         state.loadedRooms[index].users = sortedUser(state.loadedRooms[index].users)
         state.loadedRooms = [...state.loadedRooms]
-
     },
 
     // 修改群组信息响应
-    COMMAND_EDIT_GROUP_PROFILE_RESP: (state,data) => {
-        const {roomId: changeRoomId, roomName, avatar} = data.data
-        const index = state.loadedRooms.findIndex(r => r.roomId === changeRoomId);
+    COMMAND_EDIT_GROUP_PROFILE_RESP: (state, data) => {
+        const { roomId: changeRoomId, roomName, avatar } = data.data
+        const index = state.loadedRooms.findIndex(r => r.roomId === changeRoomId)
         state.loadedRooms[index].roomName = roomName
         state.loadedRooms[index].avatar = avatar
 
@@ -260,58 +253,55 @@ export default {
     },
 
     // 删除群组信息响应
-    COMMAND_MESSAGE_DELETE_RESP: (state,data) => {
-        const {_id, roomId: messageRoomId, isLastMessage} = data.data
+    COMMAND_MESSAGE_DELETE_RESP: (state, data) => {
+        const { _id, roomId: messageRoomId, isLastMessage } = data.data
         if (messageRoomId === state.roomId) {
-            const index = state.messages.findIndex(r => r._id === _id);
+            const index = state.messages.findIndex(r => r._id === _id)
             if (index !== -1) {
                 state.messages[index].deleted = true
                 state.messages = [...state.messages]
             }
             if (isLastMessage) {
                 const lastMessage = buildLastMessage(data.data)
-                const roomIndex = state.loadedRooms.findIndex(r => r.roomId === messageRoomId);
+                const roomIndex = state.loadedRooms.findIndex(r => r.roomId === messageRoomId)
                 state.loadedRooms[roomIndex].lastMessage = lastMessage
                 state.loadedRooms = [...state.loadedRooms]
             }
-
         }
     },
 
     // 系统会话创建响应
     COMMAND_SYSTEM_MESSAGE_RESP: (state, data) => {
-      let room = data.data.group
-      let users = data.data.users
-      const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId);
+      const room = data.data.group
+      const users = data.data.users
+      const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId)
       if (index === -1) {
         room.users = users
         state.loadedRooms[state.loadedRooms.length] = room
         state.loadedRooms = [...state.loadedRooms]
       }
       if (state.loadedRooms.length === 1) {
-        store.commit('changeRoom',room.roomId)
+        store.commit('changeRoom', room.roomId)
       }
     },
 
     // 已读消息响应
-    COMMAND_MESSAGE_READ_RESP: (state,data) => {
-        const {roomId: messageRoomId, messageId} = data.data
+    COMMAND_MESSAGE_READ_RESP: (state, data) => {
+        const { roomId: messageRoomId, messageId } = data.data
 
         if (messageRoomId === state.roomId) {
-            const index = state.messages.findIndex(r => r._id === messageId);
+            const index = state.messages.findIndex(r => r._id === messageId)
             if (index !== -1) {
                 state.messages[index].seen = true
                 state.messages = [...state.messages]
             }
         }
 
-        const index = state.loadedRooms.findIndex(r => r.roomId === messageRoomId);
+        const index = state.loadedRooms.findIndex(r => r.roomId === messageRoomId)
         if (state.loadedRooms[index].lastMessage.messageId === messageId) {
             state.loadedRooms[index].lastMessage.seen = true
             state.loadedRooms = [...state.loadedRooms]
         }
-
-
     }
 
 }

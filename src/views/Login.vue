@@ -1,9 +1,9 @@
 <template>
   <div>
     <div v-if="isElectron">
-      <top-bar/>
+      <top-bar />
     </div>
-    <div class="download-client" v-if="!isElectron">
+    <div v-if="!isElectron" class="download-client">
       <v-btn text @click="downloadDesktop">
         <v-icon>{{ icons.mdiLaptop }}</v-icon>
         客户端下载
@@ -73,8 +73,8 @@
 
                 <!-- forgot link -->
                 <a
-                    @click="forgotPassword"
                     class="mt-1"
+                    @click="forgotPassword"
                 >
                   忘记密码
                 </a>
@@ -127,35 +127,33 @@
       />
     </div>
 
-    <im-tip :snackbar="snackbar" @close="snackbar.display = false"/>
+    <im-tip :snackbar="snackbar" @close="snackbar.display = false" />
   </div>
 </template>
 
 <script>
-import TopBar from "../components/basic/TopBar";
-import {mdiEyeOffOutline, mdiEyeOutline, mdiLaptop} from '@mdi/js'
-import {onMounted, ref} from '@vue/composition-api'
-import {close, startWebSocket} from "@/net/socket";
+import TopBar from '../components/basic/TopBar'
+import { mdiEyeOffOutline, mdiEyeOutline, mdiLaptop } from '@mdi/js'
+import { onMounted, ref } from '@vue/composition-api'
+import { close, startWebSocket } from '@/net/socket'
 import msg from '@/plugins/msg'
-import router from "@/router";
-import localStoreUtil from "@/utils/local-store";
-import sessionStoreUtil from "@/utils/session-store";
-import {userLogin} from "@/net/api";
-import ImTip from "@/components/basic/ImTip";
-import {downloadDesktop} from "@/utils/desktop-util";
-import store from "@/store";
+import router from '@/router'
+import localStoreUtil from '@/utils/local-store'
+import sessionStoreUtil from '@/utils/session-store'
+import { userLogin } from '@/net/api'
+import ImTip from '@/components/basic/ImTip'
+import { downloadDesktop } from '@/utils/desktop-util'
+import store from '@/store'
 
 export default {
 
-  name: "Login",
+  name: 'Login',
   components: {
     ImTip,
     TopBar
   },
   setup() {
-
-    let isElectron = ref(process.env.IS_ELECTRON);
-
+    const isElectron = ref(process.env.IS_ELECTRON)
     const isPasswordVisible = ref(false)
     const username = ref('')
     const password = ref('')
@@ -168,7 +166,7 @@ export default {
 
     const login = () => {
       // startWebSocket(username.value, password.value)
-      userLogin({account: username.value, password: password.value}).then(response => {
+      userLogin({ account: username.value, password: password.value }).then(response => {
         if (response.success) {
           sessionStoreUtil.setValue('token', response.data)
           startWebSocket(response.data)
@@ -180,20 +178,19 @@ export default {
     }
 
     onMounted(() => {
-      const value = localStoreUtil.getValue('username');
+      const value = localStoreUtil.getValue('username')
       if (value) {
         username.value = value
       }
-      const pwd = localStoreUtil.getValue('password');
+      const pwd = localStoreUtil.getValue('password')
       if (pwd) {
         remember.value = true
         password.value = pwd
       }
-      msg.$on("COMMAND_LOGIN_RESP", (data) => {
+      msg.$on('COMMAND_LOGIN_RESP', (data) => {
         if (data.success) {
           localStoreUtil.setValue('username', username.value)
           store.commit('setCurrentUserId', data.data._id)
-          console.log(store.state.currentUserId)
           if (remember.value) {
             localStoreUtil.setValue('password', password.value)
           }

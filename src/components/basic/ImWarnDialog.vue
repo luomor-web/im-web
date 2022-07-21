@@ -2,15 +2,15 @@
   <v-dialog v-model="action.model" width="350">
     <v-card>
       <v-card-title class="text-h6">
-        {{action.title}}
+        {{ action.title }}
       </v-card-title>
 
       <v-card-text>
-        {{action.content}}
+        {{ action.content }}
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
             color="green darken-1"
             text
@@ -33,12 +33,11 @@
 
 <script>
 export default {
-  name: "ImWarnDialog",
+  name: 'ImWarnDialog',
   props: {
-    action: Object,
+    action: { type: Object, default: () => {} }
   },
   setup(props) {
-
     const cancel = () => {
       props.action.cancel()
     }

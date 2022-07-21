@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')"/>
+    <drawer-top :title="'编辑资料'" :sub="true" @close="open('SETTING_ITEM')" />
     <div class="mt-2">
       <div class="mx-2">
         <div class="d-table ma-auto">
@@ -18,7 +18,7 @@
                     v-if="hover"
                     absolute
                   >
-                    <v-btn icon @click="openUpload" height="120" width="120">
+                    <v-btn icon height="120" width="120" @click="openUpload">
                       <v-icon>{{ icons.mdiCamera }}</v-icon>
                     </v-btn>
                   </v-overlay>
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <im-upload ref="upload" @sure="sure"/>
+    <im-upload ref="upload" @sure="sure" />
 
     <div class="mx-2 mb-2 mt-8">
       <v-text-field
@@ -43,8 +43,8 @@
 
     <v-fab-transition>
       <v-btn
-        class="mb-16 mr-8"
         v-show="showSure"
+        class="mb-16 mr-8"
         absolute
         fab
         right
@@ -59,20 +59,20 @@
 </template>
 
 <script>
-import {mdiCamera, mdiCheck} from "@mdi/js";
-import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import {editProfile} from "@/net/send-message";
-import DrawerTop from "@/components/basic/DrawerTop";
-import ImUpload from "@/components/basic/ImUpload";
-import store from "@/store";
+import { mdiCamera, mdiCheck } from '@mdi/js'
+import { computed, onMounted, ref, watch } from '@vue/composition-api'
+import { editProfile } from '@/net/send-message'
+import DrawerTop from '@/components/basic/DrawerTop'
+import ImUpload from '@/components/basic/ImUpload'
+import store from '@/store'
 
 export default {
-  name: "SettingUserProfile",
+  name: 'SettingUserProfile',
   components: {
     ImUpload,
-    DrawerTop,
+    DrawerTop
   },
-  setup() {
+  setup () {
     const user = computed(() => store.state.curUser)
     const upload = ref(null)
     const username = ref('')
@@ -86,7 +86,6 @@ export default {
       return username.value !== user.value.username && username.value !== ''
     })
 
-
     onMounted(() => {
       initData()
     })
@@ -96,7 +95,7 @@ export default {
     }
 
     const changeUserProfile = (url) => {
-      editProfile({userId: user.value._id, avatar: url, name: username.value})
+      editProfile({ userId: user.value._id, avatar: url, name: username.value })
     }
 
     const sure = (url) => {

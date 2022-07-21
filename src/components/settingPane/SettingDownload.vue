@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height">
-    <drawer-top :title="'下载设置'" :sub="true" @close="open('SETTING_ITEM')"/>
+    <drawer-top :title="'下载设置'" :sub="true" @close="open('SETTING_ITEM')" />
 
     <v-list nav>
       <v-subheader>下载设置</v-subheader>
@@ -42,13 +42,13 @@
 </template>
 
 <script>
-import DrawerTop from "@/components/basic/DrawerTop";
-import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import {mdiCheck, mdiFolderOutline, mdiHelp} from "@mdi/js";
-import store from "@/store";
+import DrawerTop from '@/components/basic/DrawerTop'
+import { computed, onMounted, ref, watch } from '@vue/composition-api'
+import { mdiCheck, mdiFolderOutline, mdiHelp } from '@mdi/js'
+import store from '@/store'
 
 export default {
-  name: "SettingDownload",
+  name: 'SettingDownload',
   components: {
     DrawerTop
   },

@@ -1,32 +1,32 @@
 <template>
 <div>
-  <input type="file" ref="file" class="d-none" accept="image/*"
-         @change="onFileChange($event.target.files)"/>
+  <input ref="file" type="file" class="d-none" accept="image/*"
+         @change="onFileChange($event.target.files)"
+    />
 
   <v-dialog
+      v-model="dialog"
       hide-overlay
       persistent
-      v-model="dialog"
       width="500"
   >
-    <im-cropper :img="img" @sure="sure" @cancel="closeDialog"/>
+    <im-cropper :img="img" @sure="sure" @cancel="closeDialog" />
   </v-dialog>
-
 </div>
 </template>
 
 <script>
-import ImCropper from "@/components/basic/ImCropper";
-import {ref} from "@vue/composition-api";
+import ImCropper from '@/components/basic/ImCropper'
+import { ref } from '@vue/composition-api'
 
 export default {
-  name: "ImUpload",
-  props: {
-  },
-  components:{
+  name: 'ImUpload',
+  components: {
     ImCropper
   },
-  setup(props,{emit}){
+  props: {
+  },
+  setup(props, { emit }) {
     // 文件节点
     const file = ref(null)
     // 文件截图弹窗
@@ -49,13 +49,12 @@ export default {
 
     const sure = (url) => {
       dialog.value = false
-      emit('sure',url)
+      emit('sure', url)
     }
 
     const startUpload = () => {
       file.value.click()
     }
-
 
     const onFileCancel = () => {
     }

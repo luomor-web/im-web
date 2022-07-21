@@ -2,40 +2,39 @@
   <div class="top">
     <v-toolbar height="32px" flat style="padding: 0">
       <span class="ml-3">信使</span>
-      <v-spacer/>
+      <v-spacer />
       <div class="no-drag">
-        <v-btn icon @click="handler('min')" dense>
+        <v-btn icon dense @click="handler('min')">
           <v-icon>
             {{ icons.mdiWindowMinimize }}
           </v-icon>
         </v-btn>
 
-        <v-btn icon @click="handler('max')" dense>
+        <v-btn icon dense @click="handler('max')">
           <v-icon dense>
             {{ icons.mdiWindowMaximize }}
           </v-icon>
         </v-btn>
 
-        <v-btn icon @click="handler('close')" dense>
+        <v-btn icon dense @click="handler('close')">
           <v-icon dense>
             {{ icons.mdiWindowClose }}
           </v-icon>
         </v-btn>
       </div>
     </v-toolbar>
-    <update/>
+    <update />
   </div>
 </template>
 
 <script>
-import {mdiWindowClose, mdiWindowMaximize, mdiWindowMinimize} from "@mdi/js"
-import Update from "@/components/basic/Update";
+import { mdiWindowClose, mdiWindowMaximize, mdiWindowMinimize } from '@mdi/js'
+import Update from '@/components/basic/Update'
 
 export default {
-  name: "TopBar",
-  components: {Update},
+  name: 'TopBar',
+  components: { Update },
   setup() {
-
     const handler = item => {
       window.require('electron').ipcRenderer.send(item)
     }
@@ -46,7 +45,7 @@ export default {
       icons: {
         mdiWindowClose,
         mdiWindowMaximize,
-        mdiWindowMinimize,
+        mdiWindowMinimize
       }
     }
   }

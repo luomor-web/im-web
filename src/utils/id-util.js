@@ -1,8 +1,8 @@
 
-import SnowflakeId from "snowflake-id";
+import SnowflakeId from 'snowflake-id'
 
-const id= new SnowflakeId();
+const id = new SnowflakeId()
 
 export const uuid = () => {
-    return id.generate();
+    return id.generate()
 }

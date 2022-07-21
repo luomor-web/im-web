@@ -2,49 +2,50 @@
   <div class="message-history">
     <drawer-top @close="close">
       <template #default>
-        <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search"/>
+        <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" @input="search" />
       </template>
       <template #right>
-        <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker" @input="pickerDataChange">
-
+        <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker"
+                  @input="pickerDataChange"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-                v-bind="attrs"
-                v-on="on"
-                icon
-                :color="picker.length === 2 ? 'primary' : ''"
+              v-bind="attrs"
+              icon
+              :color="picker.length === 2 ? 'primary' : ''"
+              v-on="on"
             >
               <v-icon>{{ icons.mdiCalendarBlankOutline }}</v-icon>
             </v-btn>
           </template>
           <v-date-picker
-              :prev-icon="icons.mdiChevronLeft"
-              :next-icon="icons.mdiChevronRight"
-              v-model="picker"
-              :landscape="true"
-              :first-day-of-week="0"
-              locale="zh-cn"
-              range
+            v-model="picker"
+            :prev-icon="icons.mdiChevronLeft"
+            :next-icon="icons.mdiChevronRight"
+            :landscape="true"
+            :first-day-of-week="0"
+            locale="zh-cn"
+            range
           >
-            <v-spacer/>
+            <v-spacer />
             <v-btn
-                text
-                color="primary"
-                @click="resetPicker"
+              text
+              color="primary"
+              @click="resetPicker"
             >
               重置
             </v-btn>
             <v-btn
-                text
-                color="primary"
-                @click="modal = false"
+              text
+              color="primary"
+              @click="modal = false"
             >
               取消
             </v-btn>
             <v-btn
-                text
-                color="primary"
-                @click="$refs.dialog.save(picker)"
+              text
+              color="primary"
+              @click="$refs.dialog.save(picker)"
             >
               确定
             </v-btn>
@@ -55,10 +56,11 @@
 
     <div class="overflow-y-auto message-history-content">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of messagesSearched"
-                     :key="index" two-line @click="scroll(item)">
+        <v-list-item v-for="(item,index) of messagesSearched" :key="index" v-ripple
+                     class="im-list-item" two-line @click="scroll(item)"
+        >
           <v-list-item-avatar>
-            <v-img :src="item.avatar"/>
+            <v-img :src="item.avatar" />
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>
@@ -66,7 +68,7 @@
                 <div>
                   {{ item.username }}
                 </div>
-                <v-spacer/>
+                <v-spacer />
                 <div class="text-body-2">
                   {{ buildDisplayTime(item.date, item.timestamp) }}
                 </div>
@@ -79,28 +81,27 @@
         </v-list-item>
       </v-list>
     </div>
-
   </div>
 </template>
 
 <script>
-import {mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
-import DrawerTop from "@/components/basic/DrawerTop";
-import {computed, onMounted, onUnmounted, ref} from "@vue/composition-api";
-import msg from "@/plugins/msg";
-import {searchMessage} from "@/net/send-message";
-import {buildDisplayTime} from "@/utils/date-util";
-import {scrollToView} from "@/utils/dom";
-import store from "@/store";
+import { mdiCalendarBlankOutline, mdiChevronLeft, mdiChevronRight } from '@mdi/js'
+import DrawerTop from '@/components/basic/DrawerTop'
+import { computed, onMounted, onUnmounted, ref } from '@vue/composition-api'
+import msg from '@/plugins/msg'
+import { searchMessage } from '@/net/send-message'
+import { buildDisplayTime } from '@/utils/date-util'
+import { scrollToView } from '@/utils/dom'
+import store from '@/store'
 
 export default {
-  name: "MessageHistory",
+  name: 'MessageHistory',
   components: {
     DrawerTop
   },
 
   filters: {},
-  setup() {
+  setup () {
     const modal = ref(false)
     const startDate = ref(null)
     const endDate = ref(null)
@@ -124,22 +125,26 @@ export default {
         messagesSearched.value = []
         return
       }
-      searchMessage({content: item, roomId: room.value.roomId, startDate: startDate.value, endDate: endDate.value})
+      searchMessage({
+        content: item,
+        roomId: room.value.roomId,
+        startDate: startDate.value,
+        endDate: endDate.value
+      })
     }
 
     const scroll = item => {
       // 是否在当前已加载的消息列表中 如果在的话直接跳转
 
       // 否则的话刷掉
-      const element = document.getElementById(item._id);
-      console.log(element)
+      const element = document.getElementById(item._id)
       if (!element) {
         store.commit('setSearchMessage', true)
         store.commit('clearMessages')
         store.commit('pushMessage', item)
 
         setTimeout(() => {
-          const element = document.getElementById(item._id);
+          const element = document.getElementById(item._id)
           scrollToView(element)
         }, 1000)
         return
@@ -178,7 +183,7 @@ export default {
       icons: {
         mdiCalendarBlankOutline,
         mdiChevronLeft,
-        mdiChevronRight,
+        mdiChevronRight
       }
     }
   }

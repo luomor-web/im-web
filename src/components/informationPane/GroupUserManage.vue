@@ -1,14 +1,15 @@
 <template>
-  <div  class="fill-height">
+  <div class="fill-height">
     <drawer-top :sub="true" @close="open('GROUP_EDIT')">
-      <v-text-field hide-details rounded dense filled placeholder="搜索" v-model="searchName"/>
+      <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" />
     </drawer-top>
     <div class="mx-2 overflow-y-auto " style="height: calc(100% - 64px)">
       <v-list nav>
-        <v-list-item v-ripple class="im-list-item" v-for="(item,index) of filteredItems"
-                     :key="index">
+        <v-list-item v-for="(item,index) of filteredItems" :key="index" v-ripple
+                     class="im-list-item"
+>
           <v-list-item-avatar>
-            <v-img :src="item.avatar"/>
+            <v-img :src="item.avatar" />
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{ item.username }}</v-list-item-title>
@@ -20,7 +21,8 @@
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"
-                       @click="startSetRoomAdmin(item)">
+                       @click="startSetRoomAdmin(item)"
+>
                   <v-icon>{{ icons.mdiShieldLockOutline }}</v-icon>
                 </v-btn>
               </template>
@@ -34,7 +36,8 @@
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"
-                       @click="startUnSetRoomAdmin(item)">
+                       @click="startUnSetRoomAdmin(item)"
+>
                   <v-icon>{{ icons.mdiShieldLockOpenOutline }}</v-icon>
                 </v-btn>
               </template>
@@ -48,7 +51,8 @@
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"
-                       @click="startRemoveRoom(item)">
+                       @click="startRemoveRoom(item)"
+>
                   <v-icon>{{ icons.mdiExitToApp }}</v-icon>
                 </v-btn>
               </template>
@@ -59,20 +63,19 @@
       </v-list>
     </div>
 
-    <im-warn-dialog :action="action"/>
+    <im-warn-dialog :action="action" />
   </div>
 </template>
 <script>
-import DrawerTop from "@/components/basic/DrawerTop";
-import {computed, ref} from "@vue/composition-api";
-import {mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline} from "@mdi/js";
-import {removeUserGroup, setAdmin} from "@/net/send-message";
-import ImWarnDialog from "@/components/basic/ImWarnDialog";
-import store from "@/store";
+import DrawerTop from '@/components/basic/DrawerTop'
+import { computed, ref } from '@vue/composition-api'
+import { mdiExitToApp, mdiShieldCrownOutline, mdiShieldLockOpenOutline, mdiShieldLockOutline } from '@mdi/js'
+import { removeUserGroup, setAdmin } from '@/net/send-message'
+import ImWarnDialog from '@/components/basic/ImWarnDialog'
+import store from '@/store'
 
 export default {
-
-  name: "GroupUserManage",
+  name: 'GroupUserManage',
   components: {
     ImWarnDialog,
     DrawerTop
@@ -91,15 +94,15 @@ export default {
       item: null,
       sure: () => {
         switch (action.value.type) {
-          case "REMOVE_ROOM":
+          case 'REMOVE_ROOM':
             removeRoom(action.value.item)
             action.value.model = false
             break
-          case "SET_ROOM_ADMIN":
+          case 'SET_ROOM_ADMIN':
             setRoomAdmin(action.value.item)
             action.value.model = false
             break
-          case "UN_SET_ROOM_ADMIN":
+          case 'UN_SET_ROOM_ADMIN':
             unSetRoomAdmin(action.value.item)
             action.value.model = false
             break
@@ -124,7 +127,7 @@ export default {
     }
 
     const removeRoom = item => {
-      removeUserGroup({roomId: room.value.roomId, userId: item._id, type: 'REMOVE'})
+      removeUserGroup({ roomId: room.value.roomId, userId: item._id, type: 'REMOVE' })
     }
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -137,7 +140,7 @@ export default {
     }
 
     const setRoomAdmin = (item) => {
-      setAdmin({roomId: room.value.roomId, userId: item._id, type: 'SET'})
+      setAdmin({ roomId: room.value.roomId, userId: item._id, type: 'SET' })
     }
 
     // 点击退出群组按钮, 主要强调弹出过程
@@ -150,11 +153,11 @@ export default {
     }
 
     const unSetRoomAdmin = (item) => {
-      setAdmin({roomId: room.value.roomId, userId: item._id, type: 'UN_SET'})
+      setAdmin({ roomId: room.value.roomId, userId: item._id, type: 'UN_SET' })
     }
 
     const open = (item) => {
-      store.commit('setInformationPane',item)
+      store.commit('setInformationPane', item)
     }
 
     return {

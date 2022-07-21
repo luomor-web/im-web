@@ -2,10 +2,11 @@
   <div class="fill-height">
     <drawer-top
       :title="'资料'"
-      @close="close">
+      @close="close"
+>
       <template #right>
-        <v-spacer/>
-        <v-btn class="no-drag" icon @click="open('GROUP_EDIT')" v-if="isGroup">
+        <v-spacer />
+        <v-btn v-if="isGroup" class="no-drag" icon @click="open('GROUP_EDIT')">
           <v-icon>
             {{ icons.mdiPencilOutline }}
           </v-icon>
@@ -34,20 +35,20 @@
               <v-list-item-title>通知</v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
-              <v-switch v-model="notice" @change="noticeChange"/>
+              <v-switch v-model="notice" @change="noticeChange" />
             </v-list-item-action>
           </v-list-item>
         </v-list>
       </div>
     </div>
 
-    <im-driver/>
+    <im-driver />
     <div v-if="isGroup" style="height: calc(100% - 308px)" class="overflow-y-auto">
       <div class="mx-2">
         <v-list nav>
           <v-list-item v-for="(item,index) in room.users" :key="index" v-ripple class="im-list-item">
             <v-list-item-avatar>
-              <v-img :src="item.avatar"/>
+              <v-img :src="item.avatar" />
             </v-list-item-avatar>
             <v-list-item-content>
               <v-badge
@@ -83,28 +84,27 @@
         </v-btn>
       </div>
     </div>
-    <im-user-select-dialog :model="userSelectModel" @sure="sureInviteUser" @cancel="userSelectModel = false" multiple/>
+    <im-user-select-dialog :model="userSelectModel" multiple @sure="sureInviteUser" @cancel="userSelectModel = false" />
   </div>
 </template>
 
 <script>
-import {joinUserGroup, userGroupConfig} from "@/net/send-message";
-import {mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus} from "@mdi/js";
-import DrawerTop from "@/components/basic/DrawerTop";
-import ImDriver from "@/components/basic/ImDriver";
-import {computed, onMounted, ref, watch} from "@vue/composition-api";
-import store from "@/store";
-import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
+import { joinUserGroup, userGroupConfig } from '@/net/send-message'
+import { mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus } from '@mdi/js'
+import DrawerTop from '@/components/basic/DrawerTop'
+import ImDriver from '@/components/basic/ImDriver'
+import { computed, onMounted, ref, watch } from '@vue/composition-api'
+import store from '@/store'
+import ImUserSelectDialog from '@/components/basic/ImUserSelectDialog'
 
 export default {
-  name: "RoomInfo",
+  name: 'RoomInfo',
   components: {
     ImDriver,
     DrawerTop,
     ImUserSelectDialog
   },
   setup(props, context) {
-
     const room = computed(() => store.getters.curRoom)
     const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem)
     const userSelectModel = ref(false)
@@ -120,7 +120,6 @@ export default {
     const notice = ref(true)
 
     watch(room, room => {
-      console.log(room)
       notice.value = room.notice
     })
 
@@ -150,14 +149,14 @@ export default {
       const group = {
         roomId: room.value.roomId
       }
-      joinUserGroup({group, users})
+      joinUserGroup({ group, users })
     }
 
     const sureInviteUser = (data) => {
-      const {users} = data
+      const { users } = data
       if (!users) return
 
-      const filter = users.filter(r => room.value.users.findIndex(x => x._id === r._id) === -1);
+      const filter = users.filter(r => room.value.users.findIndex(x => x._id === r._id) === -1)
       joinGroup(filter)
       userSelectModel.value = false
     }
@@ -178,7 +177,7 @@ export default {
         mdiBellOutline,
         mdiBellOffOutline,
         mdiPencilOutline,
-        mdiPlus,
+        mdiPlus
       }
     }
   }
@@ -193,6 +192,5 @@ export default {
   border-radius: 120px;
   background-color: $v-grey-lighten1;
 }
-
 
 </style>

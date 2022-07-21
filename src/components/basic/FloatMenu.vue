@@ -56,20 +56,20 @@
         </v-list>
       </v-card>
     </v-menu>
-    <im-user-select-dialog :model="addChat" @cancel="closeAddChat" @sure="sureAddChat"/>
+    <im-user-select-dialog :model="addChat" @cancel="closeAddChat" @sure="sureAddChat" />
   </div>
 </template>
 
 <script>
-import {computed, ref} from "@vue/composition-api";
-import {mdiAccountOutline, mdiAccountSupervisorOutline, mdiClose, mdiPencil} from "@mdi/js";
-import ImUserSelectDialog from "@/components/basic/ImUserSelectDialog";
-import {createGroup} from "@/net/send-message";
-import store from "@/store";
+import { computed, ref } from '@vue/composition-api'
+import { mdiAccountOutline, mdiAccountSupervisorOutline, mdiClose, mdiPencil } from '@mdi/js'
+import ImUserSelectDialog from '@/components/basic/ImUserSelectDialog'
+import { createGroup } from '@/net/send-message'
+import store from '@/store'
 
 export default {
-  name: "FloatMenu",
-  components: {ImUserSelectDialog},
+  name: 'FloatMenu',
+  components: { ImUserSelectDialog },
   setup() {
     const fab = ref(false)
     const addChat = ref(false)
@@ -88,7 +88,7 @@ export default {
       addChat.value = false
       const room = loadedRooms.value.find(r => item._id === r.friendId)
       if (!room) {
-        createGroup({isFriend: true, roomName: '好友会话', users: [{_id: item._id}]})
+        createGroup({ isFriend: true, roomName: '好友会话', users: [{ _id: item._id }] })
         return
       }
       store.commit('upRoom', room.roomId)
@@ -96,7 +96,7 @@ export default {
     }
 
     const openCreateGroup = () => {
-      store.commit('setSettingPane','CREATE_GROUP')
+      store.commit('setSettingPane', 'CREATE_GROUP')
     }
 
     return {
@@ -111,10 +111,9 @@ export default {
         mdiAccountSupervisorOutline,
         mdiAccountOutline,
         mdiPencil,
-        mdiClose,
+        mdiClose
       }
     }
-
   }
 }
 </script>

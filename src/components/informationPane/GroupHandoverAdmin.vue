@@ -1,15 +1,14 @@
 <template>
   <div class="fill-height">
-
-    <drawer-top :sub="true" @close="open('GROUP_EDIT')">
-      <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索"/>
+<drawer-top :sub="true" @close="open('GROUP_EDIT')">
+      <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" />
     </drawer-top>
 
     <div class="mx-2 overflow-y-auto" style="height: calc(100% - 64px)">
       <v-list nav>
-        <v-list-item v-ripple v-for="(item,index) of filteredItems" :key="index" @click="startHandoverRoom(item)">
+        <v-list-item v-for="(item,index) of filteredItems" :key="index" v-ripple @click="startHandoverRoom(item)">
           <v-list-item-avatar>
-            <v-img :src="item.avatar"/>
+            <v-img :src="item.avatar" />
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{ item.username }}</v-list-item-title>
@@ -18,20 +17,19 @@
       </v-list>
     </div>
 
-    <im-warn-dialog :action="action"/>
-
-  </div>
+    <im-warn-dialog :action="action" />
+</div>
 </template>
 
 <script>
-import DrawerTop from "@/components/basic/DrawerTop";
-import {computed, ref} from "@vue/composition-api";
-import {handoverUserGroup} from "@/net/send-message";
-import ImWarnDialog from "@/components/basic/ImWarnDialog";
-import store from "@/store";
+import DrawerTop from '@/components/basic/DrawerTop'
+import { computed, ref } from '@vue/composition-api'
+import { handoverUserGroup } from '@/net/send-message'
+import ImWarnDialog from '@/components/basic/ImWarnDialog'
+import store from '@/store'
 
 export default {
-  name: "GroupHandoverAdmin",
+  name: 'GroupHandoverAdmin',
   components: {
     ImWarnDialog,
     DrawerTop
@@ -50,7 +48,7 @@ export default {
       item: null,
       sure: () => {
         switch (action.value.type) {
-          case "HANDOVER_ROOM":
+          case 'HANDOVER_ROOM':
             handoverRoom(action.value.item)
             action.value.model = false
             break
@@ -74,8 +72,8 @@ export default {
     }
 
     const handoverRoom = (item) => {
-      handoverUserGroup({roomId: room.value.roomId, userId: item._id})
-      store.commit('setInformationPane','ROOM_INFO')
+      handoverUserGroup({ roomId: room.value.roomId, userId: item._id })
+      store.commit('setInformationPane', 'ROOM_INFO')
     }
 
     const open = (item) => {

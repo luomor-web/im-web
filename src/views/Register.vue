@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="isElectron">
-      <top-bar/>
+      <top-bar />
     </div>
     <div class="auth-wrapper auth-v1">
       <div class="auth-inner">
@@ -48,7 +48,7 @@
                   :loading="checkAccount.loading"
                   @blur="accountBlur"
               >
-                <template v-slot:append v-if="checkAccount.displayIcon">
+                <template v-if="checkAccount.displayIcon" v-slot:append>
                   <v-tooltip
                       bottom
                   >
@@ -143,21 +143,20 @@
 </template>
 
 <script>
-import TopBar from "../components/basic/TopBar";
-import {mdiCheckCircleOutline, mdiCloseCircleOutline, mdiEyeOffOutline, mdiEyeOutline} from '@mdi/js'
-import {ref} from '@vue/composition-api'
-import {checkAccountAuth, registerUser} from "@/net/api";
-import router from "@/router";
+import TopBar from '../components/basic/TopBar'
+import { mdiCheckCircleOutline, mdiCloseCircleOutline, mdiEyeOffOutline, mdiEyeOutline } from '@mdi/js'
+import { ref } from '@vue/composition-api'
+import { checkAccountAuth, registerUser } from '@/net/api'
+import router from '@/router'
 
 export default {
 
-  name: "Register",
+  name: 'Register',
   components: {
     TopBar
   },
   setup() {
-
-    let isElectron = ref(process.env.IS_ELECTRON);
+    const isElectron = ref(process.env.IS_ELECTRON)
 
     const from = ref(null)
 
@@ -165,7 +164,7 @@ export default {
       account: '',
       username: '',
       password: '',
-      repeatPassword: '',
+      repeatPassword: ''
     })
 
     const checkAccount = ref({
@@ -178,32 +177,31 @@ export default {
     const rules = ref({
       account: [
         v => !!v || '登录账号必填',
-        v => v.length <= 10 || '登录账号不能超过十个字符',
+        v => v.length <= 10 || '登录账号不能超过十个字符'
       ],
       username: [
         v => !!v || '用户名必填',
-        v => v.length <= 10 || '用户名不能超过十个字符',
+        v => v.length <= 10 || '用户名不能超过十个字符'
       ],
       password: [
         v => !!v || '密码必填',
-        v => v.length <= 16 || '密码不能超过16个字符',
+        v => v.length <= 16 || '密码不能超过16个字符'
       ],
       repeatPassword: [
         v => !!v || '重复密码必填',
         v => v.length <= 16 || '重复密码不能超过16个字符',
         v => v === registerFrom.value.password || '重复密码与密码不相同'
-      ],
+      ]
     })
 
     const register = () => {
-      const validate = from.value.validate();
+      const validate = from.value.validate()
       if (!validate) return
 
       registerUser(registerFrom.value).then(response => {
-        console.log(response, 'response')
-        if(response.success){
+        if (response.success) {
           from.value.reset()
-          router.push("/login")
+          router.push('/login')
         }
       })
     }
@@ -219,19 +217,18 @@ export default {
         return
       }
       checkAccount.value.loading = true
-      checkAccountAuth({account: registerFrom.value.account}).then(response => {
+      checkAccountAuth({ account: registerFrom.value.account }).then(response => {
         checkAccount.value.loading = false
         if (response.success) {
           checkAccount.value.success = true
           checkAccount.value.tip = '该登录账号可以使用'
-        }else{
+        } else {
           checkAccount.value.success = false
           checkAccount.value.tip = '该登录账号已存在'
         }
         checkAccount.value.displayIcon = true
       })
     }
-
 
     return {
       from,
@@ -246,7 +243,7 @@ export default {
         mdiEyeOutline,
         mdiEyeOffOutline,
         mdiCheckCircleOutline,
-        mdiCloseCircleOutline,
+        mdiCloseCircleOutline
       },
 
       isElectron

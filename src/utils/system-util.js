@@ -1,22 +1,22 @@
 // 提示音
 export const ding = () => {
-    let audio = document.querySelector("#audio1");
+    let audio = document.querySelector('#audio1')
     if (!audio) {
-        audio = document.createElement("audio");
-        audio.id = "audio1";
-        let source = document.createElement("source");
+        audio = document.createElement('audio')
+        audio.id = 'audio1'
+        const source = document.createElement('source')
         source.src = require('@/assets/music/tip.mp3')
         source.className = 'd-none'
-        source.type = "audio/mpeg";
-        audio.append(source);
-        document.body.append(audio);
+        source.type = 'audio/mpeg'
+        audio.append(source)
+        document.body.append(audio)
     }
-    const aid = document.querySelector("#audio1");
-    aid.load();
-    let timer = setTimeout(() => {
-        clearTimeout(timer);
-        aid.play();
-    }, 200);
+    const aid = document.querySelector('#audio1')
+    aid.load()
+    const timer = setTimeout(() => {
+        clearTimeout(timer)
+        aid.play()
+    }, 200)
 
     if (!process.env.IS_ELECTRON) return
     window.require('electron').ipcRenderer.send('ding')
@@ -38,5 +38,6 @@ export const sortedUser = (users) => {
                 return x.username.localeCompare(y.username, 'zh')
             }
         }
+        return 1
     })
 }

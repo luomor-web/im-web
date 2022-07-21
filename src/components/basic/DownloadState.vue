@@ -3,14 +3,13 @@
 </template>
 
 <script>
-import store from "@/store";
-import {onMounted} from "@vue/composition-api";
-import {ref} from "@vue/composition-api/dist/vue-composition-api";
+import store from '@/store'
+import { onMounted, ref } from '@vue/composition-api'
 
 export default {
-  name: "DownloadState",
-  emits:['tip'],
-  setup(props,{emit}) {
+  name: 'DownloadState',
+  emits: ['tip'],
+  setup(props, { emit }) {
     const snackbar = ref({
       display: false,
       text: '',
@@ -18,23 +17,23 @@ export default {
     })
 
     onMounted(() => {
-      if(!process.env.IS_ELECTRON) return
+      if (!process.env.IS_ELECTRON) return
       store.commit('clearDownloadingItem')
       window.require('electron').ipcRenderer.on('download-file-start', (event, args) => {
-        store.commit('pushDownloadItem', {...args, state: 'start', receivedBytes: 0, totalBytes: 0})
+        store.commit('pushDownloadItem', { ...args, state: 'start', receivedBytes: 0, totalBytes: 0 })
         tip('开始下载')
       })
       window.require('electron').ipcRenderer.on('download-file-interrupted', (event, args) => {
-        store.commit('updateDownloadItem', {args, status: 'interrupted'})
+        store.commit('updateDownloadItem', { args, status: 'interrupted' })
       })
       window.require('electron').ipcRenderer.on('download-file-paused', (event, args) => {
-        store.commit('updateDownloadItem', {args, status: 'paused'})
+        store.commit('updateDownloadItem', { args, status: 'paused' })
       })
       window.require('electron').ipcRenderer.on('download-file-ing', (event, args) => {
-        store.commit('updateDownloadItem', {args, status: 'ing'})
+        store.commit('updateDownloadItem', { args, status: 'ing' })
       })
       window.require('electron').ipcRenderer.on('download-file-done', (event, args) => {
-        store.commit('updateDownloadItem', {args, status: 'done'})
+        store.commit('updateDownloadItem', { args, status: 'done' })
         tip('下载完成')
       })
       window.require('electron').ipcRenderer.on('download-file-fail', (event, args) => {
