@@ -16,6 +16,7 @@
       :message-selection-actions="messageSelectionActions"
       :room-info-enabled="true"
       :search-message="searchMessage"
+      :emoji-picker-slots="emojiPickerSlots"
       @open-failed-message="openFailedMessage"
       @room-info="roomInfo"
       @send-message="sendMessage"
@@ -41,6 +42,22 @@
       <template #float-action="{}">
         <float-menu />
       </template>
+      <template #emoji-search-emoticon>
+        22
+      </template>
+      <template #emoji-emoticon>
+        33
+      </template>
+      <template #emoji-search-emoticon-icon>
+        <v-icon color="orange">
+          mdi-store-outline
+        </v-icon>
+      </template>
+      <template #emoji-emoticon-icon>
+        <v-icon color="red">
+          mdi-heart-outline
+        </v-icon>
+      </template>
     </chat-window>
     <im-component ref="imComponent" />
   </div>
@@ -61,6 +78,7 @@ import {
 import { textMessages } from '@/locales/text-message'
 import { messageActions } from '@/locales/message-action'
 import { messageSelectionActions } from '@/locales/message-selection-action'
+import { emojiPickerSlots } from '@/locales/emoji-picker-slots'
 import RoomsHeader from '@/components/RoomsHeader'
 import RoomOptions from '@/components/RoomOptions'
 import InformationPane from '@/components/InformationPane'
@@ -213,8 +231,8 @@ export default {
             url: file.url,
             progress: file.progress
           },
-roomId: message.roomId,
-isLast: isOver
+          roomId: message.roomId,
+          isLast: isOver
         })
 
         // 捕获发送过程中的异常, 消息发送失败处理
@@ -237,6 +255,7 @@ isLast: isOver
       textMessages,
       messageActions,
       messageSelectionActions,
+      emojiPickerSlots,
 
       isElectron,
       pageHeight,

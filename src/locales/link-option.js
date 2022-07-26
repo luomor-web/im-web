@@ -1,1 +1,1 @@
-export const linkOptions = {disabled: false, target: '_blank'}
+export const linkOptions = { disabled: false, target: '_blank' }

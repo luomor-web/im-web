@@ -4,4 +4,3 @@ export default [
         title: '房间信息'
     }
 ]
-
