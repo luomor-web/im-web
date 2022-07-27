@@ -191,6 +191,15 @@ const forwardMessage = (data) => {
   sendMsg(param)
 }
 
+// 搜索表情包
+const searchEmoticon = (data) => {
+  const param = {
+    cmd: 36,
+    ...data
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
   store.commit('resetData')
   close()
@@ -249,5 +258,6 @@ export {
   editGroupProfile,
   messageDelete,
   buildLastMessageTime,
-  userGroupConfig
+  userGroupConfig,
+  searchEmoticon
 }

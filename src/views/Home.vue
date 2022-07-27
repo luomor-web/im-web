@@ -43,7 +43,7 @@
         <float-menu />
       </template>
       <template #emoji-search-emoticon>
-        <emotion-search />
+        <emoticon-search />
       </template>
       <template #emoji-search-emoticon-icon>
         <v-icon color="orange">
@@ -91,12 +91,12 @@ import moment from 'moment'
 import ImComponent from '@/components/ImComponent'
 import FloatMenu from '@/components/basic/FloatMenu'
 import { scrollToTop } from '@/utils/dom'
-import EmotionSearch from '@/components/room/EmotionSearch'
+import EmoticonSearch from '@/components/room/EmoticonSearch'
 
 export default {
   name: 'Home',
   components: {
-    EmotionSearch,
+    EmoticonSearch,
     ImComponent,
     SettingPane,
     InformationPane,

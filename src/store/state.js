@@ -30,5 +30,7 @@ export default {
     // 自动下载
     autoDownload: false,
     // 默认下载位置
-    downloadPath: ''
+    downloadPath: '',
+    // 表情包
+    emoticons: []
 }

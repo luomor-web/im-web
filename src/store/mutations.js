@@ -205,5 +205,17 @@ export default {
 
     setDownloadPath: (state, path) => { state.downloadPath = path },
 
+    clearEmoticons: (state) => { state.emoticons = [] },
+
+    // 搜索表情包
+    pushEmoticons: (state, data) => {
+      data.forEach(x => {
+        const index = state.emoticons.findIndex(r => r._id === x._id)
+        if (index === -1) {
+          state.emoticons.push(x)
+        }
+      })
+    },
+
     ...responseMessage
 }

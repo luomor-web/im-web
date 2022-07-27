@@ -77,6 +77,10 @@ const webSocket = (token) => {
             case 33:
                 store.commit('COMMAND_REMOVE_GROUP_USER_RESP', data)
                 break
+          // 解散群聊响应
+            case 37:
+                msg.$emit('COMMAND_EMOTICON_SEARCH_RESP', data)
+            break
             // 解散群聊响应
             case 39:
                 store.commit('COMMAND_DISBAND_GROUP_RESP', data)
