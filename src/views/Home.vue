@@ -43,15 +43,15 @@
         <float-menu />
       </template>
       <template #emoji-search-emoticon>
-        22
-      </template>
-      <template #emoji-emoticon>
-        33
+        <emotion-search />
       </template>
       <template #emoji-search-emoticon-icon>
         <v-icon color="orange">
           mdi-store-outline
         </v-icon>
+      </template>
+      <template #emoji-emoticon>
+        33
       </template>
       <template #emoji-emoticon-icon>
         <v-icon color="red">
@@ -91,10 +91,12 @@ import moment from 'moment'
 import ImComponent from '@/components/ImComponent'
 import FloatMenu from '@/components/basic/FloatMenu'
 import { scrollToTop } from '@/utils/dom'
+import EmotionSearch from '@/components/room/EmotionSearch'
 
 export default {
   name: 'Home',
   components: {
+    EmotionSearch,
     ImComponent,
     SettingPane,
     InformationPane,
