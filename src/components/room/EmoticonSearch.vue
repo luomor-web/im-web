@@ -1,18 +1,18 @@
 <template>
   <div class="emoticon-search">
-    <input class="emoticon-search-input" placeholder="搜索" />
+    <input v-model="searchName" class="emoticon-search-input" placeholder="搜索" @input="searchNameChange" />
     <div class="emoticon-search-content">
       <!--    <v-text-field hide-details rounded dense filled placeholder="搜索" />-->
 
-      <div v-for="(item, index) of emoticons" :key="index" class="emoticon-search-img" @click="sendEmoticon(item)">
+      <div v-for="(item, index) of emoticons" :key="index" class="emoticon-img" @click="sendEmoticon(item)">
         <v-img :src="item.url" max-height="75px" />
       </div>
-      <div v-if="!emoticonLoaded" v-intersect="onIntersect" style="height: 40px" class="text-center">
-        <v-progress-circular
-          indeterminate
-          color="primary"
-        />
-      </div>
+    </div>
+    <div v-if="!emoticonLoaded" v-intersect="onIntersect" style="height: 40px" class="text-center">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+      />
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ import msg from '@/plugins/msg'
 
 export default {
   name: 'EmoticonSearch',
-  setup() {
+  setup () {
     const emoticons = computed(() => store.state.emoticons)
     const curUser = computed(() => store.state.curUser)
     const currentUserId = computed(() => store.state.currentUserId)
@@ -48,6 +48,11 @@ export default {
     const onSearchResp = (data) => {
       store.commit('pushEmoticons', data.data)
       emoticonLoaded.value = data.data < 20
+    }
+
+    const searchNameChange = () => {
+      store.commit('clearEmoticons')
+      emoticonsLoad(searchName.value)
     }
 
     const emoticonsLoad = (name) => {
@@ -89,15 +94,17 @@ export default {
       store.commit('pushMessage', message)
 
       store.commit('addWaitSendMessage', { message })
-      console.log(message, 'message')
       sendChatMessage(message)
     }
 
     return {
       emoticons,
+      searchName,
       emoticonLoaded,
       onIntersect,
-      sendEmoticon
+      sendEmoticon,
+      emoticonsLoad,
+      searchNameChange
     }
   }
 }
@@ -105,7 +112,7 @@ export default {
 
 <style scoped lang="scss">
 
-.emoticon-search{
+.emoticon-search {
   padding: 8px;
 
   .emoticon-search-input {
@@ -123,7 +130,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
 
-    .emoticon-search-img {
+    .emoticon-img {
       margin: 3px;
       //background-color: #b7c1ca;
       max-height: 75px;

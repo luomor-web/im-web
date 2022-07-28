@@ -32,5 +32,9 @@ export default {
     // 默认下载位置
     downloadPath: '',
     // 表情包
-    emoticons: []
+    emoticons: [],
+    // 用户表情包
+    userEmoticons: [],
+    // 用户表情包是否加载完成
+    userEmoticonLoaded: false
 }

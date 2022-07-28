@@ -26,6 +26,7 @@
       @message-selection-action-handler="messageSelectionActionHandler"
       @open-file="openFile"
       @click-scroll-icon="clickScrollIcon"
+      @add-emoticon="addEmoticon"
     >
       <template #rooms-header="{}">
         <rooms-header />
@@ -51,7 +52,7 @@
         </v-icon>
       </template>
       <template #emoji-emoticon>
-        33
+        <emoticon-user />
       </template>
       <template #emoji-emoticon-icon>
         <v-icon color="red">
@@ -72,7 +73,7 @@ import {
   getHistoryMessage,
   getUserInfo,
   messageDelete,
-  messageReaction,
+  messageReaction, operationEmoticon,
   sendChatMessage
 } from '@/net/send-message'
 import { textMessages } from '@/locales/text-message'
@@ -92,10 +93,12 @@ import ImComponent from '@/components/ImComponent'
 import FloatMenu from '@/components/basic/FloatMenu'
 import { scrollToTop } from '@/utils/dom'
 import EmoticonSearch from '@/components/room/EmoticonSearch'
+import EmoticonUser from '@/components/room/EmoticonUser'
 
 export default {
   name: 'Home',
   components: {
+    EmoticonUser,
     EmoticonSearch,
     ImComponent,
     SettingPane,
@@ -106,7 +109,7 @@ export default {
     ChatWindow,
     FloatMenu
   },
-  setup() {
+  setup () {
     const isElectron = ref(process.env.IS_ELECTRON)
     const pageHeight = isElectron.value ? 'calc(100vh - 32px)' : '100vh'
     const imComponent = ref(null)
@@ -120,6 +123,7 @@ export default {
     const messages = computed(() => store.state.messages)
     const curUser = computed(() => store.state.curUser)
     const informationPane = computed(() => store.state.informationPane)
+    const userEmoticons = computed(() => store.state.userEmoticons)
     provide('imComponent', imComponent)
 
     onMounted(() => {
@@ -243,6 +247,20 @@ export default {
       })
     }
 
+    const addEmoticon = ({ action, file }) => {
+      const index = userEmoticons.value.findIndex(x => x._id === file._id)
+      if (index !== -1) {
+        imComponent.value.tip({ display: true, text: '已存在于库中', timeout: 1000 })
+        return
+      }
+      const data = {
+        emoticonId: file._id,
+        type: 'INSERT_EMOTICON_TO_USER'
+      }
+      operationEmoticon(data)
+      imComponent.value.tip({ display: true, text: '添加成功', timeout: 1000 })
+    }
+
     return {
       messages,
       messageLoaded,
@@ -264,6 +282,7 @@ export default {
 
       roomInfo,
       openFile,
+      addEmoticon,
       sendMessage,
       openFailedMessage,
       fetchMessage,

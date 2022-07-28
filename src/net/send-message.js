@@ -200,6 +200,24 @@ const searchEmoticon = (data) => {
   sendMsg(param)
 }
 
+// 获取自己的表情包
+const searchUserEmoticon = (data) => {
+  const param = {
+    cmd: 57,
+    ...data
+  }
+  sendMsg(param)
+}
+
+// 操作表情包
+const operationEmoticon = (data) => {
+  const param = {
+    cmd: 59,
+    ...data
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
   store.commit('resetData')
   close()
@@ -208,7 +226,10 @@ const quitSystem = () => {
 // 构建最后一条消息
 const buildLastMessage = (data) => {
   let content = data.deleted ? '删除了一条消息' : data.content
-  if (!data.content && data.files.length > 0 && !data.deleted) {
+  if (!data.content && data.files.length === 1 && !data.deleted && data.files[0].isEmoticon) {
+    content += '[表情包]'
+  }
+  if (!data.content && data.files.length > 1 && !data.deleted) {
     content += ('[文件] - ' + data.files[0].name)
     content += (data.files.length === 1 ? '' : '等多个文件')
   }
@@ -259,5 +280,7 @@ export {
   messageDelete,
   buildLastMessageTime,
   userGroupConfig,
-  searchEmoticon
+  searchEmoticon,
+  operationEmoticon,
+  searchUserEmoticon
 }

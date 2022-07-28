@@ -182,7 +182,7 @@ export default {
           break
         case 'BE_CALLED_REFUSE':
           overVideo('接听者对方已挂断')
-          imComponent.value.tip(snackbar)
+          imComponent.value.tip(snackbar.value)
           break
         // 发起者接收指令
         case 'NOT_ONLINE':

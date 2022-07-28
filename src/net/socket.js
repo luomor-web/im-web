@@ -113,6 +113,14 @@ const webSocket = (token) => {
             case 56:
                 msg.$emit('COMMAND_VIDEO_RESP', data)
                 break
+            // 当前用户表情包
+            case 58:
+                store.commit('COMMAND_EMOTICON_RESP', data)
+                break
+            // 操作用户表情包
+            case 60:
+                store.commit('COMMAND_EMOTICON_OPERATION_RESP', data)
+                break
             default:
                 break
         }

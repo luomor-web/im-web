@@ -3,6 +3,7 @@ import { buildLastMessage, buildLastMessageTime, clearUnReadMessage } from '@/ne
 import { nextTick } from '@vue/composition-api'
 import store from '@/store/index'
 import { ding, sortedUser } from '@/utils/system-util'
+import msg from '@/plugins/msg'
 
 export default {
 
@@ -302,6 +303,34 @@ export default {
             state.loadedRooms[index].lastMessage.seen = true
             state.loadedRooms = [...state.loadedRooms]
         }
+    },
+
+    // 自己的表情包返回
+    COMMAND_EMOTICON_RESP: (state, data) => {
+      data.data.forEach(x => {
+        const index = state.userEmoticons.findIndex(r => r._id === x._id)
+        if (index === -1) {
+          state.userEmoticons.push(x)
+        }
+      })
+      state.userEmoticonLoaded = data.data < 20
+    },
+
+    COMMAND_EMOTICON_OPERATION_RESP: (state, data) => {
+      const { type, emoticon } = data.data
+      switch (type) {
+        case 'INSERT_EMOTICON_TO_USER':
+          if (state.userEmoticons.findIndex(r => r._id === emoticon._id) === -1) {
+            state.userEmoticons.unshift(emoticon)
+          }
+          break
+        case 'INSERT_TO_USER':
+          if (state.userEmoticons.findIndex(r => r._id === emoticon._id) === -1) {
+            state.userEmoticons.unshift(emoticon)
+          }
+          msg.$emit('INSERT_TO_USER_MSG', data)
+          break
+      }
     }
 
 }
