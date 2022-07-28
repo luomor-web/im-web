@@ -126,6 +126,7 @@ export default {
         isEmoticon: true,
         url: item.url,
         name: item.name,
+        size: item.size,
         _id: item._id,
         type: item.type
       }]

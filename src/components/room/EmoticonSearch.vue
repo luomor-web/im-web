@@ -67,11 +67,10 @@ export default {
     }
 
     const sendEmoticon = (item) => {
-      console.log(item)
-
       const files = [{
         isEmoticon: true,
         url: item.url,
+        size: item.size,
         name: item.name,
         _id: item._id,
         type: item.type
