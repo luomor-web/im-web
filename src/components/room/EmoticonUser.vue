@@ -3,20 +3,33 @@
     <div class="emoticon-content">
       <!--    <v-text-field hide-details rounded dense filled placeholder="搜索" />-->
       <div class="emoticon-img emoticon-add" @click="addEmoticon">
-        <div style="display: flex">
+        <div class="d-flex">
           <v-icon :size="48">
             mdi-plus
           </v-icon>
         </div>
       </div>
-      <div v-for="(item, index) of userEmoticons" :key="index" class="emoticon-img">
-        <div class="emoticon-operation">
-          <div class="vac-svg-button">
-            <v-icon :size="20">
-              mdi-chevron-down-circle
-            </v-icon>
+      <div v-for="(item, index) of userEmoticons" :key="index"
+           class="emoticon-img"
+           @mouseover="operationHover = index"
+           @mouseleave="closeOptions"
+      >
+        <v-slide-x-reverse-transition>
+          <div v-show="operationHover === index" class="emoticon-operation">
+            <div class="vac-svg-button emoticon-operation-button" @click="optionsOpened = index">
+              <v-icon :size="20">
+                mdi-chevron-down-circle
+              </v-icon>
+            </div>
           </div>
-        </div>
+        </v-slide-x-reverse-transition>
+        <v-slide-x-reverse-transition>
+          <div v-show="optionsOpened === index" class="emoticon-menu-list" @click="deleteEmoticon(item)">
+            <div class="emoticon-menu-item">
+              删除
+            </div>
+          </div>
+        </v-slide-x-reverse-transition>
         <v-img :src="item.url" max-height="75px" @click="sendEmoticon(item)" />
       </div>
     </div>
@@ -49,6 +62,8 @@ export default {
     const roomId = computed(() => store.state.roomId)
     const upload = ref(null)
     const imComponent = inject('imComponent', () => {})
+    const operationHover = ref(-1)
+    const optionsOpened = ref(-1)
 
     onMounted(() => {
       msg.$on('INSERT_TO_USER_MSG', (data) => {
@@ -56,16 +71,28 @@ export default {
           imComponent.value.tip({ display: true, text: '新增成功', timeout: 1000 })
         }
       })
+      msg.$on('DELETE_MSG', (data) => {
+        if (data.success) {
+          imComponent.value.tip({ display: true, text: '删除成功', timeout: 1000 })
+          closeOptions()
+        }
+      })
     })
 
     onUnmounted(() => {
       msg.$off('INSERT_TO_USER_MSG')
+      msg.$off('DELETE_MSG')
     })
 
     const onIntersect = (entries) => {
       if (entries[0].isIntersecting) {
         loadMoreEmoticons()
       }
+    }
+
+    const closeOptions = () => {
+      operationHover.value = -1
+      optionsOpened.value = -1
     }
 
     const addEmoticon = () => {
@@ -82,6 +109,14 @@ export default {
         url: file.url,
         size: file.size,
         type: 'INSERT_TO_USER'
+      }
+      operationEmoticon(data)
+    }
+
+    const deleteEmoticon = (item) => {
+      const data = {
+        emoticonId: item._id,
+        type: 'DELETE'
       }
       operationEmoticon(data)
     }
@@ -118,12 +153,16 @@ export default {
     return {
       userEmoticons,
       emoticonLoaded,
+      upload,
+      operationHover,
+      optionsOpened,
 
       sure,
-      upload,
       addEmoticon,
+      closeOptions,
       onIntersect,
-      sendEmoticon
+      sendEmoticon,
+      deleteEmoticon
     }
   }
 }
@@ -145,7 +184,7 @@ export default {
 
   .emoticon-img {
     margin: 3px;
-    //background-color: #b7c1ca;
+    height: 75px;
     max-height: 75px;
     width: 75px;
     display: flex;
@@ -153,14 +192,54 @@ export default {
     position: relative;
 
     .emoticon-operation {
+      height: 24px;
+      width: 24px;
+      background-color: #d0d7d7;
       position: absolute;
       z-index: 1;
       right: 0;
+      border-bottom-left-radius: 8px;
+
+      .emoticon-operation-button {
+        position: absolute;
+        z-index: 2;
+        right: 2px;
+        top: 2px;
+      }
+    }
+
+    .emoticon-menu-list {
+      z-index: 3;
+      width: 50px;
+      height: 24px;
+      position: absolute;
+      top: 24px;
+      right: 0;
+      font-size: 16px;
+      text-align: center;
+
+      border-radius: 4px;
+      display: block;
+      cursor: pointer;
+      background: var(--chat-dropdown-bg-color);
+
+      :hover {
+        background: var(--chat-dropdown-bg-color-hover);
+        transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+      }
+
+      :not(:hover) {
+        transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+      }
+
+      .emoticon-menu-item {
+        width: 50px;
+      }
     }
 
     &:hover {
       transform: scale(1.1);
-      opacity: 0.7;
+      opacity: 1;
     }
   }
 }

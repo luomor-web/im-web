@@ -330,6 +330,9 @@ export default {
           }
           msg.$emit('INSERT_TO_USER_MSG', data)
           break
+        case 'DELETE':
+          state.userEmoticons.splice(state.userEmoticons.findIndex(r => r._id === emoticon._id), 1)
+          msg.$emit('DELETE_MSG', data)
       }
     }
 
