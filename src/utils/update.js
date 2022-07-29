@@ -3,38 +3,38 @@
  */
 const fs = require('fs')
 const path = require('path')
-const log = require('electron-log');
-const axios = require('axios').default;
+const log = require('electron-log')
+const https = require('https')
+const axios = require('axios').default
 
 /**
  * 删除文件或文件夹
  * @param {string} dir 文件夹位置
  */
-function deleteDirSync(dir) {
-    let files = fs.readdirSync(dir)
-    for (let i = 0; i < files.length; i++) {
-        let newPath = path.join(dir, files[i]);
-        let stat = fs.statSync(newPath)
-        if (stat.isDirectory()) {
-            // 如果是文件夹就递归下去
-            deleteDirSync(newPath);
-        } else {
-            // 删除文件
-            fs.unlinkSync(newPath);
-        }
+function deleteDirSync (dir) {
+  const files = fs.readdirSync(dir)
+  for (let i = 0; i < files.length; i++) {
+    const newPath = path.join(dir, files[i])
+    const stat = fs.statSync(newPath)
+    if (stat.isDirectory()) {
+      // 如果是文件夹就递归下去
+      deleteDirSync(newPath)
+    } else {
+      // 删除文件
+      fs.unlinkSync(newPath)
     }
-    fs.rmdirSync(dir)// 如果文件夹是空的，删除自身
+  }
+  fs.rmdirSync(dir)// 如果文件夹是空的，删除自身
 }
-
 
 /**
  * 通过main进程发送事件给renderer进程，提示更新信息
  * @param {string} text 信息
  * @param {object} mainWindow 实例
  */
-function sendUpdateMessage(text, mainWindow) {
-    log.info('enter sendUpdateMessage', text);
-    mainWindow.webContents.send('message', text)
+function sendUpdateMessage (text, mainWindow) {
+  log.info('enter sendUpdateMessage', text)
+  mainWindow.webContents.send('message', text)
 }
 
 /**
@@ -42,22 +42,28 @@ function sendUpdateMessage(text, mainWindow) {
  * @param uri 远程地址
  * @param filename 文件名
  */
-function downloadFile(uri, filename) {
-    return new Promise((resolve, reject) => {
-        const writer = fs.createWriteStream(filename)
-        axios.get(uri, {responseType: 'stream'}).then(res => {
-            res.data.pipe(writer);
-        }).catch(e => {
-            reject(e)
-        })
+function downloadFile (uri, filename) {
+  return new Promise((resolve, reject) => {
+    const writer = fs.createWriteStream(filename)
+    const agent = new https.Agent({
+      rejectUnauthorized: false
+    })
+    axios.get(uri, { responseType: 'stream', httpsAgent: agent }).then(res => {
+      res.data.pipe(writer)
+    }).catch(e => {
+      log.error('写入失败', e)
+      reject(e)
+    })
 
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-    });
+    writer.on('finish', () => {
+      resolve(true)
+    })
+    writer.on('error', () => {})
+  })
 }
 
 module.exports = {
-    deleteDirSync,
-    downloadFile,
-    sendUpdateMessage
+  deleteDirSync,
+  downloadFile,
+  sendUpdateMessage
 }

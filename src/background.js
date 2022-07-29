@@ -65,6 +65,8 @@ function createWindow () {
 }
 
 app.commandLine.appendSwitch('ignore-certificate-errors') // 忽略证书的检测
+
+// app.commandLine.appendSwitch('ignore-certificate-errors', 'true')
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS, it is common for applications and their menu bar
@@ -289,17 +291,11 @@ const willDownload = () => {
       setProgressBar()
       if (state === 'completed') {
         renameSync(item.file.downloadPath + '.tmp', item.file.downloadPath)
-        win.webContents.send('download-file-done', {
-          ...item.file
-        })
+        win.webContents.send('download-file-done', { ...item.file })
       } else if (state === 'cancelled') {
-        win.webContents.send('download-file-cancelled', {
-          ...item.file
-        })
+        win.webContents.send('download-file-cancelled', { ...item.file })
       } else {
-        win.webContents.send('download-file-fail', {
-          ...item.file
-        })
+        win.webContents.send('download-file-fail', { ...item.file })
       }
     })
   })
@@ -366,9 +362,9 @@ ipcMain.handle('open-file-shell', async (event, item) => {
 // 开启开发者模式更新
 // Object.defineProperty(app, 'isPackaged', {
 //     get() {
-//         return true;
+//         return true
 //     }
-// });
+// })
 
 const updateHandle = () => {
   log.transports.file.level = 'debug'
@@ -378,8 +374,8 @@ const updateHandle = () => {
   autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = false
 
-  autoUpdater.checkForUpdates().then(() => {
-  })
+  // autoUpdater.checkForUpdates().then(() => {
+  // })
   // 更新失败
   autoUpdater.on('error', (info) => {
     // win?.webContents.send('check-update-error', info)
@@ -421,6 +417,7 @@ const updateHandle = () => {
       win.webContents.send('development-model')
       return
     }
+    log.info('检查更新指令,当前', version)
     autoUpdater.checkForUpdates().then(() => {
     })
   })
@@ -443,12 +440,15 @@ const updateHandle = () => {
     if (fs.existsSync(zipFile)) {
       fs.unlinkSync(zipFile)
     }
-    log.info('最新版本', version, ' 将从', updateUrl, '请求更新')
-    const download = await update.downloadFile(updateUrl, zipFile).catch(() => {
+    log.info('最新版本', version, '将从', updateUrl, '请求更新, 写入', zipFile)
+    await update.downloadFile(updateUrl, zipFile).then(() => {
+
+      log.info('增量文件下载成功')
+      win.webContents.send('increment-update-downloaded')
+    }).catch(() => {
+      log.info('最新版本', version, '增量更新处置失败')
       win.webContents.send('increment-update-fail')
     })
-    log.info('文件下载结果', download)
-    win.webContents.send('increment-update-downloaded')
   })
   ipcMain.on('increment-install', () => {
     try {
