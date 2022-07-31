@@ -67,7 +67,7 @@
 <script>
 import ChatWindow from 'alispig-advanced-chat'
 import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
-import { computed, onMounted, ref, provide } from '@vue/composition-api'
+import { computed, onMounted, ref, provide, onUnmounted } from '@vue/composition-api'
 import TopBar from '../components/basic/TopBar'
 import {
   getHistoryMessage,
@@ -127,7 +127,16 @@ export default {
     provide('imComponent', imComponent)
 
     onMounted(() => {
+      console.log('加载')
       getUserInfo(currentUserId.value)
+    })
+
+    onbeforeunload = () => {
+      store.commit('unmounted')
+    }
+
+    onUnmounted(() => {
+      console.log('xiezA')
     })
 
     const deleteMessage = ({ message }) => {

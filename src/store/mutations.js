@@ -25,6 +25,23 @@ export default {
     state.userEmoticons = []
   },
 
+  unmounted: (state) => {
+    state.loadedRooms = []
+    state.curUser = { _id: '' }
+    state.loadingRooms = false
+    state.roomsLoaded = true
+    state.messages = []
+    state.messageLoaded = false
+    state.searchMessage = false
+    state.roomId = '1'
+    state.waitSendMessage = []
+    state.timers = new Map()
+    state.informationPane = ''
+    state.settingPane = ''
+    state.userEmoticonLoaded = false
+    state.userEmoticons = []
+  },
+
   setInformationPane: (state, active) => { state.informationPane = active },
 
   setSettingPane: (state, active) => { state.settingPane = active },
@@ -54,6 +71,9 @@ export default {
     state.loadedRooms[roomIndex].users = [...state.loadedRooms[roomIndex].users]
     state.loadedRooms[roomIndex].unreadCount = 0
     state.loadedRooms = [...state.loadedRooms]
+    if (process.env.IS_ELECTRON) {
+      window.require('electron').ipcRenderer.sendTo(2, 'notify-list', state.loadedRooms[roomIndex])
+    }
   },
 
   changeRoom: (state, item) => {
@@ -69,7 +89,6 @@ export default {
   },
 
   clearMessages: (state) => {
-    state.messages = state.messages.splice(0, state.messages.length)
     state.messages = []
   },
 

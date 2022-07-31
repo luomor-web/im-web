@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, shell, Tray } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, shell, Tray, screen } from 'electron'
 import createProtocol from './service/createProtocol'
 import { autoUpdater } from 'electron-updater'
 import update from '@/utils/update'
@@ -8,6 +8,7 @@ import { getDownloadPath, separator } from '@/utils/electron-util'
 import { existsSync } from 'fs'
 import { prefix, suffix } from '@/utils/media-file'
 import { renameSync } from 'fs-extra'
+import notificationList from '@/service/notificationList'
 
 const log = require('electron-log')
 
@@ -49,10 +50,8 @@ function createWindow () {
     })
   } else {
     createProtocol('app', path.join(resources, './app.asar.unpacked'))
-    win.loadURL('app://./index.html').then(() => {
-    })
+    win.loadURL('app://./index.html').then(() => {})
   }
-
   win.on('closed', () => {
     win = null
   })
@@ -87,6 +86,8 @@ app.on('ready', async () => {
   bindTray()
   updateHandle()
   willDownload()
+  const bounds = appIcon.getBounds()
+  notificationList.createWindow(bounds.x, bounds.y)
 })
 
 ipcMain.on('min', () => win.minimize())
@@ -104,7 +105,6 @@ ipcMain.on('quit', () => {
 ipcMain.handle('win-version', (event, v) => {
   version = v
 })
-
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {
@@ -127,6 +127,13 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
     accelerator: 'F12',
     click: (item, focusedWindow) => {
       focusedWindow.webContents.toggleDevTools()
+    }
+  },
+  {
+    label: 'close',
+    accelerator: 'esc',
+    click: (it) => {
+      hideWindow()
     }
   },
   {
@@ -155,6 +162,7 @@ Menu.setApplicationMenu(Menu.buildFromTemplate([
   }
 ]))
 
+let trayNoticeInterval, position
 // 绑定托盘
 let iconPath, blankIconPath
 const bindTray = () => {
@@ -183,12 +191,42 @@ const bindTray = () => {
   appIcon.on('right-click', (event, position) => {
     console.log(event, position)
   })
-  appIcon.on('mouse-enter', (event, position) => {
-    console.log(event, position)
+  appIcon.on('mouse-move', (event, position) => {
+    // log.info('鼠标移动')
+    // console.log(event, position)
+
+    if (trayNoticeInterval) return
+    mouseEnter()
   })
-  appIcon.on('mouse-leave', (event, position) => {
-    console.log(event, position)
-  })
+}
+
+// 鼠标进入托盘,离开托盘事件======================
+const mouseEnter = () => {
+  const bounds = appIcon.getBounds()
+  console.log(bounds)
+  notificationList.showWindow(bounds.x - 100, bounds.y - 100)
+
+  trayNoticeInterval = setInterval(() => {
+    position = screen.getCursorScreenPoint()
+    const xl = bounds.x - 100
+    const xr = bounds.x + 100
+    const yt = bounds.y - 100
+    const yb = bounds.y
+    const inTray = (bounds.x < position.x && bounds.y < position.y && position.x < (bounds.x + bounds.width) && position.y < (bounds.y + bounds.height))
+    // 窗口 y = 图标位置Y - 通知高度
+    // 窗口左 x = 图标位置x - 通知宽度 / 2
+    // 窗口右 x = 图标位置x + 通知宽度 / 2
+    // 鼠标所在位置的X轴大于窗口左侧 小于窗口右侧
+    // console.log('当前鼠标位置', position.x, position.y, xl, xr, yt, yb)
+    const inNotify = (position.x > xl && position.x < xr && position.y > yt && position.y < yb)
+    // 如果不在范围内了
+    if (!inTray && !inNotify) {
+      clearInterval(trayNoticeInterval)
+      trayNoticeInterval = null
+      // log.info('mouseOut')
+      notificationList.hideWindow()
+    }
+  }, 100)
 }
 
 const showWindow = () => {

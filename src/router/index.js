@@ -24,6 +24,11 @@ const routes = [
         path: '/register',
         name: 'Register',
         component: () => import('../views/Register.vue')
+    },
+    {
+      path: '/notify',
+      name: 'Notify',
+      component: () => import('../views/Notify.vue')
     }
 ]
 
@@ -32,7 +37,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.path === '/login' || to.path === '/register') {
+    if (to.path === '/login' || to.path === '/register' || to.path === '/notify') {
         next()
     } else {
         const token = sessionStoreUtil.getValue('token')

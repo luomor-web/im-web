@@ -99,7 +99,6 @@ export default {
         // 设置最后一条消息
         const lastMessage = buildLastMessage(message)
         state.loadedRooms[roomIndex] = { ...state.loadedRooms[roomIndex], lastMessage }
-
         // 将目标消息置顶
         store.commit('upRoom', message.roomId)
         if (message.roomId === state.roomId) {
@@ -108,7 +107,6 @@ export default {
                 const checkIndex = state.messages.findIndex(r => r._id === message._id)
                 if (checkIndex !== -1) {
                     state.messages[checkIndex] = message
-                    state.messages = [...state.messages]
                 } else {
                     state.messages.push(message)
                 }
@@ -117,10 +115,18 @@ export default {
             } else {
                 state.messages.push(message)
             }
+            if (state.messages.length > 42) {
+              state.messages = [...state.message]
+            } else {
+              state.messages = [...state.messages.slice(state.messages.length - 40, state.messages.length)]
+            }
             return
         }
         state.loadedRooms[roomIndex].unreadCount = message.unreadCount
         state.loadedRooms = [...state.loadedRooms]
+        if (process.env.IS_ELECTRON) {
+          window.require('electron').ipcRenderer.sendTo(2, 'notify-list', state.loadedRooms[roomIndex])
+        }
     },
 
     // 用户状态变化消息
@@ -148,9 +154,11 @@ export default {
     COMMAND_JOIN_GROUP_NOTIFY_RESP: (state, data) => {
         const room = data.data.group
         const users = data.data.users
+        const otherUsers = data.data.otherUsers
         const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId)
         if (index === -1) {
-            room.users = users
+            room.users = [...users]
+            room.users.push(...otherUsers)
             state.loadedRooms[state.loadedRooms.length] = room
             state.loadedRooms = [...state.loadedRooms]
         } else {
