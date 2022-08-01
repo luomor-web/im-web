@@ -8,7 +8,6 @@ import { getDownloadPath, separator } from '@/utils/electron-util'
 import { existsSync } from 'fs'
 import { prefix, suffix } from '@/utils/media-file'
 import { renameSync } from 'fs-extra'
-import notificationList from '@/service/notificationList'
 
 const log = require('electron-log')
 
@@ -46,7 +45,7 @@ function createWindow () {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // 开发环境打开控制台
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL).then(() => {
-      if (!process.env.IS_TEST) win.webContents.toggleDevTools()
+      if (isDevelopment) win.webContents.toggleDevTools()
     })
   } else {
     createProtocol('app', path.join(resources, './app.asar.unpacked'))
@@ -60,7 +59,7 @@ function createWindow () {
     win.show() // 初始化后再显示
   })
 
-  win.on('focus', closeFlash)
+  win.on('focus', onWindowFocus)
 }
 
 app.commandLine.appendSwitch('ignore-certificate-errors') // 忽略证书的检测
@@ -88,8 +87,7 @@ app.on('ready', async () => {
   bindTray()
   updateHandle()
   willDownload()
-  const bounds = appIcon.getBounds()
-  notificationList.createWindow(bounds.x, bounds.y)
+  msgWindowHandler.createWindow()
 })
 
 ipcMain.on('min', () => win.minimize())
@@ -194,19 +192,89 @@ const bindTray = () => {
     console.log(event, position)
   })
   appIcon.on('mouse-move', (event, position) => {
-    // log.info('鼠标移动')
-    // console.log(event, position)
-
     if (trayNoticeInterval) return
     mouseEnter()
   })
+}
+
+let msgWindow
+let notifyList = []
+ipcMain.on('notify-list', (event, room) => {
+  if (win.isFocused()) {
+    notifyList = []
+    msgWindow.webContents.send('notify-list', { room: null, action: 'clear' })
+    msgWindowHandler.hideWindow()
+    return
+  }
+  const index = notifyList.findIndex(x => x.roomId === room.roomId)
+  if (index !== -1) {
+    notifyList.splice(index, 1)
+    if (room.unreadCount === 0) {
+      return
+    }
+  }
+  if (index === -1 && room.unreadCount === 0) return
+  notifyList.unshift(room)
+  // TODO 测试
+  msgWindowHandler.showWindow(100, 200, notifyList.length)
+  msgWindow.webContents.send('notify-list', { room, action: 'add' })
+})
+
+ipcMain.on('focus-chat', (event, room) => {
+  win.webContents.send('change-room', room.roomId)
+  win.focus()
+  msgWindowHandler.hideWindow()
+})
+
+const msgWindowHandler = {
+   createWindow: () => {
+    msgWindow = new BrowserWindow({
+      width: 200,
+      height: 100,
+      frame: false,
+      show: false,
+      type: 'toolbar',
+      alwaysOnTop: true,
+      resizable: false,
+      // focusable: false,
+      webPreferences: {
+        webSecurity: false,
+        nodeIntegration: true,
+        contextIsolation: false,
+        webviewTag: true
+      }
+    })
+    msgWindow.setSkipTaskbar(false)
+    msgWindow.loadURL('https://192.168.3.128:8888/#/notify').then(() => {
+      if (isDevelopment) win.webContents.toggleDevTools()
+    })
+
+    msgWindow.on('closed', () => {
+      msgWindow = null
+    })
+  },
+
+  hideWindow: () => {
+    msgWindow.hide()
+  },
+
+  showWindow: (x, y, count) => {
+     const height = count <= 8 ? count * 48 : 8 * 48
+      msgWindow.setSize(200, height + 36)
+      msgWindow.setPosition(x, y)
+      msgWindow.setAlwaysOnTop(true, 'pop-up-menu')
+      msgWindow.show()
+  }
+
 }
 
 // 鼠标进入托盘,离开托盘事件======================
 const mouseEnter = () => {
   const bounds = appIcon.getBounds()
   console.log(bounds)
-  notificationList.showWindow(bounds.x - 100, bounds.y - 100)
+  if (notifyList.length > 0) {
+    msgWindowHandler.showWindow(bounds.x - 100, bounds.y - 100, notifyList.length)
+  }
 
   trayNoticeInterval = setInterval(() => {
     position = screen.getCursorScreenPoint()
@@ -226,7 +294,7 @@ const mouseEnter = () => {
       clearInterval(trayNoticeInterval)
       trayNoticeInterval = null
       // log.info('mouseOut')
-      notificationList.hideWindow()
+      msgWindowHandler.hideWindow()
     }
   }, 100)
 }
@@ -249,7 +317,10 @@ ipcMain.on('ding', () => {
 })
 
 let t
-const closeFlash = () => {
+const onWindowFocus = () => {
+  notifyList = []
+  msgWindow.webContents.send('notify-list', { room: null, action: 'clear' })
+  msgWindowHandler.hideWindow()
   win.flashFrame(false)
   appIcon.setImage(iconPath)
   clearInterval(t)
@@ -480,7 +551,6 @@ const updateHandle = () => {
     }
     log.info('最新版本', version, '将从', updateUrl, '请求更新, 写入', zipFile)
     await update.downloadFile(updateUrl, zipFile).then(() => {
-
       log.info('增量文件下载成功')
       win.webContents.send('increment-update-downloaded')
     }).catch(() => {

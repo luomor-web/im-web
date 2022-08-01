@@ -1,8 +1,8 @@
 <template>
-  <v-card style="height: 100%;width: 100%;padding: 8px;font-size: 14px">
-    <span class="font-weight-black">新消息({{ allUnreadCount }})</span>
+  <v-card style="height: 100%;width: 100%;padding: 8px;font-size: 14px;">
+    <span class="font-weight-black" style="-webkit-app-region: drag;">新消息({{ allUnreadCount }})</span>
     <v-list>
-      <v-list-item v-for="(item, index) of notify" :key="index" v-ripple class="im-list-item">
+      <v-list-item v-for="(item, index) of notify" :key="index" v-ripple class="im-list-item overflow-y-auto" style="max-height: 384px" @click="focusChat(item)">
         <v-list-item-avatar :size="32">
           <v-img :src="item.avatar" />
         </v-list-item-avatar>
@@ -33,7 +33,11 @@ export default {
 
     onMounted(() => {
       if (process.env.IS_ELECTRON) {
-        window.require('electron').ipcRenderer.on('notify-list', (event, room) => {
+        window.require('electron').ipcRenderer.on('notify-list', (event, { room, action }) => {
+          if (action === 'clear') {
+            notify.value = []
+            return
+          }
           const index = notify.value.findIndex(x => x.roomId === room.roomId)
           if (index !== -1) {
             notify.value.splice(index, 1)
@@ -57,9 +61,14 @@ export default {
       allUnreadCount.value = count
     }
 
+    const focusChat = (item) => {
+      window.require('electron').ipcRenderer.send('focus-chat', item)
+    }
+
     return {
       notify,
-      allUnreadCount
+      allUnreadCount,
+      focusChat
     }
   }
 }

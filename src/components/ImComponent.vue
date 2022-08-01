@@ -10,13 +10,13 @@
 </template>
 
 <script>
-import { computed, ref } from '@vue/composition-api/dist/vue-composition-api'
 import store from '@/store'
 import ImTip from '@/components/basic/ImTip'
 import DownloadState from '@/components/basic/DownloadState'
 import ImDownloadPath from '@/components/basic/ImDownloadPath'
 import ImUserSelectDialog from '@/components/basic/ImUserSelectDialog'
 import { forwardMessage } from '@/net/send-message'
+import { onMounted, computed, ref } from '@vue/composition-api'
 
 export default {
   name: 'ImComponent',
@@ -32,6 +32,14 @@ export default {
     const snackbar = ref({})
     const forwardModel = ref(false)
     const forwardMessages = ref([])
+
+    onMounted(() => {
+      if (process.env.IS_ELECTRON) {
+        window.require('electron').ipcRenderer.on('change-room', (event, roomId) => {
+          store.commit('changeRoom', roomId)
+        })
+      }
+    })
 
     const selectDownloadPath = (file) => {
       downloadPath.value.action(file)

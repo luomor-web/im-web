@@ -67,13 +67,14 @@
 <script>
 import ChatWindow from 'alispig-advanced-chat'
 import 'alispig-advanced-chat/dist/vue-advanced-chat.css'
-import { computed, onMounted, ref, provide, onUnmounted } from '@vue/composition-api'
+import { computed, onMounted, provide, ref } from '@vue/composition-api'
 import TopBar from '../components/basic/TopBar'
 import {
   getHistoryMessage,
   getUserInfo,
   messageDelete,
-  messageReaction, operationEmoticon,
+  messageReaction,
+  operationEmoticon,
   sendChatMessage
 } from '@/net/send-message'
 import { textMessages } from '@/locales/text-message'
@@ -127,17 +128,12 @@ export default {
     provide('imComponent', imComponent)
 
     onMounted(() => {
-      console.log('加载')
       getUserInfo(currentUserId.value)
     })
 
     onbeforeunload = () => {
       store.commit('unmounted')
     }
-
-    onUnmounted(() => {
-      console.log('xiezA')
-    })
 
     const deleteMessage = ({ message }) => {
       messageDelete({ messageId: message._id })

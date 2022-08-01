@@ -125,7 +125,7 @@ export default {
         state.loadedRooms[roomIndex].unreadCount = message.unreadCount
         state.loadedRooms = [...state.loadedRooms]
         if (process.env.IS_ELECTRON) {
-          window.require('electron').ipcRenderer.sendTo(2, 'notify-list', state.loadedRooms[roomIndex])
+          window.require('electron').ipcRenderer.send('notify-list', state.loadedRooms[roomIndex])
         }
     },
 
