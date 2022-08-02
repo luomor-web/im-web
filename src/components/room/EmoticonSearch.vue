@@ -5,13 +5,26 @@
       <!--    <v-text-field hide-details rounded dense filled placeholder="搜索" />-->
 
       <div v-for="(item, index) of emoticons" :key="index" class="emoticon-img" @click="sendEmoticon(item)">
-        <v-img :src="item.url" max-height="75px" />
+        <v-img :src="item.url" :lazy-src="item.url" max-height="75px">
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey"
+              />
+            </v-row>
+          </template>
+        </v-img>
       </div>
     </div>
     <div v-if="!emoticonLoaded" v-intersect="onIntersect" style="height: 40px" class="text-center">
       <v-progress-circular
         indeterminate
-        color="primary"
+        color="grey lighten-5"
       />
     </div>
   </div>

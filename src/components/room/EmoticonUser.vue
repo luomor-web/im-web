@@ -30,14 +30,27 @@
             </div>
           </div>
         </v-slide-x-reverse-transition>
-        <v-img :src="item.url" max-height="75px" @click="sendEmoticon(item)" />
+        <v-img :src="item.url" max-height="75px" :lazy-src="item.url" @click="sendEmoticon(item)">
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              justify="center"
+            >
+              <v-progress-circular
+                indeterminate
+                color="grey"
+              />
+            </v-row>
+          </template>
+        </v-img>
       </div>
     </div>
     <im-upload ref="upload" @sure="sure" />
     <div v-if="!emoticonLoaded" v-intersect="onIntersect" style="height: 40px" class="text-center">
       <v-progress-circular
         indeterminate
-        color="primary"
+        color="grey lighten-5"
       />
     </div>
   </div>
