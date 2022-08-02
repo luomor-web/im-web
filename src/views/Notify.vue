@@ -1,13 +1,17 @@
 <template>
-  <v-card style="height: 100%;width: 100%;padding: 8px;font-size: 14px;">
-    <span class="font-weight-black" style="-webkit-app-region: drag;">新消息({{ allUnreadCount }})</span>
-    <v-list>
-      <v-list-item v-for="(item, index) of notify" :key="index" v-ripple class="im-list-item overflow-y-auto" style="max-height: 384px" @click="focusChat(item)">
+  <v-card class="notify-card">
+    <div style="padding: 8px 8px 0 8px">
+      <span class="font-weight-black card-title">新消息({{ allUnreadCount }})</span>
+    </div>
+    <v-list class="card-list overflow-y-auto">
+      <v-list-item v-for="(item, index) of notify" :key="index" v-ripple class="im-list-item card-list-item"
+                   @click="focusChat(item)"
+      >
         <v-list-item-avatar :size="32">
           <v-img :src="item.avatar" />
         </v-list-item-avatar>
         <v-list-item-content>
-            <v-list-item-title>{{ item.roomName }}</v-list-item-title>
+          <v-list-item-title>{{ item.roomName }}</v-list-item-title>
         </v-list-item-content>
         <v-list-item-action>
           <div>
@@ -27,8 +31,58 @@ import { onMounted, ref } from '@vue/composition-api'
 
 export default {
   name: 'Notify',
-  setup() {
-    const notify = ref([])
+  setup () {
+    const notify = ref([{
+      roomId: '1',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '2',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '3',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '4',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '2',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '3',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '4',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '2',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '3',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }, {
+      roomId: '4',
+      roomName: '2',
+      unreadCount: 3,
+      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
+    }])
     const allUnreadCount = ref(0)
 
     onMounted(() => {
@@ -46,7 +100,8 @@ export default {
               return
             }
           }
-          if (index === -1 && room.unreadCount === 0) return
+          console.log(room)
+          if (index === -1 && room.unreadCount && room.unreadCount === 0) return
           notify.value.unshift(room)
           numberUnreadCount()
         })
@@ -74,6 +129,27 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.notify-card {
+  height: 100%;
+  width: 220px;
+  font-size: 14px;
 
+  .card-title {
+    -webkit-app-region: drag;
+  }
+
+  .card-list {
+    max-height: 384px;
+
+    .card-list-item {
+      border-radius: 6px;
+      padding: 0 4px
+    }
+  }
+
+  .card-list::-webkit-scrollbar {
+    display:none
+  }
+}
 </style>

@@ -72,12 +72,18 @@ export default {
     state.loadedRooms[roomIndex].unreadCount = 0
     state.loadedRooms = [...state.loadedRooms]
     if (process.env.IS_ELECTRON) {
-      window.require('electron').ipcRenderer.sendTo(2, 'notify-list', state.loadedRooms[roomIndex])
+      const room = state.loadedRooms[roomIndex]
+      window.require('electron').ipcRenderer.send('notify-list', {
+        roomId: room.roomId,
+        roomName: room.roomName,
+        unreadCount: room.unreadCount,
+        avatar: room.avatar
+      })
     }
   },
 
   changeRoom: (state, item) => {
-    if (!item) return
+    if (!item || item === state.roomId) return
     store.commit('clearMessages')
     store.commit('pushWaitSendMessageToMessages', item)
     store.commit('setMessageLoaded', false)

@@ -120,12 +120,27 @@ export default {
             } else {
               state.messages = [...state.messages.slice(state.messages.length - 40, state.messages.length)]
             }
+            if (process.env.IS_ELECTRON) {
+              const room = state.loadedRooms[roomIndex]
+              window.require('electron').ipcRenderer.send('notify-list', {
+                roomId: room.roomId,
+                roomName: room.roomName,
+                unreadCount: 1,
+                avatar: room.avatar
+              })
+            }
             return
         }
         state.loadedRooms[roomIndex].unreadCount = message.unreadCount
         state.loadedRooms = [...state.loadedRooms]
         if (process.env.IS_ELECTRON) {
-          window.require('electron').ipcRenderer.send('notify-list', state.loadedRooms[roomIndex])
+          const room = state.loadedRooms[roomIndex]
+          window.require('electron').ipcRenderer.send('notify-list', {
+            roomId: room.roomId,
+            roomName: room.roomName,
+            unreadCount: room.unreadCount,
+            avatar: room.avatar
+          })
         }
     },
 
