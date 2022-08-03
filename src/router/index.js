@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import sessionStoreUtil from '@/utils/session-store'
+import Notify from '@/views/Notify'
 
 Vue.use(VueRouter)
 
@@ -28,7 +29,7 @@ const routes = [
     {
       path: '/notify',
       name: 'Notify',
-      component: () => import('../views/Notify.vue')
+      component: Notify
     }
 ]
 

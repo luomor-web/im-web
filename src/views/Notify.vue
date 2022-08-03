@@ -32,57 +32,7 @@ import { onMounted, ref } from '@vue/composition-api'
 export default {
   name: 'Notify',
   setup () {
-    const notify = ref([{
-      roomId: '1',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '2',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '3',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '4',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '2',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '3',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '4',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '2',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '3',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }, {
-      roomId: '4',
-      roomName: '2',
-      unreadCount: 3,
-      avatar: 'https://192.168.3.128:8888/courier/1550005152395862016.jpeg'
-    }])
+    const notify = ref([])
     const allUnreadCount = ref(0)
 
     onMounted(() => {
@@ -144,7 +94,7 @@ export default {
 
     .card-list-item {
       border-radius: 6px;
-      padding: 0 4px
+      padding: 0 4px 0 8px
     }
   }
 
