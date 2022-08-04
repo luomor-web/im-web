@@ -1,4 +1,4 @@
-const {mergeSassVariables} = require('@vuetify/cli-plugin-utils')
+const { mergeSassVariables } = require('@vuetify/cli-plugin-utils')
 module.exports = {
     devServer: {
         public: 'https://192.168.3.128:8888'
@@ -37,38 +37,38 @@ module.exports = {
             nodeIntegration: true,
             customFileProtocol: './',
             chainWebpackMainProcess: (config) => {
-                config.output.filename('index.js');
+                config.output.filename('index.js')
             },
             builderOptions: {
                 // options placed here will be merged with default configuration and passed to electron-builder
-                productName: "im",
-                appId: "123456789",
-                copyright: "Copyright © 2022",//版权信息
+                productName: 'im',
+                appId: '123456789',
+                copyright: 'Copyright © 2022', // 版权信息
                 directories: {
-                    output: "./dist_electron"//输出文件路径
+                    output: './dist_electron'// 输出文件路径
                 },
                 releaseInfo: {
-                    releaseNotes: `{"forceVersion": "0.0.3", "wholeVersion": "0.0.3"}`
+                    releaseNotes: '{"forceVersion": "0.0.4", "wholeVersion": "0.0.4"}'
                 },
                 afterPack: './afterPack.js',
                 extraResources: [{
-                    from: "dist_electron/bundled",
-                    to: "app.asar.unpacked",
+                    from: 'dist_electron/bundled',
+                    to: 'app.asar.unpacked',
                     filter: [
-                        "!**/icons",
-                        "!**/preload.js",
-                        "!**/node_modules",
-                        "!**/index.js"
+                        '!**/icons',
+                        '!**/preload.js',
+                        '!**/node_modules',
+                        '!**/index.js'
                     ]
                 }],
                 files: [
-                    "**/icons/*",
-                    "**/preload.js",
-                    "**/node_modules/**/*",
-                    "**/index.js"
+                    '**/icons/*',
+                    '**/preload.js',
+                    '**/node_modules/**/*',
+                    '**/index.js'
                 ],
                 publish: {
-                    provider: "generic",
+                    provider: 'generic',
                     url: process.env.VUE_APP_UPDATE_URL
                 },
                 nsis: {
@@ -79,32 +79,34 @@ module.exports = {
                     createDesktopShortcut: true,
                     createStartMenuShortcut: true,
                     runAfterFinish: true,
-                    installerIcon: "./public/icons/tray.ico",
-                    uninstallerIcon: "./public/icons/tray.ico"
+                    installerIcon: './public/icons/tray.ico',
+                    uninstallerIcon: './public/icons/tray.ico'
                 },
                 win: { // win相关配置
-                    icon: "/public/icons/tray.ico",// 图标，当前图标在根目录下，注意这里有两个坑
-                    artifactName: "${productName}_${version}.${ext}",
+                    icon: '/public/icons/tray.ico', // 图标，当前图标在根目录下，注意这里有两个坑
+                  // eslint-disable-next-line no-template-curly-in-string
+                    artifactName: '${productName}_${version}.${ext}',
                     target: [
                         {
-                            target: "nsis",// 利用nsis制作安装程序
+                            target: 'nsis', // 利用nsis制作安装程序
                             arch: [
-                                "x64",
-                                "ia32" // 32位
+                                'x64',
+                                'ia32' // 32位
                             ]
                         }
                     ]
                 },
                 mac: {
-                    target: ["dmg"],
-                    artifactName: "${productName}_${version}.${ext}",
-                    category: "public.app-category.productivity",
+                    target: ['dmg'],
+                  // eslint-disable-next-line no-template-curly-in-string
+                    artifactName: '${productName}_${version}.${ext}',
+                    category: 'public.app-category.productivity',
                     hardenedRuntime: true,
                     gatekeeperAssess: true,
                     extendInfo: {
                         NSAppleEventsUsageDescription: 'Let me use Apple Events.',
                         NSCameraUsageDescription: 'Let me use the camera.',
-                        NSScreenCaptureDescription: 'Let me take screenshots.',
+                        NSScreenCaptureDescription: 'Let me take screenshots.'
                     }
                 },
                 dmg: {
@@ -114,13 +116,13 @@ module.exports = {
                         {
                             x: 255,
                             y: 85,
-                            type: "file"
+                            type: 'file'
                         },
                         {
                             x: 253,
                             y: 325,
-                            type: "link",
-                            path: "/Applications"
+                            type: 'link',
+                            path: '/Applications'
                         }
                     ],
                     window: {
@@ -130,19 +132,19 @@ module.exports = {
                 },
                 linux: {
                     desktop: {
-                        StartupNotify: "false",
-                        Encoding: "UTF-8",
-                        MimeType: "x-scheme-handler/deeplink"
+                        StartupNotify: 'false',
+                        Encoding: 'UTF-8',
+                        MimeType: 'x-scheme-handler/deeplink'
                     },
-                    target: ["AppImage", "rpm", "deb"]
+                    target: ['AppImage', 'rpm', 'deb']
                 },
                 deb: {
-                    priority: "optional",
-                    afterInstall: "installer/linux/after-install.tpl",
+                    priority: 'optional',
+                    afterInstall: 'installer/linux/after-install.tpl'
                 },
                 rpm: {
-                    fpm: ["--before-install", "installer/linux/before-install.tpl"],
-                    afterInstall: "installer/linux/after-install.tpl",
+                    fpm: ['--before-install', 'installer/linux/before-install.tpl'],
+                    afterInstall: 'installer/linux/after-install.tpl'
                 }
             }
         }
