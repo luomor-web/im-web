@@ -29,6 +29,8 @@ export default {
     downloadItemList: [],
     // 自动下载
     autoDownload: false,
+    // 开机自启
+    autoStart: false,
     // 默认下载位置
     downloadPath: '',
     // 表情包

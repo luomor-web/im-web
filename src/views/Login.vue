@@ -46,8 +46,8 @@
               <v-text-field
                   v-model="username"
                   outlined
-                  label="用户名"
-                  placeholder="用户名"
+                  label="登录账号"
+                  placeholder="登录账号"
                   hide-details
                   class="mb-3"
               />

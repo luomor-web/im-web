@@ -230,6 +230,8 @@ export default {
 
   setAutoDownload: (state, item) => { state.autoDownloa = item },
 
+  setAutoStart: (state, item) => { state.autoStart = item },
+
   setDownloadPath: (state, path) => { state.downloadPath = path },
 
   clearEmoticons: (state) => { state.emoticons = [] },

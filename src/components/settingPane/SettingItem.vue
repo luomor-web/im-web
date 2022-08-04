@@ -27,10 +27,18 @@
         <v-list nav>
           <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('SETTING_DOWNLOAD')">
             <v-list-item-icon>
-              <v-icon>{{ icons.mdiDownloadOutline }}</v-icon>
+              <v-icon>{{ icons.mdiFileArrowUpDownOutline }}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>下载设置</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item v-if="isElectron" v-ripple class="im-list-item" @click="open('SETTING_GENERAL')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiStoreCogOutline }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>通用设置</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -41,7 +49,12 @@
 
 <script>
 import DrawerTop from '@/components/basic/DrawerTop'
-import { mdiBellOutline, mdiDownloadOutline, mdiPencilOutline } from '@mdi/js'
+import {
+  mdiBellOutline,
+  mdiFileArrowUpDownOutline,
+  mdiPencilOutline,
+  mdiStoreCogOutline
+} from '@mdi/js'
 import ImDriver from '@/components/basic/ImDriver'
 import { computed, ref } from '@vue/composition-api'
 import store from '@/store'
@@ -73,7 +86,8 @@ export default {
       icons: {
         mdiPencilOutline,
         mdiBellOutline,
-        mdiDownloadOutline
+        mdiStoreCogOutline,
+        mdiFileArrowUpDownOutline
       }
     }
   }

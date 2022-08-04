@@ -226,10 +226,10 @@ const quitSystem = () => {
 // 构建最后一条消息
 const buildLastMessage = (data) => {
   let content = data.deleted ? '删除了一条消息' : data.content
-  if (!data.content && data.files.length === 1 && !data.deleted && data.files[0].isEmoticon) {
+  if (!data.content && data.files?.length === 1 && !data.deleted && data.files[0].isEmoticon) {
     content += '[表情包]'
   }
-  if (!data.content && data.files.length > 1 && !data.deleted) {
+  if (!data.content && data.files?.length > 0 && !data.deleted) {
     content += ('[文件] - ' + data.files[0].name)
     content += (data.files.length === 1 ? '' : '等多个文件')
   }

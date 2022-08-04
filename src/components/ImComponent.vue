@@ -5,7 +5,7 @@
     <im-tip :snackbar="snackbar" @close="snackbar.display = false" />
     <im-user-select-dialog :model="forwardModel" :types="['CHAT','PERSON']" multiple @sure="forwardSure"
                            @cancel="forwardCancel"
-/>
+    />
   </div>
 </template>
 

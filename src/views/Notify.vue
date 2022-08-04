@@ -50,7 +50,6 @@ export default {
               return
             }
           }
-          console.log(room)
           if (index === -1 && room.unreadCount && room.unreadCount === 0) return
           notify.value.unshift(room)
           numberUnreadCount()
@@ -67,6 +66,7 @@ export default {
     }
 
     const focusChat = (item) => {
+      notify.value = []
       window.require('electron').ipcRenderer.send('focus-chat', item)
     }
 
@@ -81,7 +81,6 @@ export default {
 
 <style scoped lang="scss">
 .notify-card {
-  height: 100%;
   width: 220px;
   font-size: 14px;
 

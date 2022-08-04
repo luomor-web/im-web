@@ -9,10 +9,10 @@ import log from 'electron-log'
 const resources = process.resourcesPath
 
 const path = require('path')
-
 export let version = ''
 export const isDevelopment = process.env.NODE_ENV !== 'production'
 export let win
+const ex = process.execPath
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
@@ -90,6 +90,17 @@ ipcMain.on('quit', () => {
   app.quit()
 })
 
+ipcMain.on('open-auto-start', (event, args) => {
+  if (args && isDevelopment) {
+    return
+  }
+  app.setLoginItemSettings({
+    openAtLogin: args,
+    path: ex,
+    args: []
+  })
+})
+
 ipcMain.handle('win-version', (event, v) => {
   version = v
 })
@@ -115,6 +126,7 @@ initMenu()
 let msgWindow
 export let notifyList = []
 ipcMain.on('notify-list', (event, room) => {
+
   if (win.isFocused()) {
     clearNotifyList()
     return
@@ -140,13 +152,11 @@ ipcMain.on('focus-chat', (event, room) => {
 export const msgWindowHandler = {
   createWindow: () => {
     msgWindow = new BrowserWindow({
-      width: 220,
-      height: 100,
       frame: false,
       show: false,
       type: 'toolbar',
       alwaysOnTop: true,
-      resizable: false,
+      // resizable: false,
       focusable: false,
       webPreferences: {
         webSecurity: false,
@@ -178,10 +188,13 @@ export const msgWindowHandler = {
 
   showWindow: (x, y, count) => {
     const height = count <= 8 ? count * 48 : 8 * 48
-    msgWindow.setSize(220, height + 28 + 16)
-    msgWindow.setPosition(x, y - (height + 28 + 16))
-    msgWindow.setAlwaysOnTop(true, 'pop-up-menu')
-    msgWindow.show()
+    if (msgWindow) {
+      msgWindow.setSize(220, height + 44)
+      msgWindow.setPosition(x, y - (height + 44))
+      msgWindow.setAlwaysOnTop(true, 'pop-up-menu')
+      msgWindow.setOpacity(1)
+      msgWindow.show()
+    }
   }
 
 }

@@ -173,7 +173,9 @@ export default {
         const index = state.loadedRooms.findIndex(r => r.roomId === room.roomId)
         if (index === -1) {
             room.users = [...users]
-            room.users.push(...otherUsers)
+            if (otherUsers) {
+              room.users.push(...otherUsers)
+            }
             state.loadedRooms[state.loadedRooms.length] = room
             state.loadedRooms = [...state.loadedRooms]
         } else {

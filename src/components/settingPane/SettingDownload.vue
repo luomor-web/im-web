@@ -3,7 +3,9 @@
     <drawer-top :title="'下载设置'" :sub="true" @close="open('SETTING_ITEM')" />
 
     <v-list nav>
-      <v-subheader>下载设置</v-subheader>
+      <v-subheader class="pl-2">
+        下载设置
+      </v-subheader>
       <v-list-item v-ripple class="im-list-item">
         <v-list-item-content>
           <v-list-item-title>下载时不询问</v-list-item-title>
@@ -17,7 +19,9 @@
       </v-list-item>
     </v-list>
     <v-list nav>
-      <v-subheader>下载目录</v-subheader>
+      <v-subheader class="pl-2">
+        下载目录
+      </v-subheader>
       <v-list-item v-ripple class="im-list-item">
         <v-list-item-content>
           <v-list-item-title>

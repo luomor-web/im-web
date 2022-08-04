@@ -11,6 +11,9 @@
         <v-window-item value="SETTING_DOWNLOAD">
           <setting-download />
         </v-window-item>
+        <v-window-item value="SETTING_GENERAL">
+          <setting-general />
+        </v-window-item>
         <v-window-item value="CREATE_GROUP">
           <add-room />
         </v-window-item>
@@ -31,10 +34,12 @@ import SettingItem from '@/components/settingPane/SettingItem'
 import SettingUserProfile from '@/components/settingPane/SettingUserProfile'
 import DownloadHistory from '@/components/settingPane/DownloadHistory'
 import SettingDownload from '@/components/settingPane/SettingDownload'
+import SettingGeneral from '@/components/settingPane/SettingGeneral'
 
 export default {
   name: 'SettingPane',
   components: {
+    SettingGeneral,
     SettingDownload,
     AddRoom,
     DownloadHistory,
