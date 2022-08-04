@@ -41,7 +41,7 @@ module.exports = {
             },
             builderOptions: {
                 // options placed here will be merged with default configuration and passed to electron-builder
-                productName: "信使",
+                productName: "im",
                 appId: "123456789",
                 copyright: "Copyright © 2022",//版权信息
                 directories: {
