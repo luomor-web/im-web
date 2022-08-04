@@ -59,7 +59,7 @@ export default {
       window.require('electron').ipcRenderer.on('update-available', (event, info) => {
         loading.value = false
         if (!props.action.visible) return
-        returnText.value = `发现新版本：${info.version}`
+        returnText.value = `发现新版本：${info.version},正在下载`
       })
       // 当前处于开发者模式下
       window.require('electron').ipcRenderer.on('development-model', () => {

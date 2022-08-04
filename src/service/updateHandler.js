@@ -15,7 +15,7 @@ import { win, version, isDevelopment } from '@/background'
 //         return true
 //     }
 // })
-
+let downloadUpdateIng = false
 export const updateHandle = () => {
   log.transports.file.level = 'debug'
   autoUpdater.logger = log
@@ -85,19 +85,25 @@ export const updateHandle = () => {
   log.info('当前文件夹目录', appPath)
   // 增量下载命令
   ipcMain.on('download-increment-update', async (event, version) => {
+    if (downloadUpdateIng) {
+      log.info('正在下载.... 不要着急')
+    }
     const updateUrl = process.env.VUE_APP_UPDATE_URL + 'asar.unpacked_' + version + '.zip'
     // 删除旧包
     if (fs.existsSync(zipFile)) {
       fs.unlinkSync(zipFile)
     }
+    downloadUpdateIng = true
     log.info('最新版本', version, '将从', updateUrl, '请求更新, 写入', zipFile)
     await update.downloadFile(updateUrl, zipFile).then(() => {
       log.info('增量文件下载成功')
       win.webContents.send('increment-update-downloaded')
     }).catch(() => {
+      downloadUpdateIng = false
       log.info('最新版本', version, '增量更新处置失败')
       win.webContents.send('increment-update-fail')
     })
+    downloadUpdateIng = false
   })
   ipcMain.on('increment-install', () => {
     try {
@@ -113,20 +119,15 @@ export const updateHandle = () => {
       if (!fs.existsSync(unPackage)) { // 删除旧备份
         fs.mkdirSync(unPackage) // 创建app来解压用
       }
-      try {
-        // 同步解压缩
-        const unzip = new AdmZip(zipFile, {})
-        unzip.extractAllTo(unPackage, true, false)
-        log.info('app.asar.unpacked.zip 解压缩完成')
-        log.info('更新完成，正在重启...')
-        setTimeout(() => {
-          app.relaunch() // 重启
-          app.exit(0)
-        }, 1800)
-      } catch (e) {
-        log.error('增量更新解压错误', e)
-        win.webContents.send('increment-update-fail')
-      }
+      // 同步解压缩
+      const unzip = new AdmZip(zipFile, {})
+      unzip.extractAllTo(unPackage, true, false)
+      log.info('app.asar.unpacked.zip 解压缩完成')
+      log.info('更新完成，正在重启...')
+      setTimeout(() => {
+        app.relaunch() // 重启
+        app.exit(0)
+      }, 1800)
     } catch (e) {
       log.error('增量更新错误', e)
       win.webContents.send('increment-update-fail')
