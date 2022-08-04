@@ -41,14 +41,14 @@ module.exports = {
             },
             builderOptions: {
                 // options placed here will be merged with default configuration and passed to electron-builder
-                productName: "im",
+                productName: "信使",
                 appId: "123456789",
                 copyright: "Copyright © 2022",//版权信息
                 directories: {
                     output: "./dist_electron"//输出文件路径
                 },
                 releaseInfo: {
-                    releaseNotes: `{"forceVersion": "0.0.0", "wholeVersion": "0.0.0"}`
+                    releaseNotes: `{"forceVersion": "0.0.3", "wholeVersion": "0.0.3"}`
                 },
                 afterPack: './afterPack.js',
                 extraResources: [{
