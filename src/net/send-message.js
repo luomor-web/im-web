@@ -229,7 +229,7 @@ const buildLastMessage = (data) => {
   if (!data.content && data.files?.length === 1 && !data.deleted && data.files[0].isEmoticon) {
     content += '[表情包]'
   }
-  if (!data.content && data.files?.length > 0 && !data.deleted) {
+  if (!data.content && data.files?.length > 0 && !data.deleted && !data.files[0].isEmoticon) {
     content += ('[文件] - ' + data.files[0].name)
     content += (data.files.length === 1 ? '' : '等多个文件')
   }
