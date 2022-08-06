@@ -41,6 +41,14 @@
               <v-list-item-title>通用设置</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item v-ripple class="im-list-item" @click="open('SETTING_VIDEO')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiVideoOutline }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>视频通话</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </div>
     </div>
@@ -53,7 +61,8 @@ import {
   mdiBellOutline,
   mdiFileArrowUpDownOutline,
   mdiPencilOutline,
-  mdiStoreCogOutline
+  mdiStoreCogOutline,
+  mdiVideoOutline
 } from '@mdi/js'
 import ImDriver from '@/components/basic/ImDriver'
 import { computed, ref } from '@vue/composition-api'
@@ -87,7 +96,8 @@ export default {
         mdiPencilOutline,
         mdiBellOutline,
         mdiStoreCogOutline,
-        mdiFileArrowUpDownOutline
+        mdiFileArrowUpDownOutline,
+        mdiVideoOutline
       }
     }
   }

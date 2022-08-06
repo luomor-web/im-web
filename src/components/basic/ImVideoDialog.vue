@@ -5,19 +5,14 @@
         <v-avatar color="#b7c1ca" size="30">
           <img
             :src="callUser.avatar"
+           alt=""
           />
         </v-avatar>
 
         <v-toolbar-title class="ml-1">
           {{ callUser.username }}
         </v-toolbar-title>
-        <v-progress-linear
-          :active="!!session"
-          :value="audioVolume"
-          absolute
-          bottom
-          color="deep-purple accent-4"
-        />
+
         <v-spacer />
         <v-btn v-if="videoed || role === 'HOST'" icon @click="changeAudio">
           <v-icon>{{ audioEnabled ? icons.mdiMicrophone : icons.mdiMicrophoneOff }}</v-icon>
@@ -32,7 +27,13 @@
           <v-icon>{{ icons.mdiVideo }}</v-icon>
         </v-btn>
       </v-app-bar>
-
+      <v-progress-linear
+        :active="!!session"
+        :value="audioVolume"
+        absolute
+        top
+        color="deep-purple accent-4"
+      />
       <div v-if="session && calledConfig.type === 'VIDEO'" class="content-center">
         <user-video
           :stream-manager="subStreamManager"
@@ -129,7 +130,13 @@ export default {
       }
       callVideo(param)
       videoed.value = true
-      du.joinSession(room.value.roomId, currentUserId.value, calledConfig.value.type === 'VIDEO')
+      du.joinSession({
+        roomId: room.value.roomId,
+        sessionId: currentUserId.value,
+        enableVideo: calledConfig.value.type === 'VIDEO'
+      }, (text) => {
+        sendTip(text)
+      })
       clearTimeout(selfTimer.value)
     }
 
@@ -176,32 +183,34 @@ export default {
         }
         case 'AGREE':
           clearTimeout(selfTimer.value)
-          snackbar.value.display = true
-          snackbar.value.text = '已接通'
-          imComponent.value.tip(snackbar.value)
+          sendTip('已接通')
           break
         case 'BE_CALLED_REFUSE':
-          overVideo('接听者对方已挂断')
-          imComponent.value.tip(snackbar.value)
+          // 接听者挂断
+          overVideo('对方已挂断')
           break
         // 发起者接收指令
         case 'NOT_ONLINE':
-          snackbar.value.display = true
-          snackbar.value.text = '对方不在线'
-          imComponent.value.tip(snackbar.value)
+          sendTip('对方不在线')
           setTimeout(() => {
             display.value = false
           }, 1000)
-
           break
         case 'REQ_SUCCESS':
           selfTimer.value = setTimeout(() => {
             overVideo('对方无响应')
           }, 20000)
-          du.joinSession(room.value.roomId, currentUserId.value, calledConfig.value.type === 'VIDEO')
+          du.joinSession({
+            roomId: room.value.roomId,
+            sessionId: currentUserId.value,
+            enableVideo: calledConfig.value.type === 'VIDEO'
+          }, (text) => {
+            sendTip(text)
+          })
           break
         case 'CALLED_REFUSE':
-          overVideo('发起者已挂断')
+          // 发起者
+          overVideo('对方已挂断')
           break
         default:
           break
@@ -213,9 +222,7 @@ export default {
     }
 
     const overVideo = (text) => {
-      snackbar.value.display = true
-      snackbar.value.text = text
-      imComponent.value.tip(snackbar.value)
+      sendTip(text)
       setTimeout(() => {
         display.value = false
       }, 1000)
@@ -224,6 +231,12 @@ export default {
       clearTimeout(selfTimer.value)
       du.leaveSession()
       emit('close')
+    }
+
+    const sendTip = (text) => {
+      snackbar.value.display = true
+      snackbar.value.text = text
+      imComponent.value.tip(snackbar.value)
     }
 
     const changeAudio = () => {

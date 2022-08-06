@@ -246,5 +246,12 @@ export default {
     })
   },
 
+  setAudioDeviceId: (state, data) => {
+    state.audioDeviceId = data
+  },
+
+  setVideoDeviceId: (state, data) => {
+    state.videoDeviceId = data
+  },
   ...responseMessage
 }

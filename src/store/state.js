@@ -38,5 +38,9 @@ export default {
     // 用户表情包
     userEmoticons: [],
     // 用户表情包是否加载完成
-    userEmoticonLoaded: false
+    userEmoticonLoaded: false,
+    // 设置的音频ID
+    audioDeviceId: '',
+    // 设置的视频ID
+    videoDeviceId: ''
 }

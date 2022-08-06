@@ -16,7 +16,7 @@ const subscribers = ref([])
 export const audioVolume = ref(0)
 const currentUserId = computed(() => store.state.currentUserId)
 
-const joinSession = (roomId, sessionId, enableVideo) => {
+const joinSession = ({ roomId, sessionId, enableAudio = true, enableVideo = false, audioSource, videoSource }, errorCallBack) => {
     OV.value = new OpenVidu()
 
     session.value = OV.value.initSession()
@@ -38,38 +38,40 @@ const joinSession = (roomId, sessionId, enableVideo) => {
 
     // On every asynchronous exception...
     session.value.on('exception', ({ exception }) => {
-        console.warn(exception)
+      console.warn(exception)
     })
 
     getToken(roomId).then(token => {
         session.value.connect(token, { clientData: currentUserId.value })
             .then(() => {
                 // --- Get your own camera stream with the desired properties ---
-
                 const publisherCamera = OV.value.initPublisher(undefined, {
-                    audioSource: undefined, // The source of audio. If undefined default microphone
-                    videoSource: undefined, // The source of video. If undefined default webcam
-                    publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+                    audioSource, // The source of audio. If undefined default microphone
+                    videoSource, // The source of video. If undefined default webcam
+                    publishAudio: enableAudio, // Whether you want to start publishing with your audio unmuted or not
                     publishVideo: enableVideo, // Whether you want to start publishing with your video enabled or not
                     resolution: '640x480', // The resolution of your video
                     frameRate: 30,			// The frame rate of your video
                     insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
                     mirror: false // Whether to mirror your local video or not
                 })
-
                 mainStreamManager.value = publisherCamera
                 publisher.value = publisherCamera
 
                 publisher.value.on('streamAudioVolumeChange', (event) => {
-                    audioVolume.value = 100 - (event.value.newValue * -1)
+                  audioVolume.value = 100 - (event.value.newValue * -1)
+                })
+                publisher.value.on('accessDenied', (event) => {
+                  if (event.name === 'DEVICE_ALREADY_IN_USE') {
+                    errorCallBack('设备被占用,无法展示当前')
+                  }
                 })
 
                 // --- Publish your stream ---
 
                 session.value.publish(publisher.value)
-            })
-            .catch(error => {
-                console.error('There was an error connecting to the session:', error.code, error.message)
+            }).catch(error => {
+              console.error('There was an error connecting to the session:', error.code, error.message)
             })
     })
 }
@@ -102,7 +104,10 @@ const getSession = (sessionId) => {
 
 export const leaveSession = () => {
     // --- Leave the session by calling 'disconnect' method over the Session object ---
-    if (session.value) session.value.disconnect()
+    if (session.value) {
+      console.log('离开')
+      session.value.disconnect()
+    }
 
     session.value = undefined
     mainStreamManager.value = undefined
