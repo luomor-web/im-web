@@ -27,7 +27,6 @@ export default {
 
   unmounted: (state) => {
     state.loadedRooms = []
-    state.curUser = { _id: '' }
     state.loadingRooms = false
     state.roomsLoaded = true
     state.messages = []

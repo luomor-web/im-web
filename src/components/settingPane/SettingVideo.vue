@@ -80,7 +80,7 @@ import DrawerTop from '@/components/basic/DrawerTop'
 import { computed, inject, onMounted, onUnmounted, ref } from '@vue/composition-api'
 import store from '@/store'
 import { mdiPlay, mdiStop } from '@mdi/js'
-import { audioVolume, du, mainStreamManager } from '../basic/openvidu/OpenVidu'
+import { audioVolume, du, getDeviceList, getMediaPower, mainStreamManager } from '../basic/openvidu/OpenVidu'
 
 export default {
   name: 'SettingVideo',
@@ -108,13 +108,13 @@ export default {
     })
 
     onMounted(async () => {
-      if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-          stream.getTracks().forEach(x => x.stop())
-        }).catch(e => {
-          console.log(e)
-        })
-      }
+      // if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      //   await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+      //     stream.getTracks().forEach(x => x.stop())
+      //   }).catch(e => {
+      //     console.log(e)
+      //   })
+      // }
       await initDeviceList()
       audioSelect.value = audioStore.value
       videoSelect.value = videoStore.value
@@ -162,8 +162,7 @@ export default {
     }
 
     const initDeviceList = async () => {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        console.log(devices)
+      const devices = await getDeviceList()
         audios.value = devices.filter(x => x.kind === 'audioinput')
         if (!audioStore.value && audios.value?.length > 0) {
           store.commit('setAudioDeviceId', audios.value[0].deviceId)
@@ -172,9 +171,6 @@ export default {
         if (!videoStore.value && videos.value?.length > 0) {
           store.commit('setVideoDeviceId', videos.value[0].deviceId)
         }
-      }).catch(e => {
-        console.error(e)
-      })
     }
 
     const open = (item) => {

@@ -16,6 +16,28 @@ const subscribers = ref([])
 export const audioVolume = ref(0)
 const currentUserId = computed(() => store.state.currentUserId)
 
+export const getDeviceList = () => {
+  OV.value = new OpenVidu()
+  return new Promise(resolve => {
+    OV.value.getDevices().then(devices => {
+      console.log(devices)
+      resolve(devices)
+    })
+  })
+}
+
+export const getMediaPower = () => {
+  return new Promise(resolve => {
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+      console.log(stream)
+      stream.getTracks().forEach(x => x.stop())
+      resolve()
+    }).catch(e => {
+      console.log(e)
+    })
+  })
+}
+
 const joinSession = ({ roomId, sessionId, enableAudio = true, enableVideo = false, audioSource, videoSource }, errorCallBack) => {
     OV.value = new OpenVidu()
 

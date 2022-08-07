@@ -65,8 +65,9 @@ import {
   mdiVideoOutline
 } from '@mdi/js'
 import ImDriver from '@/components/basic/ImDriver'
-import { computed, ref } from '@vue/composition-api'
+import { computed, onMounted, ref } from '@vue/composition-api'
 import store from '@/store'
+import { getMediaPower } from '@/components/basic/openvidu/OpenVidu'
 
 export default {
   name: 'SettingItem',
@@ -77,6 +78,10 @@ export default {
   setup() {
     const isElectron = ref(process.env.IS_ELECTRON)
     const curUser = computed(() => store.state.curUser)
+
+    onMounted(async () => {
+      await getMediaPower()
+    })
 
     const open = (item) => {
       store.commit('setSettingPane', item)
