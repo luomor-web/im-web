@@ -188,6 +188,7 @@ export default {
         if (props.users) selectData.value.users = [...props.users]
         if (props.types.includes('CHAT')) filterLoadedRooms.value = loadedRooms.value
       } else {
+        console.log('重置')
         groupList.value = []
         userList.value = []
         selectData.value.chats = []
@@ -208,6 +209,7 @@ export default {
 
     const onIntersect = (entries) => {
       if (entries[0].isIntersecting && props.model) {
+        console.log('触发')
         const type = props.types[tab.value]
         switch (type) {
           case 'PERSON':

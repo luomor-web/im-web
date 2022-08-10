@@ -17,24 +17,44 @@ export const audioVolume = ref(0)
 const currentUserId = computed(() => store.state.currentUserId)
 
 export const getDeviceList = () => {
-  OV.value = new OpenVidu()
   return new Promise(resolve => {
-    OV.value.getDevices().then(devices => {
-      console.log(devices)
-      resolve(devices)
-    })
+    if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+      if (navigator.mediaDevices.getUserMedia) {
+        // 最新标准API
+        navigator.mediaDevices.enumerateDevices().then(devices => { resolve(devices) })
+      } else if (navigator.webkitGetUserMedia) {
+        // webkit内核浏览器
+        navigator.webkitGetUserMedia.enumerateDevices().then(devices => { resolve(devices) })
+      } else if (navigator.mozGetUserMedia) {
+        // Firefox浏览器
+        navigator.mozGetUserMedia.enumerateDevices().then(devices => { resolve(devices) })
+      } else if (navigator.getUserMedia) {
+        // 旧版API
+        // Firefox浏览器
+        navigator.getUserMedia.enumerateDevices().then(devices => { resolve(devices) })
+      }
+    }
   })
 }
 
 export const getMediaPower = () => {
-  return new Promise(resolve => {
-    navigator.mediaDevices?.getUserMedia({ audio: true, video: true }).then(stream => {
-      console.log(stream)
-      stream.getTracks().forEach(x => x.stop())
-      resolve()
-    }).catch(e => {
-      console.log(e)
-    })
+  return new Promise((resolve, reject) => {
+    const constrains = { audio: true, video: true }
+    if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+      if (navigator.mediaDevices.getUserMedia) {
+        // 最新标准API
+        navigator.mediaDevices.getUserMedia(constrains).then(stream => { stream.getTracks().forEach(x => x.stop()) }).catch(err => { reject(err) })
+      } else if (navigator.webkitGetUserMedia) {
+        // webkit内核浏览器
+        navigator.webkitGetUserMedia(constrains).then(stream => { stream.getTracks().forEach(x => x.stop()) }).catch(err => { reject(err) })
+      } else if (navigator.mozGetUserMedia) {
+        // Firefox浏览器
+        navigator.mozGetUserMedia(constrains).then(stream => { stream.getTracks().forEach(x => x.stop()) }).catch(err => { reject(err) })
+      } else if (navigator.getUserMedia) {
+        // 旧版API
+        navigator.getUserMedia(constrains).then(stream => { stream.getTracks().forEach(x => x.stop()) }).catch(err => { reject(err) })
+      }
+    }
   })
 }
 
