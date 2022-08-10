@@ -41,6 +41,14 @@
 
     <div class="mx-2">
       <v-list nav>
+        <v-list-item v-if="isAdminOrSubAdmin" v-ripple class="im-list-item" @click="open('GROUP_SETTING')">
+          <v-list-item-icon>
+            <v-icon>{{ icons.mdiAccountCogOutline }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>群组设置</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item v-if="isAdminOrSubAdmin" v-ripple class="im-list-item" @click="open('GROUP_USER_MANAGE')">
           <v-list-item-icon>
             <v-icon>{{ icons.mdiLockOutline }}</v-icon>
@@ -58,7 +66,7 @@
             <v-list-item-title>移交群组</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-</v-list>
+      </v-list>
     </div>
 
     <v-divider />
@@ -68,8 +76,8 @@
         <v-list-item v-if="isAdmin" v-ripple class="im-list-item error--text" @click="startDisbandRoom">
           <v-list-item-icon>
             <v-icon color="red">
-{{ icons.mdiDeleteOutline }}
-</v-icon>
+              {{ icons.mdiDeleteOutline }}
+            </v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>删除并解散群聊</v-list-item-title>
@@ -79,8 +87,8 @@
         <v-list-item v-if="!isAdmin" v-ripple class="im-list-item error--text" @click="startOutRoom">
           <v-list-item-icon>
             <v-icon color="red">
-{{ icons.mdiDeleteOutline }}
-</v-icon>
+              {{ icons.mdiDeleteOutline }}
+            </v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>删除并退出群聊</v-list-item-title>
@@ -112,7 +120,14 @@
 import DrawerTop from '@/components/basic/DrawerTop'
 import { computed, onMounted, ref, watch } from '@vue/composition-api'
 import { disbandGroup, editGroupProfile, removeUserGroup } from '@/net/send-message'
-import { mdiCamera, mdiCheck, mdiDeleteOutline, mdiLockOutline, mdiPoliceBadgeOutline } from '@mdi/js'
+import {
+  mdiAccountCogOutline,
+  mdiCamera,
+  mdiCheck,
+  mdiDeleteOutline,
+  mdiLockOutline,
+  mdiPoliceBadgeOutline
+} from '@mdi/js'
 import ImUpload from '@/components/basic/ImUpload'
 import ImWarnDialog from '@/components/basic/ImWarnDialog'
 import store from '@/store'
@@ -263,7 +278,8 @@ export default {
         mdiLockOutline,
         mdiDeleteOutline,
         mdiCheck,
-        mdiPoliceBadgeOutline
+        mdiPoliceBadgeOutline,
+        mdiAccountCogOutline
       }
     }
   }

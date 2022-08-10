@@ -28,7 +28,7 @@ export const getDeviceList = () => {
 
 export const getMediaPower = () => {
   return new Promise(resolve => {
-    navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+    navigator.mediaDevices?.getUserMedia({ audio: true, video: true }).then(stream => {
       console.log(stream)
       stream.getTracks().forEach(x => x.stop())
       resolve()

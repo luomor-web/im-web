@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height">
-<drawer-top :sub="true" @close="open('GROUP_EDIT')">
+      <drawer-top :sub="true" @close="open('GROUP_EDIT')">
       <v-text-field v-model="searchName" hide-details rounded dense filled placeholder="搜索" />
     </drawer-top>
 

@@ -8,6 +8,9 @@
         <v-window-item value="GROUP_EDIT">
           <group-edit />
         </v-window-item>
+        <v-window-item value="GROUP_SETTING">
+          <group-setting />
+        </v-window-item>
         <v-window-item value="GROUP_USER_MANAGE">
           <group-user-manage />
         </v-window-item>
@@ -30,10 +33,11 @@ import GroupUserManage from '@/components/informationPane/GroupUserManage'
 import GroupHandoverAdmin from '@/components/informationPane/GroupHandoverAdmin'
 import MessageHistory from '@/components/informationPane/MessageHistory'
 import store from '@/store'
+import GroupSetting from '@/components/informationPane/GroupSetting'
 
 export default {
   name: 'InformationPane',
-  components: { MessageHistory, GroupHandoverAdmin, GroupUserManage, GroupEdit, RoomInfo },
+  components: { GroupSetting, MessageHistory, GroupHandoverAdmin, GroupUserManage, GroupEdit, RoomInfo },
   setup() {
     const room = computed(() => store.getters.curRoom)
     const informationPane = computed(() => store.state.informationPane)

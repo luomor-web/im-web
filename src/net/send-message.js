@@ -49,14 +49,22 @@ searchId
   sendMsg(param)
 }
 
+// 获取所有公开群组
+const searchGroup = (name, roomId, searchId) => {
+  const param = {
+    cmd: 63,
+    name,
+    roomId,
+    searchId
+  }
+  sendMsg(param)
+}
+
 // 创建一个好友会话群
 const createGroup = (data) => {
   const param = {
     cmd: 22,
-    isFriend: data.isFriend,
-    avatar: data.avatar,
-    users: data.users,
-    roomName: data.roomName
+    ...data
   }
   sendMsg(param)
 }
@@ -218,6 +226,15 @@ const operationEmoticon = (data) => {
   sendMsg(param)
 }
 
+// 设置群组公开
+const setPublicRoom = (data) => {
+  const param = {
+    cmd: 61,
+    ...data
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
   store.commit('resetData')
   close()
@@ -282,5 +299,7 @@ export {
   userGroupConfig,
   searchEmoticon,
   operationEmoticon,
-  searchUserEmoticon
+  searchUserEmoticon,
+  setPublicRoom,
+  searchGroup
 }

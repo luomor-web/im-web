@@ -40,6 +40,32 @@
         outlined
       />
     </div>
+    <v-list>
+      <v-list-item v-ripple class="im-list-item">
+        <v-list-item-content>
+          <v-list-item-title>
+            公开群组
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon class="pl-1"
+                        :size="20"
+                        v-bind="attrs"
+                        v-on="on"
+                >
+                  {{ icons.mdiAlertCircleOutline }}
+                </v-icon>
+              </template>
+              <span>设置后其他用户可通过群组检索到此群组</span>
+            </v-tooltip>
+          </v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-action>
+          <v-switch
+            v-model="publicRoom"
+          />
+        </v-list-item-action>
+      </v-list-item>
+    </v-list>
     <im-driver />
     <v-toolbar elevation="0" dense class="mx-2">
       <v-toolbar-title class="subtitle-1 font-weight-black">
@@ -82,7 +108,7 @@ import { createGroup } from '@/net/send-message'
 import DrawerTop from '@/components/basic/DrawerTop'
 import ImUpload from '@/components/basic/ImUpload'
 import ImDriver from '@/components/basic/ImDriver'
-import { mdiCamera } from '@mdi/js'
+import { mdiAlertCircleOutline, mdiCamera } from '@mdi/js'
 import ImUserSelectDialog from '@/components/basic/ImUserSelectDialog'
 
 export default {
@@ -94,6 +120,7 @@ export default {
     ImDriver
   },
   setup () {
+    const publicRoom = ref(false)
     const roomName = ref('')
     const userSelect = ref([])
     const roomAvatar = ref('')
@@ -104,7 +131,7 @@ export default {
       const users = userSelect.value.map(x => {
         return { _id: x._id }
       })
-      createGroup({ isFriend: false, roomName: roomName.value, avatar: roomAvatar.value, users })
+      createGroup({ isFriend: false, roomName: roomName.value, avatar: roomAvatar.value, users, publicRoom: publicRoom.value })
       closeAddRoom()
     }
 
@@ -150,6 +177,7 @@ export default {
       roomName,
       roomAvatar,
       userSelect,
+      publicRoom,
       sure,
       removeUser,
       sureChoseUser,
@@ -160,7 +188,8 @@ export default {
       startChoseUser,
 
       icons: {
-        mdiCamera
+        mdiCamera,
+        mdiAlertCircleOutline
       }
     }
   }

@@ -121,6 +121,14 @@ const webSocket = (token) => {
             case 60:
                 store.commit('COMMAND_EMOTICON_OPERATION_RESP', data)
                 break
+            // 设置群组公开
+            case 62:
+                // store.commit('COMMAND_SET_PUBLIC_ROOM_RESP', data)
+                break
+            // 操作用户表情包
+            case 64:
+                msg.$emit('COMMAND_SEARCH_GROUP_RESP', data)
+                break
             default:
                 break
         }
