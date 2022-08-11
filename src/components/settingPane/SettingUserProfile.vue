@@ -5,7 +5,7 @@
       <div class="mx-2">
         <div class="d-table ma-auto">
           <v-hover>
-            <template v-slot:default="{ hover }">
+            <template #default="{ hover }">
               <v-img
                 aspect-ratio="1"
                 height="120"

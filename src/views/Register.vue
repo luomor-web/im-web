@@ -48,11 +48,11 @@
                   :loading="checkAccount.loading"
                   @blur="accountBlur"
               >
-                <template v-if="checkAccount.displayIcon" v-slot:append>
+                <template v-if="checkAccount.displayIcon" #append>
                   <v-tooltip
                       bottom
                   >
-                    <template v-slot:activator="{ on }">
+                    <template #activator="{ on }">
                       <v-icon v-on="on">
                         {{ checkAccount.success ? icons.mdiCheckCircleOutline : icons.mdiCloseCircleOutline }}
                       </v-icon>

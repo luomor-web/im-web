@@ -31,7 +31,7 @@
           </div>
         </v-slide-x-reverse-transition>
         <v-img :src="item.url" max-height="75px" :lazy-src="item.url" @click="sendEmoticon(item)">
-          <template v-slot:placeholder>
+          <template #placeholder>
             <v-row
               class="fill-height ma-0"
               align="center"

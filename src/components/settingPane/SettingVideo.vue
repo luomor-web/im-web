@@ -18,7 +18,7 @@
         </v-list-item-content>
         <v-list-item-action>
           <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn icon
                      v-bind="attrs"
                      v-on="on"
@@ -53,7 +53,7 @@
         </v-list-item-content>
         <v-list-item-action>
           <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn icon
                      v-bind="attrs"
                      v-on="on"
@@ -80,7 +80,7 @@ import DrawerTop from '@/components/basic/DrawerTop'
 import { computed, inject, onMounted, onUnmounted, ref } from '@vue/composition-api'
 import store from '@/store'
 import { mdiPlay, mdiStop } from '@mdi/js'
-import { audioVolume, du, getDeviceList, getMediaPower, mainStreamManager } from '../basic/openvidu/OpenVidu'
+import { audioVolume, du, getDeviceList, mainStreamManager } from '../basic/openvidu/OpenVidu'
 
 export default {
   name: 'SettingVideo',
@@ -163,11 +163,11 @@ export default {
 
     const initDeviceList = async () => {
       const devices = await getDeviceList()
-        audios.value = devices.filter(x => x.kind === 'audioinput')
+        audios.value = devices.filter(x => x.kind === 'audioinput' && x.label)
         if (!audioStore.value && audios.value?.length > 0) {
           store.commit('setAudioDeviceId', audios.value[0].deviceId)
         }
-        videos.value = devices.filter(x => x.kind === 'videoinput')
+        videos.value = devices.filter(x => x.kind === 'videoinput' && x.label)
         if (!videoStore.value && videos.value?.length > 0) {
           store.commit('setVideoDeviceId', videos.value[0].deviceId)
         }

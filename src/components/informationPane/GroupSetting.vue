@@ -10,7 +10,7 @@
           <v-list-item-title>
             公开群组
             <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-icon class="pl-1"
                         :size="20"
                         v-bind="attrs"

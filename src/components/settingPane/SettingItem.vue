@@ -22,6 +22,14 @@
               <v-list-item-title>资料修改</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item v-ripple class="im-list-item" @click="open('SETTING_PASSWORD')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiLockCheckOutline }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>修改密码</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
         <im-driver />
         <v-list nav>
@@ -59,7 +67,7 @@
 import DrawerTop from '@/components/basic/DrawerTop'
 import {
   mdiBellOutline,
-  mdiFileArrowUpDownOutline,
+  mdiFileArrowUpDownOutline, mdiLockCheckOutline,
   mdiPencilOutline,
   mdiStoreCogOutline,
   mdiVideoOutline
@@ -67,7 +75,7 @@ import {
 import ImDriver from '@/components/basic/ImDriver'
 import { computed, onMounted, ref } from '@vue/composition-api'
 import store from '@/store'
-import { getMediaPower } from '@/components/basic/openvidu/OpenVidu'
+import { getDeviceList, getMediaPower } from '@/components/basic/openvidu/OpenVidu'
 
 export default {
   name: 'SettingItem',
@@ -80,7 +88,12 @@ export default {
     const curUser = computed(() => store.state.curUser)
 
     onMounted(async () => {
-      await getMediaPower()
+      const devices = await getDeviceList()
+      const filter = devices.filter(x => (x.kind === 'audioinput' || x.kind === 'videoinput') && x.label)
+      if (filter.length === 0) {
+        console.log(filter, 'filter')
+        await getMediaPower()
+      }
     })
 
     const open = (item) => {
@@ -102,7 +115,8 @@ export default {
         mdiBellOutline,
         mdiStoreCogOutline,
         mdiFileArrowUpDownOutline,
-        mdiVideoOutline
+        mdiVideoOutline,
+        mdiLockCheckOutline
       }
     }
   }

@@ -10,7 +10,7 @@
       transition="scale-transition"
       origin="right bottom"
     >
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-btn
           :class="{'mr-8': true, 'mb-16': true}"
           color="blue darken-2"

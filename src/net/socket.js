@@ -129,6 +129,10 @@ const webSocket = (token) => {
             case 64:
                 msg.$emit('COMMAND_SEARCH_GROUP_RESP', data)
                 break
+          // 操作用户表情包
+            case 66:
+                msg.$emit('COMMAND_SET_NEW_PASSWORD_RESP', data)
+                break
             default:
                 break
         }

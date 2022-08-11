@@ -8,7 +8,7 @@
         <v-dialog ref="dialog" v-model="modal" width="470" :return-value.sync="picker"
                   @input="pickerDataChange"
         >
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               v-bind="attrs"
               icon

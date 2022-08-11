@@ -17,7 +17,7 @@
 
           <v-list-item-icon v-if="item.role === 'GENERAL'">
             <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"
@@ -32,7 +32,7 @@
 
           <v-list-item-icon v-if="item.role === 'SUB_ADMIN'">
             <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"
@@ -47,7 +47,7 @@
 
           <v-list-item-icon>
             <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn icon
                        v-bind="attrs"
                        v-on="on"

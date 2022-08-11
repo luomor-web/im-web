@@ -6,7 +6,7 @@
 
       <div v-for="(item, index) of emoticons" :key="index" class="emoticon-img" @click="sendEmoticon(item)">
         <v-img :src="item.url" :lazy-src="item.url" max-height="75px">
-          <template v-slot:placeholder>
+          <template #placeholder>
             <v-row
               class="fill-height ma-0"
               align="center"

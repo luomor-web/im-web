@@ -18,7 +18,7 @@
                @click="checkUpdate"
         >
           检查更新
-          <template v-slot:loader>
+          <template #loader>
             <span>Loading...</span>
           </template>
         </v-btn>

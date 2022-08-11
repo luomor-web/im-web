@@ -35,7 +35,7 @@
             offset-y
             left
           >
-            <template v-slot:activator="{ attrs, on }">
+            <template #activator="{ attrs, on }">
               <v-btn icon
                      v-bind="attrs"
                      v-on="on"

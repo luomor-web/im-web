@@ -10,7 +10,7 @@
     </drawer-top>
     <div class="d-table ma-auto">
       <v-hover>
-        <template v-slot:default="{ hover }">
+        <template #default="{ hover }">
           <v-img
             aspect-ratio="1"
             height="120"
@@ -46,7 +46,7 @@
           <v-list-item-title>
             公开群组
             <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-icon class="pl-1"
                         :size="20"
                         v-bind="attrs"

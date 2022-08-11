@@ -240,6 +240,15 @@ const quitSystem = () => {
   close()
 }
 
+// 获取所有公开群组
+const setNewPassword = (data) => {
+  const param = {
+    cmd: 65,
+    ...data
+  }
+  sendMsg(param)
+}
+
 // 构建最后一条消息
 const buildLastMessage = (data) => {
   let content = data.deleted ? '删除了一条消息' : data.content
@@ -301,5 +310,6 @@ export {
   operationEmoticon,
   searchUserEmoticon,
   setPublicRoom,
-  searchGroup
+  searchGroup,
+  setNewPassword
 }

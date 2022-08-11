@@ -9,7 +9,7 @@
         transition="scale-transition"
         origin="left top"
       >
-        <template v-slot:activator="{ on }">
+        <template #activator="{ on }">
           <v-btn
             icon
             x-large
@@ -86,7 +86,7 @@
       </h3>
       <v-spacer />
       <v-tooltip v-if="!isElectron" bottom z-index="11">
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn icon
                  v-bind="attrs"
                  @click="downloadDesktop"

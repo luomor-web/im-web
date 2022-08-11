@@ -9,6 +9,7 @@ module.exports = {
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-control-regex': 0,
         'no-empty-pattern': 'off',
+        'vue/no-mutating-props': 'off',
         'no-unused-vars': 'warn',
         'valid-typeof': 'off',
         indent: 'off',

@@ -8,6 +8,9 @@
         <v-window-item value="SETTING_USER_PROFILE">
           <setting-user-profile />
         </v-window-item>
+        <v-window-item value="SETTING_PASSWORD">
+          <setting-password />
+        </v-window-item>
         <v-window-item value="SETTING_DOWNLOAD">
           <setting-download />
         </v-window-item>
@@ -39,10 +42,12 @@ import DownloadHistory from '@/components/settingPane/DownloadHistory'
 import SettingDownload from '@/components/settingPane/SettingDownload'
 import SettingGeneral from '@/components/settingPane/SettingGeneral'
 import SettingVideo from '@/components/settingPane/SettingVideo'
+import SettingPassword from '@/components/settingPane/SettingPassword'
 
 export default {
   name: 'SettingPane',
   components: {
+    SettingPassword,
     SettingVideo,
     SettingGeneral,
     SettingDownload,
