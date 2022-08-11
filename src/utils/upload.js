@@ -60,7 +60,7 @@ function countSpeed(file, cb) {
         total += x
     })
     const progress = total <= 0 ? 0 : Math.round((total / file.size) * 10000) / 100.0
-    // eslint-disable-next-line node/no-callback-literal
+    // eslint-disable-next-line n/no-callback-literal
     cb({ ...file, progress }, false)
     return true
 }

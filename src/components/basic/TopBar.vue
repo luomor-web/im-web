@@ -52,7 +52,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .top {
   -webkit-app-region: drag;
 }
