@@ -116,6 +116,9 @@ const joinSession = ({ roomId, sessionId, enableAudio = true, enableVideo = fals
                   if (event.name === 'DEVICE_ALREADY_IN_USE') {
                     errorCallBack('设备被占用,无法展示当前')
                   }
+                  if (event.name === 'DEVICE_ACCESS_DENIED') {
+                    errorCallBack('未发现设备或设备权限问题')
+                  }
                 })
 
                 // --- Publish your stream ---

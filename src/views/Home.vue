@@ -17,6 +17,7 @@
       :room-info-enabled="true"
       :search-message="searchMessage"
       :emoji-picker-slots="emojiPickerSlots"
+      @room-action-handler="roomActionHandler"
       @open-failed-message="openFailedMessage"
       @room-info="roomInfo"
       @send-message="sendMessage"
@@ -95,6 +96,7 @@ import FloatMenu from '@/components/basic/FloatMenu'
 import { scrollToTop } from '@/utils/dom'
 import EmoticonSearch from '@/components/room/EmoticonSearch'
 import EmoticonUser from '@/components/room/EmoticonUser'
+import { userGroupConfig } from '../net/send-message'
 
 export default {
   name: 'Home',
@@ -151,6 +153,16 @@ export default {
       if (action.name === 'forwardMessages') {
         imComponent.value.forward(messages)
       }
+    }
+
+    const roomActionHandler = ({ roomId, action }) => {
+      console.log(roomId, action)
+      const param = {
+        roomId,
+        moveTop: action === 'moveTop',
+        type: 'MOVE_TOP'
+      }
+      userGroupConfig(param)
     }
 
     const openFile = ({ file }) => {
@@ -295,6 +307,7 @@ export default {
       deleteMessage,
       clickScrollIcon,
       sendMessageReaction,
+      roomActionHandler,
       messageSelectionActionHandler
 
     }

@@ -16,17 +16,47 @@
       >
         <v-slide-x-reverse-transition>
           <div v-show="operationHover === index" class="emoticon-operation">
-            <div class="vac-svg-button emoticon-operation-button" @click="optionsOpened = index">
-              <v-icon :size="20">
-                mdi-chevron-down-circle
-              </v-icon>
+            <div class="vac-svg-button emoticon-operation-top">
+              <v-tooltip bottom :z-index="11">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon :size="20"
+                          v-bind="attrs"
+                          @click="moveTopEmoticon(item)"
+                          v-on="on"
+                  >
+                    mdi-arrow-up-circle
+                  </v-icon>
+                </template>
+                <span>移到最前</span>
+              </v-tooltip>
             </div>
-          </div>
-        </v-slide-x-reverse-transition>
-        <v-slide-x-reverse-transition>
-          <div v-show="optionsOpened === index" class="emoticon-menu-list" @click="deleteEmoticon(item)">
-            <div class="emoticon-menu-item">
-              删除
+            <div class="vac-svg-button emoticon-operation-store">
+              <v-tooltip bottom :z-index="11">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon :size="20"
+                          v-bind="attrs"
+                          @click="shareEmoticon(item)"
+                          v-on="on"
+                  >
+                    mdi-cloud-circle
+                  </v-icon>
+                </template>
+                <span>分享</span>
+              </v-tooltip>
+            </div>
+            <div class="vac-svg-button emoticon-operation-delete">
+              <v-tooltip bottom :z-index="11">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon :size="20"
+                          v-bind="attrs"
+                          @click="deleteEmoticon(item)"
+                          v-on="on"
+                  >
+                    mdi-delete-circle
+                  </v-icon>
+                </template>
+                <span>删除</span>
+              </v-tooltip>
             </div>
           </div>
         </v-slide-x-reverse-transition>
@@ -76,25 +106,38 @@ export default {
     const upload = ref(null)
     const imComponent = inject('imComponent', () => {})
     const operationHover = ref(-1)
-    const optionsOpened = ref(-1)
 
     onMounted(() => {
-      msg.$on('INSERT_TO_USER_MSG', (data) => {
+      msg.$on('EMOTICON_INSERT_TO_USER_MSG', (data) => {
         if (data.success) {
           imComponent.value.tip({ display: true, text: '新增成功', timeout: 1000 })
         }
       })
-      msg.$on('DELETE_MSG', (data) => {
+      msg.$on('EMOTICON_DELETE_MSG', (data) => {
         if (data.success) {
           imComponent.value.tip({ display: true, text: '删除成功', timeout: 1000 })
+          closeOptions()
+        }
+      })
+      msg.$on('EMOTICON_MOVE_TOP', (data) => {
+        if (data.success) {
+          imComponent.value.tip({ display: true, text: '移动成功', timeout: 1000 })
+          closeOptions()
+        }
+      })
+      msg.$on('EMOTICON_INSERT_TO_STORE', (data) => {
+        if (data.success) {
+          imComponent.value.tip({ display: true, text: '分享成功', timeout: 1000 })
           closeOptions()
         }
       })
     })
 
     onUnmounted(() => {
-      msg.$off('INSERT_TO_USER_MSG')
-      msg.$off('DELETE_MSG')
+      msg.$off('EMOTICON_INSERT_TO_USER_MSG')
+      msg.$off('EMOTICON_DELETE_MSG')
+      msg.$off('EMOTICON_MOVE_TOP')
+      msg.$off('EMOTICON_INSERT_TO_STORE')
     })
 
     const onIntersect = (entries) => {
@@ -105,7 +148,6 @@ export default {
 
     const closeOptions = () => {
       operationHover.value = -1
-      optionsOpened.value = -1
     }
 
     const addEmoticon = () => {
@@ -130,6 +172,20 @@ export default {
       const data = {
         emoticonId: item._id,
         type: 'DELETE'
+      }
+      operationEmoticon(data)
+    }
+    const shareEmoticon = (item) => {
+      const data = {
+        emoticonId: item._id,
+        type: 'INSERT_TO_STORE'
+      }
+      operationEmoticon(data)
+    }
+    const moveTopEmoticon = (item) => {
+      const data = {
+        emoticonId: item._id,
+        type: 'MOVE_TOP'
       }
       operationEmoticon(data)
     }
@@ -169,14 +225,15 @@ export default {
       emoticonLoaded,
       upload,
       operationHover,
-      optionsOpened,
 
       sure,
       addEmoticon,
       closeOptions,
       onIntersect,
       sendEmoticon,
-      deleteEmoticon
+      deleteEmoticon,
+      shareEmoticon,
+      moveTopEmoticon
     }
   }
 }
@@ -207,47 +264,32 @@ export default {
 
     .emoticon-operation {
       height: 24px;
-      width: 24px;
+      width: 66px;
       background-color: #d0d7d7;
       position: absolute;
       z-index: 1;
       right: 0;
       border-bottom-left-radius: 8px;
 
-      .emoticon-operation-button {
+      .emoticon-operation-delete {
         position: absolute;
         z-index: 2;
         right: 2px;
         top: 2px;
       }
-    }
 
-    .emoticon-menu-list {
-      z-index: 3;
-      width: 50px;
-      height: 24px;
-      position: absolute;
-      top: 24px;
-      right: 0;
-      font-size: 16px;
-      text-align: center;
-
-      border-radius: 4px;
-      display: block;
-      cursor: pointer;
-      background: var(--chat-dropdown-bg-color);
-
-      :hover {
-        background: var(--chat-dropdown-bg-color-hover);
-        transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+      .emoticon-operation-store {
+        position: absolute;
+        z-index: 2;
+        right: 22px;
+        top: 2px;
       }
 
-      :not(:hover) {
-        transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-      }
-
-      .emoticon-menu-item {
-        width: 50px;
+      .emoticon-operation-top {
+        position: absolute;
+        z-index: 2;
+        right: 42px;
+        top: 2px;
       }
     }
 

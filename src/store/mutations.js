@@ -125,7 +125,9 @@ export default {
     if (roomIndex === -1) {
       return
     }
-    state.loadedRooms[roomIndex].index = new Date().getTime()
+    if (state.loadedRooms[roomIndex].index !== 9999999999999) {
+      state.loadedRooms[roomIndex].index = new Date().getTime()
+    }
     state.loadedRooms = [...state.loadedRooms]
   },
   addWaitSendMessage: (state, { message, haveFile }) => {

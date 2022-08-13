@@ -42,6 +42,9 @@ export default {
             case 'NOTICE':
                 state.loadedRooms[index].notice = config.notice
                 break
+          case 'MOVE_TOP':
+              state.loadedRooms[index].index = config.index
+                break
         }
 
         state.loadedRooms = [...state.loadedRooms]
@@ -357,7 +360,20 @@ export default {
           break
         case 'DELETE':
           state.userEmoticons.splice(state.userEmoticons.findIndex(r => r._id === emoticon._id), 1)
-          msg.$emit('DELETE_MSG', data)
+          msg.$emit('EMOTICON_DELETE_MSG', data)
+          break
+        case 'MOVE_TOP':
+          state.userEmoticons.splice(state.userEmoticons.findIndex(r => r._id === emoticon._id), 1)
+          state.userEmoticons.unshift(emoticon)
+          msg.$emit('EMOTICON_MOVE_TOP', data)
+          break
+        case 'INSERT_TO_STORE':
+          if (state.emoticons.findIndex(r => r._id === emoticon._id)) {
+            state.emoticons.splice(state.emoticons.findIndex(r => r._id === emoticon._id), 1)
+          }
+          state.emoticons.unshift(emoticon)
+          msg.$emit('EMOTICON_INSERT_TO_STORE', data)
+          break
       }
     }
 
