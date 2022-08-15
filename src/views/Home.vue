@@ -72,7 +72,6 @@ import { computed, onMounted, provide, ref } from '@vue/composition-api'
 import TopBar from '../components/basic/TopBar'
 import {
   getHistoryMessage,
-  getUserInfo,
   messageDelete,
   messageReaction,
   operationEmoticon,
@@ -130,7 +129,7 @@ export default {
     provide('imComponent', imComponent)
 
     onMounted(() => {
-      getUserInfo(currentUserId.value)
+      // getUserInfo(currentUserId.value)
     })
 
     onbeforeunload = () => {

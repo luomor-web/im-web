@@ -1,10 +1,18 @@
 'use strict'
-import { app, BrowserWindow, ipcMain, Menu, protocol, screen, Tray } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, screen, shell, Tray } from 'electron'
 import createProtocol from './service/createProtocol'
-import { updateHandle } from '@/service/updateHandler'
 import { initMenu } from '@/service/menuHandler'
-import { downloadHandle } from '@/service/downloadHandler'
 import log from 'electron-log'
+import { getDownloadPath, separator } from '@/utils/electron-util'
+import { prefix, suffix } from '@/utils/media-file'
+import { existsSync } from 'fs'
+import { renameSync } from 'fs-extra'
+import { autoUpdater } from 'electron-updater'
+import update from '@/utils/update'
+import * as fs from 'fs'
+import AdmZip from 'adm-zip'
+import os from 'os'
+import sudo from 'sudo-prompt'
 
 const resources = process.resourcesPath
 
@@ -15,7 +23,9 @@ export let win
 const ex = process.execPath
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
+app.commandLine.appendSwitch('ignore-certificate-errors') // 忽略证书的检测
 
+// 创建主窗口
 function createWindow () {
   win = new BrowserWindow({
     show: false,
@@ -50,9 +60,6 @@ function createWindow () {
 
   win.on('focus', onWindowFocus)
 }
-
-app.commandLine.appendSwitch('ignore-certificate-errors') // 忽略证书的检测
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS, it is common for applications and their menu bar
@@ -61,7 +68,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
 app.on('activate', () => {
   // On macOS, it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -69,27 +75,21 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
 app.on('ready', async () => {
   createWindow()
   bindTray()
   updateHandle()
-  downloadHandle()
+  willDownload()
   msgWindowHandler.createWindow()
 })
-
 ipcMain.on('min', () => win.minimize())
-
 ipcMain.on('max', () => win.isMaximized() ? win.unmaximize() : win.maximize())
-
 ipcMain.on('close', () => {
   hideWindow()
 })
-
 ipcMain.on('quit', () => {
   app.quit()
 })
-
 ipcMain.on('open-auto-start', (event, args) => {
   if (args && isDevelopment) {
     return
@@ -100,7 +100,6 @@ ipcMain.on('open-auto-start', (event, args) => {
     args: []
   })
 })
-
 ipcMain.handle('win-version', (event, v) => {
   version = v
 })
@@ -126,7 +125,6 @@ initMenu()
 let msgWindow
 export let notifyList = []
 ipcMain.on('notify-list', (event, room) => {
-
   if (win.isFocused()) {
     clearNotifyList()
     return
@@ -215,9 +213,9 @@ let trayNoticeInterval, position
 // 绑定托盘
 let iconPath, blankIconPath
 
-export let appIcon
+let appIcon
 
-export const bindTray = () => {
+const bindTray = () => {
   iconPath = path.join(__dirname, isDevelopment ? '../public/icons/tray.ico' : './icons/tray.ico')
   blankIconPath = path.join(__dirname, isDevelopment ? '../public/icons/black_tray.ico' : './icons/black_tray.ico')
   log.info('图标路径', iconPath)
@@ -255,7 +253,9 @@ export const bindTray = () => {
 }
 
 export const resetTrayIcon = () => {
-  appIcon.setImage(iconPath)
+  if (appIcon) {
+    appIcon.setImage(iconPath)
+  }
   clearInterval(t)
   t = null
 }
@@ -320,4 +320,303 @@ const clearNotifyList = () => {
     msgWindow.webContents.send('notify-list', { room: null, action: 'clear' })
   }
   msgWindowHandler.hideWindow()
+}
+
+let downloadFile
+const downloadItemList = new Map()
+ipcMain.on('download-file', (event, file, again) => {
+  const path = again ? file.downloadPath : file.downloadPath + separator(file.downloadPath) + file.name
+  const downloadPath = getDownloadPath(prefix(path), suffix(path), 0)
+  downloadFile = {
+    ...file,
+    downloadPath
+  }
+  win.webContents.downloadURL(file.url)
+})
+ipcMain.handle('download-file-stop', (event, file) => {
+  const downloadItem = downloadItemList.get(file.id)
+  if (downloadItem) {
+    downloadItem.cancel()
+    return true
+  }
+  return false
+})
+ipcMain.handle('open-file-dialog', (event, oldPath) => openFileDialog(oldPath))
+ipcMain.handle('downloads-path', () => app.getPath('downloads'))
+ipcMain.handle('open-file-folder', (event, item) => {
+  if (!existsSync(item.downloadPath)) return false
+  shell.showItemInFolder(item.downloadPath)
+  return true
+})
+ipcMain.handle('open-file-shell', async (event, item) => {
+  if (!existsSync(item.downloadPath)) return false
+  await shell.openPath(item.downloadPath)
+  return true
+})
+
+/**
+ * 打开文件选择框
+ * @param oldPath - 上一次打开的路径
+ */
+const openFileDialog = async (oldPath = app.getPath('downloads')) => {
+  if (!win) return oldPath
+
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    title: '选择保存位置',
+    properties: ['openDirectory', 'createDirectory'],
+    defaultPath: oldPath
+  })
+
+  return !canceled ? filePaths[0] : oldPath
+}
+const setProgressBar = () => {
+  if (!downloadItemList) {
+    win.setProgressBar(-1)
+    return
+  }
+  let progress = -1
+
+  downloadItemList.forEach((v) => {
+    const number = v.getReceivedBytes() / v.getTotalBytes()
+    if (number > progress) {
+      progress = number
+    }
+  })
+  win.setProgressBar(progress)
+}
+const willDownload = () => {
+  win.webContents.session.on('will-download', (event, item) => {
+    item.setSavePath(downloadFile.downloadPath + '.tmp')
+    // 发送下载记录给界面
+    item.file = downloadFile
+    win.webContents.send('download-file-start', {
+      ...item.file,
+      receivedBytes: item.getReceivedBytes(),
+      totalBytes: item.getTotalBytes()
+    })
+    // 设置当前下载的列表,用来停止下载
+    downloadItemList.set(item.file.id, item)
+    item.on('updated', (event, updatedState) => {
+      if (updatedState === 'interrupted') {
+        log.info('download-file-interrupted')
+        // 中断的话直接删除
+        downloadItemList.delete(item.file.id)
+        win.webContents.send('download-file-interrupted', {
+          ...item.file,
+          receivedBytes: item.getReceivedBytes(),
+          totalBytes: item.getTotalBytes()
+        })
+      } else if (updatedState === 'progressing') {
+        if (item.isPaused()) {
+          win.webContents.send('download-file-paused', {
+            ...item.file,
+            receivedBytes: item.getReceivedBytes(),
+            totalBytes: item.getTotalBytes()
+          })
+        } else {
+          win.webContents.send('download-file-ing', {
+            ...item.file,
+            receivedBytes: item.getReceivedBytes(),
+            totalBytes: item.getTotalBytes()
+          })
+          setProgressBar()
+          // console.log(`Received bytes: ${item.getReceivedBytes()}`)
+        }
+      }
+    })
+    item.once('done', (event, state) => {
+      // 结束的话直接删除
+      downloadItemList.delete(item.file.id)
+      setProgressBar()
+      if (state === 'completed') {
+        renameSync(item.file.downloadPath + '.tmp', item.file.downloadPath)
+        win.webContents.send('download-file-done', { ...item.file })
+      } else if (state === 'cancelled') {
+        win.webContents.send('download-file-cancelled', { ...item.file })
+      } else {
+        win.webContents.send('download-file-fail', { ...item.file })
+      }
+    })
+  })
+}
+
+// 系统更新========================================
+// 开启开发者模式更新
+Object.defineProperty(app, 'isPackaged', {
+    get() {
+        return true
+    }
+})
+let downloadUpdateIng = false
+export const updateHandle = () => {
+  log.transports.file.level = 'debug'
+  autoUpdater.logger = log
+  // autoUpdater.setFeedURL(updateUrl)
+
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = false
+
+  // autoUpdater.checkForUpdates().then(() => {
+  // })
+  // 更新失败
+  autoUpdater.on('error', (info) => {
+    // win?.webContents.send('check-update-error', info)
+    log.info('更新失败', info)
+  })
+  // 当开始检查更新的时候触发。
+  autoUpdater.on('checking-for-update', (info) => {
+    log.info('检查更新', info)
+    win.webContents.send('checking-for-update', info)
+  })
+  // 当发现一个可用更新的时候触发，更新包下载会自动开始。
+  autoUpdater.on('update-available', (info) => {
+    log.info('当前运行版本:', version, ' 检查版本', info.version)
+    if (version === info.version) {
+      win.webContents.send('update-not-available', info)
+    } else {
+      win.webContents.send('update-available', info)
+    }
+  })
+  // 当没有可用更新的时候触发。
+  autoUpdater.on('update-not-available', (info) => {
+    win.webContents.send('update-not-available', info)
+  })
+  // 下载进度监听
+  autoUpdater.on('download-progress', (progress) => {
+    log.info('下载进度监听', progress)
+    // win?.webContents.send('download-progress', progress)
+  })
+  // 下载完成,等待下一步动作
+  autoUpdater.on('update-downloaded', function () {
+    win.webContents.send('update-downloaded')
+    ipcMain.on('quit-and-install', () => {
+      autoUpdater.quitAndInstall()
+    })
+  })
+  // 监听消息检查更新
+  ipcMain.on('check-update', () => {
+    // if (isDevelopment) {
+    //   win.webContents.send('development-model')
+    //   return
+    // }
+    log.info('检查更新指令,当前', version)
+    autoUpdater.checkForUpdates().then(() => {
+    })
+  })
+  // 监听下载命令执行下载
+  ipcMain.on('download-update', () => {
+    autoUpdater.downloadUpdate().then(() => {
+    })
+  })
+
+  const appPath = path.dirname(app.getPath('exe'))
+  const temp = path.dirname(os.tmpdir())
+  const unPackage = `${appPath}/resources/app.asar.unpacked`
+  const unPackageBack = `${appPath}/resources/app.asar.unpacked.back`
+  const zipFile = `${temp}/im/app.zip`
+  const zipUnPackage = `${temp}/im/app.asar.unpacked`
+  // 1. 下载到临时文件夹
+  // 2. 解压到临时文件夹
+  // 3. 备份应用文件夹
+  // 4. 移动临时文件夹到应用文件夹
+  // 5. 异常情况删除应用文件夹重命名备份文件夹
+  log.info('当前文件夹目录', appPath)
+  // 增量下载命令
+  ipcMain.on('download-increment-update', async (event, version) => {
+    if (downloadUpdateIng) {
+      log.info('正在下载.... 不要着急')
+      return
+    }
+    const updateUrl = process.env.VUE_APP_UPDATE_URL + 'asar.unpacked_' + version + '.zip'
+    if (!fs.existsSync(`${temp}/im`)) {
+      fs.mkdirSync(`${temp}/im`)
+    }
+    // 删除旧包
+    if (fs.existsSync(zipFile)) {
+      fs.unlinkSync(zipFile)
+    }
+    downloadUpdateIng = true
+    log.info('最新版本', version, '将从', updateUrl, '请求更新, 写入', zipFile)
+    await update.downloadFile(updateUrl, zipFile).then(() => {
+      log.info('增量文件下载成功')
+      win.webContents.send('increment-update-downloaded')
+    }).catch(() => {
+      downloadUpdateIng = false
+      log.info('最新版本', version, '增量更新处置失败')
+      win.webContents.send('increment-update-fail')
+    })
+    downloadUpdateIng = false
+  })
+  ipcMain.on('increment-install', async () => {
+    try {
+      // 删除旧解压目录
+      if (fs.existsSync(zipUnPackage)) {
+        update.deleteDirSync(zipUnPackage)
+      }
+      // 同步解压缩
+      const unzip = new AdmZip(zipFile, {})
+      unzip.extractAllTo(zipUnPackage, true, false)
+      log.info('app.asar.unpacked.zip 解压缩完成')
+      try {
+        // 删除备份文件夹
+        if (fs.existsSync(unPackageBack)) {
+          update.deleteDirSync(unPackageBack)
+        }
+        // 重命名文件夹
+        if (fs.existsSync(unPackage)) {
+          fs.renameSync(unPackage, unPackageBack)
+        }
+        // 如果不存在,则将加压好的文件夹复制过去
+        if (!fs.existsSync(unPackage)) { // 删除旧备份
+          update.cpSync(zipUnPackage, unPackage) // 创建app来解压用
+        }
+      } catch (e) {
+        log.info('部署失败,待提权处置')
+        // 提权删除备份文件夹, 重命名, 复制文件夹 提权恢复
+        await new Promise((resolve, reject) => {
+          const shell = `ren "${unPackage}" app.asar.unpacked.back &&  mkdir "${unPackage}" && xcopy "${zipUnPackage}" "${unPackage}" /e /y /h /r /q && rd /s /q "${zipUnPackage}"`
+          sudo.exec(shell, { name: 'Electron' }, function (error, stdout, stderr) {
+            if (error) {
+              reject(error)
+              log.info('error:' + error)
+              return
+            }
+            resolve(stdout)
+            log.info('stdout: ' + stdout)
+          })
+        })
+        log.info('提权执行完成')
+      }
+
+      log.info('更新完成，正在重启...')
+      setTimeout(() => {
+        app.relaunch() // 重启
+        app.exit(0)
+      }, 1800)
+    } catch (e) {
+      log.error('增量更新错误', e)
+      win.webContents.send('increment-update-fail')
+      try {
+        if (fs.existsSync(unPackageBack)) {
+          fs.renameSync(unPackageBack, unPackage) // 备份目录
+        }
+      } catch (e) {
+        log.info('部署失败2,待提权处置')
+        // 提权恢复
+        await new Promise((resolve, reject) => {
+          const shell = `rd /s /q "${zipUnPackage}" && ren "${unPackageBack}" app.asar.unpacked &&  mkdir "${unPackage}"`
+          sudo.exec(shell, { name: 'Electron' }, function (error, stdout, stderr) {
+            if (error) {
+              reject(error)
+              log.info('error:' + error)
+              return
+            }
+            resolve(stdout)
+            log.info('stdout: ' + stdout)
+          })
+        })
+        log.info('提权执行完成')
+      }
+    }
+  })
 }

@@ -84,6 +84,7 @@ module.exports = {
                 },
                 win: { // win相关配置
                     icon: '/public/icons/tray.ico', // 图标，当前图标在根目录下，注意这里有两个坑
+                    // requestedExecutionLevel: 'highestAvailable',
                   // eslint-disable-next-line no-template-curly-in-string
                     artifactName: '${productName}_${version}.${ext}',
                     target: [

@@ -118,7 +118,7 @@
 import store from '@/store'
 import { computed, onMounted, ref } from '@vue/composition-api'
 import { downloadDesktop } from '@/utils/desktop-util'
-import { getUserInfo, quitSystem } from '@/net/send-message'
+import { quitSystem } from '@/net/send-message'
 import { mdiAlertOutline, mdiCloudDownloadOutline, mdiCog, mdiExitToApp, mdiLaptop } from '@mdi/js'
 import msg from '@/plugins/msg'
 import ImWarnDialog from '@/components/basic/ImWarnDialog'
@@ -150,7 +150,7 @@ export default {
         quitSystem()
       }
     })
-    const currentUserId = computed(() => store.state.currentUserId)
+    // const currentUserId = computed(() => store.state.currentUserId)
     const curUser = computed(() => store.state.curUser)
     const haveDownloadFile = computed(() => store.getters.haveFileDownloading)
 
@@ -160,7 +160,7 @@ export default {
       })
       msg.$on('SOCKET_CONNECTING', () => {
         if (reconnect.value === true) {
-          getUserInfo(currentUserId.value)
+          // getUserInfo(currentUserId.value)
         }
         reconnect.value = false
       })
