@@ -53,7 +53,6 @@ service.interceptors.response.use(
     return res
   },
   err => {
-      console.log(err)
       if (err.response.status === 502) {
         tip.info('网络错误,请联系管理员')
       }
