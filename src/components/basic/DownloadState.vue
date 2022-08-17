@@ -4,24 +4,19 @@
 
 <script>
 import store from '@/store'
-import { onMounted, ref } from '@vue/composition-api'
+import { onMounted } from '@vue/composition-api'
+import tip from '@/plugins/tip'
 
 export default {
   name: 'DownloadState',
   emits: ['tip'],
-  setup(props, { emit }) {
-    const snackbar = ref({
-      display: false,
-      text: '',
-      timeout: 1000
-    })
-
+  setup() {
     onMounted(() => {
       if (!process.env.IS_ELECTRON) return
       store.commit('clearDownloadingItem')
       window.require('electron').ipcRenderer.on('download-file-start', (event, args) => {
         store.commit('pushDownloadItem', { ...args, state: 'start', receivedBytes: 0, totalBytes: 0 })
-        tip('开始下载')
+        tip.info('开始下载', 1000)
       })
       window.require('electron').ipcRenderer.on('download-file-interrupted', (event, args) => {
         store.commit('updateDownloadItem', { args, status: 'interrupted' })
@@ -34,23 +29,17 @@ export default {
       })
       window.require('electron').ipcRenderer.on('download-file-done', (event, args) => {
         store.commit('updateDownloadItem', { args, status: 'done' })
-        tip('下载完成')
+        tip.info('下载完成', 1000)
       })
       window.require('electron').ipcRenderer.on('download-file-fail', (event, args) => {
         store.commit('removeDownloadItem', args)
-        tip('下载错误,错误的路径或已被清理')
+        tip.info('下载错误,错误的路径或已被清理', 1000)
       })
       window.require('electron').ipcRenderer.on('download-file-cancelled', (event, args) => {
         store.commit('removeDownloadItem', args)
-        tip('下载取消')
+        tip.info('下载取消', 1000)
       })
     })
-
-    const tip = (text) => {
-      snackbar.value.display = true
-      snackbar.value.text = text
-      emit('tip', snackbar.value)
-    }
   }
 }
 </script>

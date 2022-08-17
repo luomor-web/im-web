@@ -128,8 +128,6 @@
           src="@/assets/images/misc/tree-3.png"
       />
     </div>
-
-    <im-tip :snackbar="snackbar" @close="snackbar.display = false" />
   </div>
 </template>
 
@@ -143,15 +141,14 @@ import router from '@/router'
 import localStoreUtil from '@/utils/local-store'
 import sessionStoreUtil from '@/utils/session-store'
 import { userLogin } from '@/net/api'
-import ImTip from '@/components/basic/ImTip'
 import { downloadDesktop } from '@/utils/desktop-util'
 import store from '@/store'
+import tip from '@/plugins/tip'
 
 export default {
 
   name: 'Login',
   components: {
-    ImTip,
     TopBar
   },
   setup() {
@@ -161,11 +158,6 @@ export default {
     const password = ref('')
     const remember = ref(false)
 
-    const snackbar = ref({
-      display: false,
-      text: ''
-    })
-
     const login = () => {
       // startWebSocket(username.value, password.value)
       userLogin({ account: username.value, password: password.value }).then(response => {
@@ -173,8 +165,7 @@ export default {
           sessionStoreUtil.setValue('token', response.data)
           startWebSocket(response.data)
         } else {
-          snackbar.value.display = true
-          snackbar.value.text = response.msg
+          tip.info(response.msg)
         }
       })
     }
@@ -198,8 +189,7 @@ export default {
           }
           router.push('/')
         } else {
-          snackbar.value.display = true
-          snackbar.value.text = data.msg
+          tip.info(data.msg)
           close()
         }
       })
@@ -210,7 +200,7 @@ export default {
       username,
       password,
       remember,
-      snackbar,
+      tip,
 
       login,
       downloadDesktop,

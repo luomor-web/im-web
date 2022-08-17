@@ -52,13 +52,14 @@
 
 <script>
 
-import { computed, onMounted, ref, inject, onUnmounted } from '@vue/composition-api'
+import { computed, onMounted, onUnmounted, ref } from '@vue/composition-api'
 import msg from '@/plugins/msg'
 import { callVideo } from '@/net/send-message'
 import { mdiCamera, mdiCameraOff, mdiMicrophone, mdiMicrophoneOff, mdiPhoneHangup, mdiVideo } from '@mdi/js'
 import UserVideo from '@/components/basic/openvidu/UserVideo'
 import { audioVolume, du, mainStreamManager, session, subStreamManager } from '@/components/basic/openvidu/OpenVidu'
 import store from '@/store'
+import tip from '@/plugins/tip'
 
 export default {
   name: 'ImVideoDialog',
@@ -92,16 +93,10 @@ export default {
     const videoEnabled = ref(true)
     // 放大的视频是不是自己
     const isMainStream = ref(true)
-    const imComponent = inject('imComponent', () => {})
 
     // 当前
     const role = ref('')
-    // 提示框
-    const snackbar = ref({
-      display: false,
-      text: '',
-      timeout: 1000
-    })
+
     // 是否显示弹窗
     const display = ref(false)
     // 是否正在视频中
@@ -234,9 +229,7 @@ export default {
     }
 
     const sendTip = (text) => {
-      snackbar.value.display = true
-      snackbar.value.text = text
-      imComponent.value.tip(snackbar.value)
+      tip.info(text, 1000)
     }
 
     const changeAudio = () => {
@@ -253,7 +246,7 @@ export default {
       room,
       isMainStream,
       display,
-      snackbar,
+      tip,
       videoed,
       role,
       mainStreamManager,

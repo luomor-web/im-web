@@ -86,13 +86,14 @@
   </div>
 </template>
 <script>
-import { computed, inject, onMounted, onUnmounted, ref } from '@vue/composition-api'
+import { computed, onMounted, onUnmounted, ref } from '@vue/composition-api'
 import store from '@/store'
 import { uuid } from '@/utils/id-util'
 import moment from 'moment/moment'
 import { operationEmoticon, searchUserEmoticon, sendChatMessage } from '@/net/send-message'
 import ImUpload from '@/components/basic/ImUpload'
 import msg from '@/plugins/msg'
+import tip from '@/plugins/tip'
 
 export default {
   name: 'EmoticonUser',
@@ -104,30 +105,29 @@ export default {
     const currentUserId = computed(() => store.state.currentUserId)
     const roomId = computed(() => store.state.roomId)
     const upload = ref(null)
-    const imComponent = inject('imComponent', () => {})
     const operationHover = ref(-1)
 
     onMounted(() => {
       msg.$on('EMOTICON_INSERT_TO_USER_MSG', (data) => {
         if (data.success) {
-          imComponent.value.tip({ display: true, text: '新增成功', timeout: 1000 })
+          tip.info('新增成功', 1000)
         }
       })
       msg.$on('EMOTICON_DELETE_MSG', (data) => {
         if (data.success) {
-          imComponent.value.tip({ display: true, text: '删除成功', timeout: 1000 })
+          tip.info('删除成功', 1000)
           closeOptions()
         }
       })
       msg.$on('EMOTICON_MOVE_TOP', (data) => {
         if (data.success) {
-          imComponent.value.tip({ display: true, text: '移动成功', timeout: 1000 })
+          tip.info('移动成功', 1000)
           closeOptions()
         }
       })
       msg.$on('EMOTICON_INSERT_TO_STORE', (data) => {
         if (data.success) {
-          imComponent.value.tip({ display: true, text: '分享成功', timeout: 1000 })
+          tip.info('分享成功', 1000)
           closeOptions()
         }
       })

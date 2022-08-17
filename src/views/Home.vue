@@ -96,6 +96,7 @@ import { scrollToTop } from '@/utils/dom'
 import EmoticonSearch from '@/components/room/EmoticonSearch'
 import EmoticonUser from '@/components/room/EmoticonUser'
 import { userGroupConfig } from '../net/send-message'
+import tip from '@/plugins/tip'
 
 export default {
   name: 'Home',
@@ -267,7 +268,7 @@ export default {
     const addEmoticon = ({ action, file }) => {
       const index = userEmoticons.value.findIndex(x => x._id === file._id)
       if (index !== -1) {
-        imComponent.value.tip({ display: true, text: '已存在于库中', timeout: 1000 })
+        tip.info('已存在于库中', 1000)
         return
       }
       const data = {
@@ -275,7 +276,7 @@ export default {
         type: 'INSERT_EMOTICON_TO_USER'
       }
       operationEmoticon(data)
-      imComponent.value.tip({ display: true, text: '添加成功', timeout: 1000 })
+      tip.info('添加成功', 1000)
     }
 
     return {

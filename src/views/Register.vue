@@ -179,35 +179,29 @@
           src="@/assets/images/misc/tree-3.png"
       />
     </div>
-    <im-tip :snackbar="snackbar" @close="snackbar.display = false" />
   </div>
 </template>
 
 <script>
-import ImTip from '@/components/basic/ImTip'
 import TopBar from '../components/basic/TopBar'
 import { mdiCheckCircleOutline, mdiCloseCircleOutline, mdiEyeOffOutline, mdiEyeOutline } from '@mdi/js'
 import { ref } from '@vue/composition-api'
 import { checkAccountAuth, registerUser } from '@/net/api'
 import router from '@/router'
 import { questions } from '@/locales/account-questions'
+import tip from '@/plugins/tip'
 
 export default {
 
   name: 'Register',
   components: {
-    TopBar,
-    ImTip
+    TopBar
   },
   setup() {
     const isElectron = ref(process.env.IS_ELECTRON)
     const from = ref(null)
     const fromQuestion = ref(null)
     const el = ref(1)
-    const snackbar = ref({
-      display: false,
-      text: ''
-    })
     const registerFrom = ref({
       account: '',
       username: '',
@@ -251,8 +245,7 @@ export default {
     const next = () => {
       if (!from.value.validate()) return
       if (!checkAccount.value.success) {
-        snackbar.value.display = true
-        snackbar.value.text = '账号不可用'
+        tip.info('账号不可用')
         return
       }
       el.value = 2
@@ -263,8 +256,7 @@ export default {
       if (!validate) return
 
       registerUser(registerFrom.value).then(response => {
-        snackbar.value.text = response.msg
-        snackbar.value.display = true
+        tip.info(response.msg)
         if (response.success) {
           from.value.reset()
           router.push('/login')
@@ -304,7 +296,6 @@ export default {
       fromQuestion,
       checkAccount,
       rules,
-      snackbar,
       questions,
 
       register,

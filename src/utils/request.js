@@ -1,4 +1,5 @@
 import axios from 'axios'
+import tip from '@/plugins/tip'
 // import store from '@/store'
 
 // create an axios instance
@@ -52,6 +53,10 @@ service.interceptors.response.use(
     return res
   },
   err => {
+      console.log(err)
+      if (err.response.status === 502) {
+        tip.info('网络错误,请联系管理员')
+      }
       const config = err.config
       // If config does not exist or the retry option is not set, reject
       if (!config || !config.retry) return Promise.reject(err)

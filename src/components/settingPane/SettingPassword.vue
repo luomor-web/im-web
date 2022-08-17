@@ -49,10 +49,11 @@
 <script>
 import DrawerTop from '@/components/basic/DrawerTop'
 import store from '@/store'
-import { inject, onMounted, onUnmounted, ref, watch } from '@vue/composition-api'
+import { onMounted, onUnmounted, ref, watch } from '@vue/composition-api'
 import { mdiCheck } from '@mdi/js'
 import { setNewPassword } from '@/net/send-message'
 import msg from '@/plugins/msg'
+import tip from '@/plugins/tip'
 
 export default {
   name: 'SettingPassword',
@@ -82,24 +83,14 @@ export default {
         v => (v && v === passwordFrom.value.password) || '重复密码与密码不相同'
       ]
     })
-    // 提示框
-    const snackbar = ref({
-      display: false,
-      text: '',
-      timeout: 1000
-    })
-    const imComponent = inject('imComponent', () => {})
+
     onMounted(() => {
       msg.$on('COMMAND_SET_NEW_PASSWORD_RESP', (data) => {
         if (data.success) {
-          snackbar.value.text = '修改成功'
-          snackbar.value.display = true
-          imComponent.value.tip(snackbar.value)
+          tip.info('修改成功', 1000)
           open('SETTING_ITEM')
         } else {
-          snackbar.value.text = data.msg
-          snackbar.value.display = true
-          imComponent.value.tip(snackbar.value)
+          tip.info(data.msg, 1000)
         }
       })
     })

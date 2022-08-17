@@ -77,10 +77,11 @@
 <script>
 import UserVideo from '../basic/openvidu/UserVideo'
 import DrawerTop from '@/components/basic/DrawerTop'
-import { computed, inject, onMounted, onUnmounted, ref } from '@vue/composition-api'
+import { computed, onMounted, onUnmounted, ref } from '@vue/composition-api'
 import store from '@/store'
 import { mdiPlay, mdiStop } from '@mdi/js'
 import { audioVolume, du, getDeviceList, mainStreamManager } from '../basic/openvidu/OpenVidu'
+import tip from '@/plugins/tip'
 
 export default {
   name: 'SettingVideo',
@@ -98,23 +99,8 @@ export default {
     const videoChecking = ref(false)
     const audios = ref([])
     const videos = ref([])
-    const imComponent = inject('imComponent', () => {})
-
-    // 提示框
-    const snackbar = ref({
-      display: false,
-      text: '',
-      timeout: 1000
-    })
 
     onMounted(async () => {
-      // if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      //   await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-      //     stream.getTracks().forEach(x => x.stop())
-      //   }).catch(e => {
-      //     console.log(e)
-      //   })
-      // }
       await initDeviceList()
       audioSelect.value = audioStore.value
       videoSelect.value = videoStore.value
@@ -155,9 +141,7 @@ export default {
         audioSource: audioStore.value,
         videoSource: videoStore.value
       }, (text) => {
-        snackbar.value.display = true
-        snackbar.value.text = text
-        imComponent.value.tip(snackbar.value)
+        tip.info(text)
       })
     }
 

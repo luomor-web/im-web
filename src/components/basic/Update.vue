@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-snackbar
-      v-model="snackbar"
+      v-model="notice"
       :vertical="true"
       :timeout="-1"
       right
@@ -24,7 +24,7 @@
           color="error"
           text
           v-bind="attrs"
-          @click="snackbar = false"
+          @click="notice = false"
         >
           关闭
         </v-btn>
@@ -46,7 +46,7 @@ export default {
     const isElectron = ref(process.env.IS_ELECTRON)
 
     const version = ref(null)
-    const snackbar = ref(false)
+    const notice = ref(false)
     const text = ref('')
     const incrementUpdateFail = ref(false)
     const incrementUpdate = ref(true)
@@ -86,18 +86,18 @@ export default {
         })
         // 全量更新下载成功
         window.require('electron').ipcRenderer.on('update-downloaded', () => {
-          snackbar.value = true
+          notice.value = true
           text.value = `新版本: v${version.value},安装包下载成功,点击重启进行安装更新`
         })
         // 增量更新下载成功
         window.require('electron').ipcRenderer.on('increment-update-downloaded', () => {
-          snackbar.value = true
+          notice.value = true
           text.value = `新版本: v${version.value},本次更新为增量更新,点击重启即可更新`
         })
         window.require('electron').ipcRenderer.on('increment-update-fail', () => {
           incrementUpdate.value = false
           incrementUpdateFail.value = true
-          snackbar.value = true
+          notice.value = true
           text.value = `新版本: v${version.value},增量更新处置失败,请联系管理员或点击下载进行全量更新`
         })
         checkUpdate()
@@ -135,7 +135,7 @@ export default {
     }
 
     return {
-      snackbar,
+      notice,
       text,
       version,
       forceUpdate,

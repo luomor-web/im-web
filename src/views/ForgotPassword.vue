@@ -186,25 +186,23 @@
           src="@/assets/images/misc/tree-3.png"
       />
     </div>
-    <im-tip :snackbar="snackbar" @close="snackbar.display = false" />
   </div>
 </template>
 
 <script>
-import ImTip from '@/components/basic/ImTip'
 import TopBar from '../components/basic/TopBar'
 import { mdiCheckCircleOutline, mdiCloseCircleOutline, mdiEyeOffOutline, mdiEyeOutline } from '@mdi/js'
 import { ref } from '@vue/composition-api'
 import { checkAccountAuth, checkAccountQuestion, reset } from '@/net/api'
 import router from '@/router'
 import { questions } from '@/locales/account-questions'
+import tip from '@/plugins/tip'
 
 export default {
 
   name: 'Register',
   components: {
-    TopBar,
-    ImTip
+    TopBar
   },
   setup() {
     const isElectron = ref(process.env.IS_ELECTRON)
@@ -213,10 +211,7 @@ export default {
     const fromReset = ref(null)
     const el = ref(1)
     const loading = ref(false)
-    const snackbar = ref({
-      display: false,
-      text: ''
-    })
+
     const forgotFrom = ref({
       answer: '',
       question: 'CITY',
@@ -257,8 +252,7 @@ export default {
           fromReset.value.reset()
           router.push('/login')
         } else {
-          snackbar.value.display = true
-          snackbar.value.text = response.msg
+          tip.info(response.msg)
         }
       })
     }
@@ -273,8 +267,7 @@ export default {
         if (response.success) {
           el.value = 3
         } else {
-          snackbar.value.display = true
-          snackbar.value.text = response.msg
+          tip.info(response.msg)
         }
       })
     }
@@ -287,8 +280,7 @@ export default {
       checkAccountAuth({ account: forgotFrom.value.account }).then(response => {
         loading.value = false
         if (response.success) {
-          snackbar.value.display = true
-          snackbar.value.text = '该账号不存在'
+          tip.info('该账号不存在')
         } else {
           el.value = 2
         }
@@ -302,7 +294,6 @@ export default {
       fromReset,
       forgotFrom,
       rules,
-      snackbar,
       loading,
       questions,
 
