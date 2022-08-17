@@ -134,7 +134,7 @@
 </template>
 <script>
 
-import { computed, onMounted, onUnmounted, ref, watch } from '@vue/composition-api'
+import { computed, ref, watch } from '@vue/composition-api'
 import store from '@/store'
 import msg from '@/plugins/msg'
 import { uuid } from '@/utils/id-util'
@@ -172,23 +172,17 @@ export default {
       GROUP: ''
     })
 
-    onMounted(() => {
-      msg.$on('COMMAND_SEARCH_USER_RESP', onSearchUserResp)
-      msg.$on('COMMAND_SEARCH_GROUP_RESP', onSearchGroupResp)
-    })
-
-    onUnmounted(() => {
-      msg.$off('COMMAND_SEARCH_USER_RESP')
-      msg.$off('COMMAND_SEARCH_GROUP_RESP')
-    })
-
     watch(() => props.model, model => {
-      console.log('状态变化', model, props.types)
       if (model) {
+        msg.$on('COMMAND_SEARCH_USER_RESP', onSearchUserResp)
+        msg.$on('COMMAND_SEARCH_GROUP_RESP', onSearchGroupResp)
         if (props.users) selectData.value.users = [...props.users]
-        if (props.types.includes('CHAT')) filterLoadedRooms.value = loadedRooms.value
+        if (props.types.includes('CHAT')) {
+          filterLoadedRooms.value = loadedRooms.value
+        }
       } else {
-        console.log('重置')
+        msg.$off('COMMAND_SEARCH_USER_RESP')
+        msg.$off('COMMAND_SEARCH_GROUP_RESP')
         groupList.value = []
         userList.value = []
         selectData.value.chats = []
@@ -201,7 +195,6 @@ export default {
     })
 
     watch(tab, (newVal, oldVal) => {
-      console.log('tab变化', newVal)
       if (oldVal !== null && searchName.value !== lastSearchName.value[props.types[newVal]]) {
         searchNameChange(searchName.value)
       }
@@ -209,7 +202,6 @@ export default {
 
     const onIntersect = (entries) => {
       if (entries[0].isIntersecting && props.model) {
-        console.log('触发')
         const type = props.types[tab.value]
         switch (type) {
           case 'PERSON':
@@ -238,9 +230,7 @@ export default {
 
     const onSearchGroupResp = (data) => {
       const { searchId: requestId, roomList: returnList } = data.data
-      console.log(requestId, '1', searchId.value)
       if (requestId !== searchId.value) return
-      console.log('返回')
       for (const group of returnList) {
         const index = groupList.value.findIndex(r => r.roomId === group.roomId)
         if (index === -1) {
@@ -253,19 +243,17 @@ export default {
     }
 
     const searchUserReq = (name) => {
-      if (searchId.value) return
+      if (searchId.value.trim()) return
       const userId = userList.value.length > 0 ? userList.value[userList.value.length - 1]._id : ''
       searchId.value = uuid()
       searchUser(name, userId, searchId.value)
     }
 
     const searchGroupReq = (name) => {
-      console.log('搜索群组')
-      if (searchId.value) return
+      if (searchId.value.trim()) return
       const roomId = groupList.value.length > 0 ? groupList.value[groupList.value.length - 1].roomId : ''
       searchId.value = uuid()
       searchGroup(name, roomId, searchId.value)
-      console.log(searchId.value)
     }
 
     const searchNameChange = (name) => {

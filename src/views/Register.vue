@@ -26,83 +26,123 @@
               </h2>
             </router-link>
           </v-card-title>
+          <v-stepper v-model="el" elevation="0" non-linear>
+            <v-stepper-header>
+              <v-stepper-step step="1" editable>
+               账户信息
+              </v-stepper-step>
 
-          <!-- title -->
-          <v-card-text>
-            <p class="text-2xl font-weight-semibold text--primary mb-2">
-              欢迎来到信使 Welcome to Courier! 👋🏻
-            </p>
-          </v-card-text>
+              <v-divider />
 
-          <!-- login form -->
-          <v-card-text>
-            <v-form ref="from">
-              <v-text-field
-                  v-model="registerFrom.account"
-                  outlined
-                  label="登录账号"
-                  placeholder="登录账号"
-                  :rules="rules.account"
-                  hide-details="auto"
-                  class="mb-3"
-                  :loading="checkAccount.loading"
-                  @blur="accountBlur"
-              >
-                <template v-if="checkAccount.displayIcon" #append>
-                  <v-tooltip
-                      bottom
-                  >
-                    <template #activator="{ on }">
-                      <v-icon v-on="on">
-                        {{ checkAccount.success ? icons.mdiCheckCircleOutline : icons.mdiCloseCircleOutline }}
-                      </v-icon>
-                    </template>
-                    {{ checkAccount.tip }}
-                  </v-tooltip>
-                </template>
-              </v-text-field>
+              <v-stepper-step step="2">
+                验证信息
+              </v-stepper-step>
+            </v-stepper-header>
+            <!-- login form -->
+            <v-stepper-items>
+              <v-stepper-content step="1">
+                <v-card-text>
+                  <v-form ref="from">
+                    <v-text-field
+                      v-model="registerFrom.account"
+                      outlined
+                      label="登录账号"
+                      placeholder="登录账号"
+                      :rules="rules.account"
+                      hide-details="auto"
+                      class="mb-3"
+                      :loading="checkAccount.loading"
+                      @blur="accountBlur"
+                    >
+                      <template v-if="checkAccount.displayIcon" #append>
+                        <v-tooltip
+                          bottom
+                        >
+                          <template #activator="{ on }">
+                            <v-icon v-on="on">
+                              {{ checkAccount.success ? icons.mdiCheckCircleOutline : icons.mdiCloseCircleOutline }}
+                            </v-icon>
+                          </template>
+                          {{ checkAccount.tip }}
+                        </v-tooltip>
+                      </template>
+                    </v-text-field>
 
-              <v-text-field
-                  v-model="registerFrom.username"
-                  outlined
-                  label="用户名"
-                  placeholder="用户名"
-                  :rules="rules.username"
-                  hide-details="auto"
-                  class="mb-3"
-              />
+                    <v-text-field
+                      v-model="registerFrom.username"
+                      outlined
+                      label="用户名"
+                      placeholder="用户名"
+                      :rules="rules.username"
+                      hide-details="auto"
+                      class="mb-3"
+                    />
 
-              <v-text-field
-                  v-model="registerFrom.password"
-                  type="password"
-                  outlined
-                  label="密码"
-                  placeholder="密码"
-                  :rules="rules.password"
-                  hide-details="auto"
-                  class="mb-3"
-              />
+                    <v-text-field
+                      v-model="registerFrom.password"
+                      type="password"
+                      outlined
+                      label="密码"
+                      placeholder="密码"
+                      :rules="rules.password"
+                      hide-details="auto"
+                      class="mb-3"
+                    />
 
-              <v-text-field
-                  v-model="registerFrom.repeatPassword"
-                  type="password"
-                  outlined
-                  label="重复密码"
-                  placeholder="重复密码"
-                  :rules="rules.repeatPassword"
-                  hide-details="auto"
-              />
+                    <v-text-field
+                      v-model="registerFrom.repeatPassword"
+                      type="password"
+                      outlined
+                      label="重复密码"
+                      placeholder="重复密码"
+                      :rules="rules.repeatPassword"
+                      hide-details="auto"
+                    />
 
-              <v-btn
-                  block
-                  color="primary"
-                  class="mt-6"
-                  @click="register"
-              >
-                注册
-              </v-btn>
-            </v-form>
-          </v-card-text>
+                    <v-btn
+                      block
+                      color="primary"
+                      class="mt-6"
+                      @click="next"
+                    >
+                      下一步
+                    </v-btn>
+                  </v-form>
+                </v-card-text>
+              </v-stepper-content>
+              <v-stepper-content step="2">
+                <v-card-text>
+                    <v-form ref="fromQuestion">
+                      <v-select
+                        v-model="registerFrom.question"
+                        :items="questions"
+                        item-text="value"
+                        item-value="id"
+                        label="安全问题"
+                        outlined
+                      />
+                      <v-text-field
+                        v-model="registerFrom.answer"
+                        outlined
+                        label="答案"
+                        placeholder="答案"
+                        :rules="rules.answer"
+                        hide-details="auto"
+                        class="mb-3"
+                      />
+                    </v-form>
+                    <v-btn
+                      block
+                      color="primary"
+                      class="mt-6"
+                      @click="register"
+                    >
+                      确定
+                    </v-btn>
+                </v-card-text>
+              </v-stepper-content>
+            </v-stepper-items>
+          </v-stepper>
 
           <!-- create new account  -->
           <v-card-text class="d-flex align-center justify-center flex-wrap mt-2">
@@ -150,6 +190,7 @@ import { mdiCheckCircleOutline, mdiCloseCircleOutline, mdiEyeOffOutline, mdiEyeO
 import { ref } from '@vue/composition-api'
 import { checkAccountAuth, registerUser } from '@/net/api'
 import router from '@/router'
+import { questions } from '@/locales/account-questions'
 
 export default {
 
@@ -161,6 +202,8 @@ export default {
   setup() {
     const isElectron = ref(process.env.IS_ELECTRON)
     const from = ref(null)
+    const fromQuestion = ref(null)
+    const el = ref(1)
     const snackbar = ref({
       display: false,
       text: ''
@@ -169,7 +212,9 @@ export default {
       account: '',
       username: '',
       password: '',
-      repeatPassword: ''
+      repeatPassword: '',
+      question: '',
+      answer: ''
     })
 
     const checkAccount = ref({
@@ -183,6 +228,10 @@ export default {
       account: [
         v => !!v || '登录账号必填',
         v => v.length <= 10 || '登录账号不能超过十个字符'
+      ],
+      answer: [
+        v => !!v || '答案必填',
+        v => v.length <= 16 || '用户名不能超过十六字符'
       ],
       username: [
         v => !!v || '用户名必填',
@@ -198,6 +247,16 @@ export default {
         v => v === registerFrom.value.password || '重复密码与密码不相同'
       ]
     })
+
+    const next = () => {
+      if (!from.value.validate()) return
+      if (!checkAccount.value.success) {
+        snackbar.value.display = true
+        snackbar.value.text = '账号不可用'
+        return
+      }
+      el.value = 2
+    }
 
     const register = () => {
       const validate = from.value.validate()
@@ -238,11 +297,15 @@ export default {
     }
 
     return {
+      el,
       from,
+      next,
       registerFrom,
+      fromQuestion,
       checkAccount,
       rules,
       snackbar,
+      questions,
 
       register,
       accountBlur,

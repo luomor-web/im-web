@@ -49,6 +49,22 @@ export function checkAccountAuth(data) {
     })
 }
 
+export function checkAccountQuestion(data) {
+    return request({
+        url: '/account/check/question',
+        method: 'get',
+        params: data
+    })
+}
+
+export function reset(data) {
+  return request({
+    url: '/account/reset',
+    method: 'put',
+    data
+  })
+}
+
 export function pushVideoStream(data, userId) {
     return request({
         url: '/webrtc/publish?streamPath=live/' + userId,

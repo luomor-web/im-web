@@ -9,7 +9,7 @@
         客户端下载
       </v-btn>
     </div>
-    <div class="auth-wrapper auth-v1">
+    <div class="auth-wrapper auth-v1" @keypress.enter="login">
       <div class="auth-inner">
         <v-card class="auth-card">
           <!-- logo -->
@@ -74,9 +74,10 @@
                 <!-- forgot link -->
                 <a
                     class="mt-1"
-                    @click="forgotPassword"
                 >
+                  <router-link :to="{name:'Forgot'}">
                   忘记密码
+                </router-link>
                 </a>
               </div>
 
@@ -85,6 +86,7 @@
                   color="primary"
                   class="mt-6"
                   @click="login"
+                  @keypress.native.enter="login"
               >
                 登录
               </v-btn>
@@ -203,10 +205,6 @@ export default {
       })
     })
 
-    const forgotPassword = () => {
-
-    }
-
     return {
       isPasswordVisible,
       username,
@@ -215,7 +213,6 @@ export default {
       snackbar,
 
       login,
-      forgotPassword,
       downloadDesktop,
 
       icons: {

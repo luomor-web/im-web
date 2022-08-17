@@ -31,10 +31,10 @@ export default (scheme, serverPath = __dirname) => {
                     mimeType = 'application/json'
                 } else if (extension === '.wasm') {
                     mimeType = 'application/wasm'
-                } else if (extension === ".ico") {
-                    mimeType = "image/x-icon";
-                } else if (extension === ".wav") {
-                    mimeType = "audio/mpeg";
+                } else if (extension === '.ico') {
+                    mimeType = 'image/x-icon';
+                } else if (extension === '.wav') {
+                    mimeType = 'audio/mpeg';
                 }
                 respond({ mimeType, data })
             })
