@@ -30,7 +30,7 @@ export default {
   setup() {
     const showAnnouncement = ref(false)
     const room = computed(() => store.getters.curRoom)
-    const isGroup = computed(() => !room.value.isFriend && !room.value.isSystem)
+    const isGroup = computed(() => room.value && !room.value.isFriend && !room.value.isSystem)
     const announcement = ref({ })
 
     onMounted(() => {
@@ -50,7 +50,7 @@ export default {
     })
 
     watch(room, (val, old) => {
-      if (val.roomId !== old.roomId) {
+      if (old && val.roomId !== old.roomId) {
         showAnnouncement.value = false
       }
     })
