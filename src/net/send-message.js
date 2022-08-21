@@ -235,6 +235,15 @@ const setPublicRoom = (data) => {
   sendMsg(param)
 }
 
+// 设置群组公开
+const commitAnnouncement = (data) => {
+  const param = {
+    cmd: 69,
+    ...data
+  }
+  sendMsg(param)
+}
+
 const quitSystem = () => {
   store.commit('resetData')
   close()
@@ -311,5 +320,6 @@ export {
   searchUserEmoticon,
   setPublicRoom,
   searchGroup,
-  setNewPassword
+  setNewPassword,
+  commitAnnouncement
 }

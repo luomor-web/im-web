@@ -52,7 +52,7 @@ export default {
 
     // 获取历史消息响应
     COMMAND_GET_MESSAGE_RESP: (state, data) => {
-        const { type, messages: loadMessages, returnDefault } = data.data
+        const { type, messages: loadMessages, returnDefault, groupAnnouncementRead } = data.data
         if (loadMessages.length === 0) {
             nextTick(() => {
                 if (type === 'DOWN') {
@@ -84,6 +84,10 @@ export default {
                     store.commit('setMessageLoaded', true)
                 }
             })
+        }
+
+        if (!groupAnnouncementRead) {
+          msg.$emit('SHOW_ANNOUNCEMENT')
         }
     },
 
@@ -374,6 +378,20 @@ export default {
           state.emoticons.unshift(emoticon)
           msg.$emit('EMOTICON_INSERT_TO_STORE', data)
           break
+      }
+    },
+
+    COMMAND_GROUP_ANNOUNCEMENT_RESP: (state, data) => {
+      console.log(data.data)
+      const announcement = data.data
+      const index = state.loadedRooms.findIndex(r => r.roomId === announcement.roomId)
+      state.loadedRooms[index] = {
+        ...state.loadedRooms[index],
+        announcement
+      }
+      state.loadedRooms = [...state.loadedRooms]
+      if (state.loadedRooms[index].roomId === state.roomId) {
+        msg.$emit('SHOW_ANNOUNCEMENT', announcement)
       }
     }
 

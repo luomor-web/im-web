@@ -60,6 +60,9 @@
           mdi-heart-outline
         </v-icon>
       </template>
+      <template #room-announcement>
+        <room-announcement />
+      </template>
     </chat-window>
     <im-component ref="imComponent" />
   </div>
@@ -97,10 +100,12 @@ import EmoticonSearch from '@/components/room/EmoticonSearch'
 import EmoticonUser from '@/components/room/EmoticonUser'
 import { userGroupConfig } from '../net/send-message'
 import tip from '@/plugins/tip'
+import RoomAnnouncement from '@/components/room/RoomAnnouncement'
 
 export default {
   name: 'Home',
   components: {
+    RoomAnnouncement,
     EmoticonUser,
     EmoticonSearch,
     ImComponent,

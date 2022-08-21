@@ -1,6 +1,6 @@
 {
   "name": "im-web",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": true,
   "description": "信使",
   "author": "礼貌",
@@ -21,7 +21,7 @@
     "@vue/composition-api": "^1.4.0",
     "@vuetify/cli-plugin-utils": "^0.0.10",
     "adm-zip": "^0.5.9",
-    "alispig-advanced-chat": "1.5.6-bate.7",
+    "alispig-advanced-chat": "1.5.6-bate.8",
     "axios": "^0.23.0",
     "core-js": "^3.19.1",
     "fs-extra": "^10.1.0",

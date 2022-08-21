@@ -38,6 +38,17 @@
               <v-switch v-model="notice" @change="noticeChange" />
             </v-list-item-action>
           </v-list-item>
+          <v-list-item v-if="isGroup" v-ripple class="im-list-item" @click="open('ANNOUNCEMENT_SETTING')">
+            <v-list-item-icon>
+              <v-icon>{{ icons.mdiNoteTextOutline }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>群公告</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-list-item-action>
+          </v-list-item>
         </v-list>
       </div>
     </div>
@@ -90,7 +101,7 @@
 
 <script>
 import { joinUserGroup, userGroupConfig } from '@/net/send-message'
-import { mdiBellOffOutline, mdiBellOutline, mdiPencilOutline, mdiPlus } from '@mdi/js'
+import { mdiBellOffOutline, mdiBellOutline, mdiNoteTextOutline, mdiPencilOutline, mdiPlus } from '@mdi/js'
 import DrawerTop from '@/components/basic/DrawerTop'
 import ImDriver from '@/components/basic/ImDriver'
 import { computed, onMounted, ref, watch } from '@vue/composition-api'
@@ -175,6 +186,7 @@ export default {
 
       icons: {
         mdiBellOutline,
+        mdiNoteTextOutline,
         mdiBellOffOutline,
         mdiPencilOutline,
         mdiPlus

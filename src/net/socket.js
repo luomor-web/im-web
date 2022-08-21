@@ -133,6 +133,11 @@ const webSocket = (token) => {
             case 66:
                 msg.$emit('COMMAND_SET_NEW_PASSWORD_RESP', data)
                 break
+          // 群公告响应
+            case 70:
+                store.commit('COMMAND_GROUP_ANNOUNCEMENT_RESP', data)
+                msg.$emit('COMMAND_GROUP_ANNOUNCEMENT_RESP', data)
+                break
             default:
                 break
         }

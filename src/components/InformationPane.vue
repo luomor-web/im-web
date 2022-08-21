@@ -17,6 +17,9 @@
         <v-window-item value="GROUP_HANDOVER_ADMIN">
           <group-handover-admin />
         </v-window-item>
+        <v-window-item value="ANNOUNCEMENT_SETTING">
+          <notice-setting />
+        </v-window-item>
         <v-window-item value="MESSAGE_HISTORY">
           <message-history />
         </v-window-item>
@@ -34,10 +37,11 @@ import GroupHandoverAdmin from '@/components/informationPane/GroupHandoverAdmin'
 import MessageHistory from '@/components/informationPane/MessageHistory'
 import store from '@/store'
 import GroupSetting from '@/components/informationPane/GroupSetting'
+import NoticeSetting from '@/components/informationPane/AnnouncementSetting'
 
 export default {
   name: 'InformationPane',
-  components: { GroupSetting, MessageHistory, GroupHandoverAdmin, GroupUserManage, GroupEdit, RoomInfo },
+  components: { NoticeSetting, GroupSetting, MessageHistory, GroupHandoverAdmin, GroupUserManage, GroupEdit, RoomInfo },
   setup() {
     const room = computed(() => store.getters.curRoom)
     const informationPane = computed(() => store.state.informationPane)
