@@ -285,6 +285,18 @@ export default {
         state.loadedRooms = [...state.loadedRooms]
     },
 
+    // 设置群公开响应
+    COMMAND_SET_PUBLIC_ROOM_RESP: (state, data) => {
+      const { roomId: changeRoomId, publicRoom } = data.data
+      const index = state.loadedRooms.findIndex(r => r.roomId === changeRoomId)
+      state.loadedRooms[index] = {
+        ...state.loadedRooms[index],
+        publicRoom
+      }
+
+      state.loadedRooms = [...state.loadedRooms]
+    },
+
     // 删除群组信息响应
     COMMAND_MESSAGE_DELETE_RESP: (state, data) => {
         const { _id, roomId: messageRoomId, isLastMessage } = data.data

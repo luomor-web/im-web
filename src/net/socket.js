@@ -123,7 +123,7 @@ const webSocket = (token) => {
                 break
             // 设置群组公开
             case 62:
-                // store.commit('COMMAND_SET_PUBLIC_ROOM_RESP', data)
+                store.commit('COMMAND_SET_PUBLIC_ROOM_RESP', data)
                 break
             // 操作用户表情包
             case 64:
