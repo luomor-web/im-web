@@ -37,7 +37,7 @@
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^4.1.0",
     "websocket-heartbeat-js": "^1.0.13",
-    "sudo-prompt": "https://github.com/xuxingeren/sudo-prompt.git"
+    "alispig-sudo-prompt": "9.2.1"
   },
   "devDependencies": {
     "@mdi/font": "^6.8.96",
