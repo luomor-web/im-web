@@ -87,7 +87,9 @@ export default {
     const currentUserId = computed(() => store.state.currentUserId)
     const announcementContent = ref('')
     const showSure = computed(() => {
-      return (room.value.announcement ? room.value.announcement.content.replace('[群公告]\r\n', '') : '') !== announcementContent.value
+      return (room.value.announcement ?
+        room.value.announcement.content.replace('[群公告]\r\n', '').replace('[群公告]\n', '')
+        : '') !== announcementContent.value
     })
     // 当前用户
     const curUser = ref(null)
@@ -120,7 +122,9 @@ export default {
 
     const resetAnnouncementContent = () => {
       setTimeout(() => {
-        announcementContent.value = room.value.announcement ? room.value.announcement.content.replace('[群公告]\r\n', '') : ''
+        announcementContent.value = room.value.announcement
+          ? room.value.announcement.content.replace('[群公告]\r\n', '').replace('[群公告]\n', '')
+          : ''
       }, 100)
     }
 
