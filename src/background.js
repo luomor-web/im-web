@@ -12,7 +12,7 @@ import update from '@/utils/update'
 import * as fs from 'fs'
 import AdmZip from 'adm-zip'
 import os from 'os'
-import sudo from 'sudo-prompt'
+import sudo from 'alispig-sudo-prompt'
 
 const resources = process.resourcesPath
 
