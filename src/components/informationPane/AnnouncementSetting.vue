@@ -87,8 +87,8 @@ export default {
     const currentUserId = computed(() => store.state.currentUserId)
     const announcementContent = ref('')
     const showSure = computed(() => {
-      return (room.value.announcement ?
-        room.value.announcement.content.replace('[群公告]\r\n', '').replace('[群公告]\n', '')
+      return (room.value.announcement
+        ? room.value.announcement.content.replace('[群公告]\r\n', '').replace('[群公告]\n', '')
         : '') !== announcementContent.value
     })
     // 当前用户
